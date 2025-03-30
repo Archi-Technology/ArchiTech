@@ -1,0 +1,148 @@
+###
+
+POST http://localhost:5000/api/auth/register
+content-type: application/json
+
+{
+    "username": "daniel2234",
+    "password": "daniel34",
+    "email": "dnaielgmail34.com"
+}
+
+###
+POST http://localhost:5000/api/auth/login
+content-type: application/json
+
+{
+    "username": "daniel2234",
+    "password": "daniel34"
+}
+
+###
+POST http://localhost:5000/api/auth/refresh
+content-type: application/json
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzUzNDUwY2M3NDc2OWI1NTZlNDdkNjMiLCJpYXQiOjE3MzM1MTA0NTUsImV4cCI6MTczMzU0NjQ1NX0.jO3FokENigSM6IsaagxKrDMwNd8IhuoJr5fXZtMpwus
+
+###
+POST http://localhost:5000/api/auth/logout
+content-type: application/json
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzUzNDUwY2M3NDc2OWI1NTZlNDdkNjMiLCJpYXQiOjE3MzM1MTA0MjEsImV4cCI6MTczMzU0NjQyMX0.R_5_kpCnla0ICZtc9M2VW-nGXqE3XzSsQa9RXAeeHF4
+
+
+###
+GET http://localhost:5000/api/user/data
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzUzNDUwY2M3NDc2OWI1NTZlNDdkNjMiLCJpYXQiOjE3MzM1NzQxMDYsImV4cCI6MTczMzYxMDEwNn0.0qlILcv0hKNG99zhojjINBxVDCNGS7ZK5--QBHW2M3I
+
+###
+GET http://localhost:5000/api/user/676e9b27ff81114500e61db8/posts
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzZlOWIyN2ZmODExMTQ1MDBlNjFkYjgiLCJpYXQiOjE3MzUzMDU5MDgsImV4cCI6MTczNTMwOTUwOH0.OoOgsTbyKYYOuc_YYosFpNlVZRL3hbK3EDsLLI_Nv4E
+
+###
+PUT http://localhost:5000/api/user/update
+content-type: application/json
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzUyZWYwOTEwZmI0MDQ5ZTU2NzgwNzIiLCJpYXQiOjE3MzM0ODgzOTMsImV4cCI6MTczMzQ5MTk5M30.uytVeQD8xawjosofDXqIRTCDEKIjLp-H-SsKC1hGzHg
+
+{
+    "username": "daniel2233-new",
+    "image": "daniel.png"
+}
+
+
+###
+POST http://localhost:5000/api/user/create
+content-type: application/json
+
+{
+    "username": "daniel1231",
+    "password": "daniel1231",
+    "email": "dnaielgmail21.com"
+}
+
+
+//add security logic
+###
+DELETE  http://localhost:5000/api/user/6752ef8210fb4049e567807a
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzUyZWYwOTEwZmI0MDQ5ZTU2NzgwNzIiLCJpYXQiOjE3MzM0ODgzOTMsImV4cCI6MTczMzQ5MTk5M30.uytVeQD8xawjosofDXqIRTCDEKIjLp-H-SsKC1hGzHg
+
+###
+POST http://localhost:5000/api/post/create
+content-type: application/json
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzZlOWIyN2ZmODExMTQ1MDBlNjFkYjgiLCJpYXQiOjE3MzUzMDE5MjcsImV4cCI6MTczNTMwNTUyN30.fnZAT6G49RlAgqT2YcsK3zpD6Zo3LW5QIkp6PwhL40I
+
+{
+    "text": "daniel123-ceck",
+    "image": "did.png"
+}
+
+
+###
+
+POST http://localhost:5000/api/post/create/ai
+content-type: application/json
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzZlOWIyN2ZmODExMTQ1MDBlNjFkYjgiLCJpYXQiOjE3MzUzMDE5MjcsImV4cCI6MTczNTMwNTUyN30.fnZAT6G49RlAgqT2YcsK3zpD6Zo3LW5QIkp6PwhL40I
+###
+DELETE  http://localhost:5000/api/post/6752f7a9c552b48bd9710dd2
+content-type: application/json
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzUyY2U3YjlhNzgzMGU2ZDQ1NzM1MTEiLCJpYXQiOjE3MzM0ODk4ODUsImV4cCI6MTczMzQ5MzQ4NX0.rxeLxWAJQqIW4yjTHUGmcvh8fP9UF2o0eMVJKXij3YY
+
+###
+POST  http://localhost:5000/api/post/67543eb25ed1086ec36400c4/like
+content-type: application/json
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzUzNDUwY2M3NDc2OWI1NTZlNDdkNjMiLCJpYXQiOjE3MzM1NzQxMDYsImV4cCI6MTczMzYxMDEwNn0.0qlILcv0hKNG99zhojjINBxVDCNGS7ZK5--QBHW2M3I
+
+###
+POST  http://localhost:5000/api/post/6752d630ce58dbdd0e809602/unlike
+content-type: application/json
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzUyY2U3YjlhNzgzMGU2ZDQ1NzM1MTEiLCJpYXQiOjE3MzM0ODAxNDMsImV4cCI6MTczMzQ4Mzc0M30.DTwyM_MQiXUZQe7OtvgOloX6hudVQ61lW_TJ0Ksu_yw
+
+###
+GET  http://localhost:5000/api/post/all
+content-type: application/json
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzcxMzliYTcxNzE5YTI1ZTc3ZTBiNjUiLCJpYXQiOjE3MzU2MzE4MzcsImV4cCI6MTczNTYzNTQzN30.7oZButNpBEKpDKFA6dZFSCZuJbFl4y2MaEaT58uIPOs
+
+
+###
+PUT http://localhost:5000/api/post/update
+content-type: application/json
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzUyZWYwOTEwZmI0MDQ5ZTU2NzgwNzIiLCJpYXQiOjE3MzM0ODgzOTMsImV4cCI6MTczMzQ5MTk5M30.uytVeQD8xawjosofDXqIRTCDEKIjLp-H-SsKC1hGzHg
+
+{
+    "text": "daniel123-updated",
+    "image": "did.png",
+    "id": "6752ed0db0de8f1eebd9a540"
+}
+
+
+###
+POST http://localhost:5000/api/comment/create
+content-type: application/json
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzUzNDUwY2M3NDc2OWI1NTZlNDdkNjMiLCJpYXQiOjE3MzM1NzQxMDYsImV4cCI6MTczMzYxMDEwNn0.0qlILcv0hKNG99zhojjINBxVDCNGS7ZK5--QBHW2M3I
+
+{
+    "text": "daniel123-updated",
+    "postId": "67543eb25ed1086ec36400c4"
+}
+
+
+###
+DELETE  http://localhost:5000/api/comment/delete/6752e84bb7201182c186c2ce
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzUyZWYwOTEwZmI0MDQ5ZTU2NzgwNzIiLCJpYXQiOjE3MzM0ODgzOTMsImV4cCI6MTczMzQ5MTk5M30.uytVeQD8xawjosofDXqIRTCDEKIjLp-H-SsKC1hGzHg
+###
+GET  http://localhost:5000/api/comment/67543ee35ed1086ec36400c6
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzUzNDUwY2M3NDc2OWI1NTZlNDdkNjMiLCJpYXQiOjE3MzM1NzQxMDYsImV4cCI6MTczMzYxMDEwNn0.0qlILcv0hKNG99zhojjINBxVDCNGS7ZK5--QBHW2M3I
+
+###
+GET  http://localhost:5000/api/comment/post/67543eb25ed1086ec36400c4
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzUzNDUwY2M3NDc2OWI1NTZlNDdkNjMiLCJpYXQiOjE3MzM1NzQxMDYsImV4cCI6MTczMzYxMDEwNn0.0qlILcv0hKNG99zhojjINBxVDCNGS7ZK5--QBHW2M3I
+
+
+###
+PUT http://localhost:5000/api/comment/update
+content-type: application/json
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzUyZWJkN2ZjYjNlNDY4MWYyYjI1ZTkiLCJpYXQiOjE3MzM0ODc1NzUsImV4cCI6MTczMzQ5MTE3NX0.BqjZXmSa9fdiJoxOIOfzcdz1jI_gHRVG70eQcalSoow
+
+{
+    "text": "daniel123-the-king",
+    "postId": "6752d7a8c1306bd9c20bf39b",
+    "id": "6752eb93fcb3e4681f2b25e4"
+}

@@ -1,0 +1,40 @@
+
+.view-wrapper {
+    border-top: 1px solid #ddd;
+    padding-top: 16px;
+    position: absolute;
+    background-color: rgb(255, 253, 253);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    border-radius: 10px;
+    bottom: -7px;
+    z-index: 10;
+
+    .comments-wrapper {
+        width: 90%;
+        align-items: center; 
+    }
+  }
+
+.comments-enter {
+    transform: translateY(100%);  /* Start below the screen */
+    opacity: 0;                  /* Invisible */
+  }
+  .comments-enter-active {
+    transform: translateY(0);    /* Slide to position */
+    opacity: 1;                  /* Fully visible */
+    transition: transform 0.4s ease, opacity 0.4s ease;
+  }
+  
+  /* When exiting (disappearing) */
+  .comments-exit {
+    transform: translateY(0);    /* Start in position */
+    opacity: 1;                  /* Fully visible */
+  }
+  .comments-exit-active {
+    transform: translateY(100%); /* Slide down out of view */
+    opacity: 0;                  /* Fade out */
+    transition: transform 0.6s ease, opacity 0.6s ease;
+  }
+  

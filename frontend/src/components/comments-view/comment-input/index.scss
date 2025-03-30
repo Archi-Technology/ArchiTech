@@ -1,0 +1,26 @@
+.comment-input-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    input {
+        flex: 1;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        outline: none;
+      }
+      
+      button {
+        background-color: #0095f6;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 20px;
+        cursor: pointer;
+      }   
+  }
+  
+  
+    
+ 

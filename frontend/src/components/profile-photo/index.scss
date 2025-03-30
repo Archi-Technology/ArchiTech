@@ -1,0 +1,12 @@
+.profile-photo-container {
+    align-content: center;
+
+    .profile-photo {
+        border-radius: 50%;
+        border: 1px solid black;
+        justify-self: flex-start;
+      }
+} 
+.cursor {
+  cursor: pointer;
+}
