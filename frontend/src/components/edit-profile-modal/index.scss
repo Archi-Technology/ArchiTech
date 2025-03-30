@@ -1,0 +1,61 @@
+.box-content {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: center;
+
+  h3,
+  p {
+    margin: 0;
+  }
+
+  .headLines {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .TextField {
+    width: 100%;
+  }
+}
+
+.sub-comment {
+  color: grey;
+  opacity: 0.9;
+}
+
+.imageUpload {
+  border: 1px solid grey;
+  padding: 20px 4px 20px 4px;
+  width: 100%;
+}
+
+.image-input{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+
+  .imageUploadLabel {
+    width: fit-content;
+  }
+
+  .pointer {
+    cursor: pointer;
+  }
+
+  .delete-button {
+    height: 20px;
+    align-self: end;
+    cursor: pointer;
+  }
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}

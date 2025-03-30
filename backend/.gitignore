@@ -1,0 +1,34 @@
+# Node modules
+node_modules/
+
+coverage
+
+src/config/uploads/
+
+.testenv
+
+# TypeScript compiled files
+dist/
+*.tsbuildinfo
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE/editor folders and files
+.vscode/
+.idea/
+*.swp
+
+# Optional npm cache directory
+.npm
