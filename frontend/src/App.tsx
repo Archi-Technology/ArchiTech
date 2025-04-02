@@ -37,7 +37,7 @@ const App: React.FC = () => {
 
 const MainLayout: React.FC = () => (
   <>
-    {/* <Navbar /> */}
+    <Navbar />
     {/* <div className="content"> */}
       <Outlet />
     {/* </div> */}

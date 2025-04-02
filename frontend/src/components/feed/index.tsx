@@ -13,27 +13,6 @@ import CodePanel from "../code-panel"
 export const Feed: React.FC = () => {
     return (
         <div className="container" >
-      {/* Top navigation bar */}
-      <div className="navbar">
-        <div className="navbarLeft">
-          <div className="logoContainer">
-            <div className="logo">A</div>
-            <div className="appName">ArchiTech</div>
-          </div>
-          <div className="appTitle">AWS 3 tier web app with a database</div>
-        </div>
-        <div className="navbarRight">
-          <button className="navButton">
-            Templates <span className="chevronDown">▼</span>
-          </button>
-          <button className="iconButton">
-            <span className="shareIcon">↗</span>
-          </button>
-          <button className="iconButton">
-            <span className="settingsIcon">⚙</span>
-          </button>
-        </div>
-      </div>
 
       {/* Main content area */}
       <div className="mainContent">
