@@ -37,10 +37,10 @@ const App: React.FC = () => {
 
 const MainLayout: React.FC = () => (
   <>
-    <Navbar />
-    <div className="content">
+    {/* <Navbar /> */}
+    {/* <div className="content"> */}
       <Outlet />
-    </div>
+    {/* </div> */}
   </>
 );
 

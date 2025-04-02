@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import logo from '../../assets/images/google.png';
+import loginImage from '../../assets/images/login.png';
 import { enterModeOptions, enterModeText } from "../../consts/login";
 import { showToast } from "../../consts/toast";
 import { useUser } from "../../contexts/userContext";
@@ -56,8 +57,8 @@ export const LoginCard: React.FC<IProp> = ({ onLogin, onRegister, enterMode, set
     return <div className="login-card">
 
         <div className="header">
-            <span className="title">Welcome to TripNet</span>
-            <span className="desc">Connect with friends and share your moments</span>
+            <span className="title">Login to your account</span>
+            <span className="desc">Welcome back! Select your login method</span>
         </div>
 
         <div className="card-data">
@@ -143,6 +144,7 @@ export const LoginCard: React.FC<IProp> = ({ onLogin, onRegister, enterMode, set
                         type="submit"
                         variant="contained"
                         fullWidth
+                        className="submit-button"
                         sx={{ mt: 2, py: 1.5 }}
                     >
                         {isRegisterMode ? "Register" : "Sign In"}
@@ -196,7 +198,17 @@ const LoginContainer: React.FC = () => {
 export const LoginScreen: React.FC = () => {
     return <div className="login-screen">
         <div className="login-container">
-            <LoginContainer />
+            <img src={logo} alt="logo" className="logo" />
+            <div className="login-form" >
+                <LoginContainer />
+            </div>
+        </div>
+        <div className="login-gif">
+            <img src={loginImage} alt="loginImage" className="login-image" />
+            <div className="text-wrapper">
+                <h2 className="text one">Meet your cloud infrastructure design-to-code app </h2>
+                <p className="text two">Architech design to code approach lets you build your cloud infrastructure in real time in a beautiful, intuitive way.</p>
+            </div>
         </div>
     </div>
 }
