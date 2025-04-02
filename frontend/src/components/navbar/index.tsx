@@ -11,20 +11,27 @@ const Navbar: React.FC = () => {
   const { logoutUser } = useUser();
 
   return (
-    <nav className="navbar">
-      <div className="navbar-left">
-        <img src={appLogo} alt="TripsNet Logo" className="navbar-logo-img" />
-        <span className="navbar-logo">TripsNet</span>
+  
+        <div className="navbar">
+        <div className="navbarLeft">
+          <div className="logoContainer">
+            <div className="logo">A</div>
+            <div className="appName">ArchiTech</div>
+          </div>
+          <div className="appTitle">AWS 3 tier web app with a database</div>
+        </div>
+        <div className="navbarRight">
+          <button className="navButton">
+            Templates <span className="chevronDown">▼</span>
+          </button>
+          <button className="iconButton">
+            <span className="shareIcon">↗</span>
+          </button>
+          <button className="iconButton">
+            <span className="settingsIcon">⚙</span>
+          </button>
+        </div>
       </div>
-      <div className="navbar-center">
-        <Link to="/" className="navbar-link">Feed</Link>
-        <Link to="/map" className="navbar-link">Map</Link>
-        <Link to={`/profile?id=${user?._id}`}  className="navbar-link">Profile</Link>
-      </div>
-      <div className="navbar-right">
-        <button onClick={logoutUser} className="btn sign-out-btn">Sign Out</button>
-      </div>
-    </nav>
   );
 };
 

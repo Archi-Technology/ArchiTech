@@ -1,0 +1,318 @@
+.canvas {
+  width: 100%;
+  height: 100%;
+  min-height: 800px;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  position: relative;
+}
+
+.canvasInner {
+  position: absolute;
+  inset: 0;
+  padding: 1rem;
+}
+
+.diagramContainer {
+  border: 2px dashed #93c5fd;
+  border-radius: 0.5rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+.diagram {
+  position: relative;
+  width: 100%;
+  max-width: 64rem;
+  margin: 0 auto;
+}
+
+/* Node positioning */
+.httpClient {
+  position: absolute;
+  left: 0;
+  top: 25%;
+  transform: translateY(-50%);
+}
+
+.apiServicePlan {
+  position: absolute;
+  left: 150px;
+  top: 25%;
+  transform: translateY(-50%);
+}
+
+.applicationSection1 {
+  position: absolute;
+  left: 350px;
+  top: 50px;
+}
+
+.serviceBusSection {
+  position: absolute;
+  left: 550px;
+  top: 50px;
+}
+
+.queueTriggerSection {
+  position: absolute;
+  left: 750px;
+  top: 50px;
+}
+
+.storageSection {
+  position: absolute;
+  left: 550px;
+  top: 220px;
+}
+
+.blobTriggerSection {
+  position: absolute;
+  left: 750px;
+  top: 220px;
+}
+
+.insightsSection {
+  position: absolute;
+  left: 550px;
+  top: 390px;
+}
+
+.secretsSection {
+  position: absolute;
+  left: 750px;
+  top: 390px;
+}
+
+/* Diagram node styles */
+.diagramNode {
+  border: 1px solid;
+  border-radius: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.nodeIcon {
+  font-size: 1.5rem;
+}
+
+.smallIcon {
+  font-size: 1.125rem;
+}
+
+.nodeTitle {
+  font-size: 0.75rem;
+  text-align: center;
+  margin-top: 0.25rem;
+  padding: 0 0.25rem;
+}
+
+.smallTitle {
+  font-size: 0.625rem;
+}
+
+/* Diagram section styles */
+.diagramSection {
+  border: 1px solid;
+  border-radius: 0.25rem;
+}
+
+.sectionTitle {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem;
+  border-bottom: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+}
+
+.sectionBody {
+  padding: 0.5rem;
+  height: calc(100% - 24px);
+}
+
+.sectionContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.sectionContentColumn {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.sectionContentItem {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sectionContentItemBottom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+/* Connection lines */
+.connectionLines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+
+/* Diagram node styles */
+.diagram-node {
+  border: 1px solid;
+  border-radius: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.node-icon {
+  font-size: 1.5rem;
+}
+
+.small-icon {
+  font-size: 1.125rem;
+}
+
+.node-title {
+  font-size: 0.75rem;
+  text-align: center;
+  margin-top: 0.25rem;
+  padding: 0 0.25rem;
+}
+
+.small-title {
+  font-size: 0.625rem;
+}
+
+/* Diagram section styles */
+.diagram-section {
+  border: 1px solid;
+  border-radius: 0.25rem;
+}
+
+.section-title {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem;
+  border-bottom: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+}
+
+.section-body {
+  padding: 0.5rem;
+  height: calc(100% - 24px);
+}
+
+.section-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.section-content-column {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.section-content-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.section-content-item-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+/* Connection lines */
+.connection-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.http-client {
+  position: absolute;
+  left: 0;
+  top: 25%;
+  transform: translateY(-50%);
+}
+
+.api-service-plan {
+  position: absolute;
+  left: 150px;
+  top: 25%;
+  transform: translateY(-50%);
+}
+
+.application-section-1 {
+  position: absolute;
+  left: 350px;
+  top: 50px;
+}
+
+.service-bus-section {
+  position: absolute;
+  left: 550px;
+  top: 50px;
+}
+
+.queue-trigger-section {
+  position: absolute;
+  left: 750px;
+  top: 50px;
+}
+
+.storage-section {
+  position: absolute;
+  left: 550px;
+  top: 220px;
+}
+
+.blob-trigger-section {
+  position: absolute;
+  left: 750px;
+  top: 220px;
+}
+
+.insights-section {
+  position: absolute;
+  left: 550px;
+  top: 390px;
+}
+
+.secrets-section {
+  position: absolute;
+  left: 750px;
+  top: 390px;
+}
+
+

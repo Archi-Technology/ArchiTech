@@ -1,4 +1,129 @@
-.feed-container {
-    margin-top: 20px;
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #f1f5f9;
+  }
   
+  .navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+    height: 3rem;
+    background-color: white;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .navbarLeft {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .logoContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .logo {
+    width: 2rem;
+    height: 2rem;
+    background-color: #2563eb;
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .appName {
+    font-weight: 600;
+  }
+  
+  .appTitle {
+    font-size: 0.875rem;
+    color: #64748b;
+  }
+  
+  .navbarRight {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .navButton {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .navButton:hover {
+    background-color: #f1f5f9;
+    border-radius: 0.25rem;
+  }
+  
+  .chevronDown {
+    margin-left: 0.25rem;
+    font-size: 0.625rem;
+  }
+  
+  .iconButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    background: none;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+  }
+  
+  .iconButton:hover {
+    background-color: #f1f5f9;
+  }
+  
+  .shareIcon,
+  .settingsIcon {
+    font-size: 1rem;
+  }
+  
+  .mainContent {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+  
+  .canvasContainer {
+    flex: 1;
+    overflow: auto;
+    padding: 1rem;
+    background-image: url('../../assets/images/canvasBackground.png');
+
+  }
+  
+  .codePanel {
+    width: 24rem;
+    border-left: 1px solid #e2e8f0;
+    background-color: #1e1e1e;
+    color: white;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  
+.main-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
 }
+  
+  

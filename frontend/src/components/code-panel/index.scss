@@ -1,0 +1,132 @@
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem;
+    border-bottom: 1px solid #374151;
+  }
+  
+  .title {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  
+  .actionButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    background: none;
+    border: none;
+    border-radius: 0.25rem;
+    color: #9ca3af;
+    cursor: pointer;
+  }
+  
+  .actionButton:hover {
+    color: white;
+    background-color: #374151;
+  }
+  
+  .downloadIcon {
+    font-size: 1rem;
+  }
+  
+  .codeContent {
+    flex: 1;
+    overflow: auto;
+    padding: 1rem;
+    font-family: monospace;
+    font-size: 0.875rem;
+  }
+  
+  .codeBlock {
+    color: #4ade80;
+    margin-bottom: 1.5rem;
+  }
+  
+  .codeBlock:last-child {
+    margin-bottom: 0;
+  }
+  
+  
+
+  /* Code panel styles */
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem;
+  border-bottom: 1px solid #374151;
+}
+
+.code-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.code-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.code-action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background: none;
+  border: none;
+  border-radius: 0.25rem;
+  color: #9ca3af;
+  cursor: pointer;
+}
+
+.code-action-button:hover {
+  color: white;
+  background-color: #374151;
+}
+
+.download-icon {
+  font-size: 1rem;
+}
+
+.code-content {
+  flex: 1;
+  overflow: auto;
+  padding: 1rem;
+  font-family: monospace;
+  font-size: 0.875rem;
+}
+
+.code-block {
+  color: #4ade80;
+  margin-bottom: 1.5rem;
+}
+
+.code-block:last-child {
+  margin-bottom: 0;
+}
+
+/* Utility classes */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+

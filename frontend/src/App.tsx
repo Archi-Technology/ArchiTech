@@ -38,9 +38,9 @@ const App: React.FC = () => {
 const MainLayout: React.FC = () => (
   <>
     <Navbar />
-    <div className="content">
+    {/* <div className="content"> */}
       <Outlet />
-    </div>
+    {/* </div> */}
   </>
 );
 
