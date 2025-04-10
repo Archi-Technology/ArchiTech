@@ -8,6 +8,7 @@ import { Button } from "../ui/button"
 import ServiceSidebar from "../service-sidebar"
 import DiagramCanvas from "../diagram-canvas"
 import CodePanel from "../code-panel"
+import Chat from "../Chat";
 
 
 export const Feed: React.FC = () => {
@@ -28,6 +29,10 @@ export const Feed: React.FC = () => {
         <div className="codePanel">
           <CodePanel />
         </div>
+
+        <div className="aiChatPanel">
+          <Chat />
+          </div>
       </div>
     </div>
     )
