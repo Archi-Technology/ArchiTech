@@ -4,6 +4,7 @@ import { showToast } from '../consts/toast';
 import { IGenericResponse, IUser } from '../interfaces/user';
 import { getAuthTokenByName, refreshTokenName, removeAuthTokens, updateTokens } from '../utils/functions/localstorage';
 import { AxiosInstence } from './axios/AxiosInstance';
+import { IUserContext } from '../components/cloud-assistant';
 
 export interface ILoginResponse {
   accessToken: string;
@@ -96,6 +97,22 @@ export const editProfile = async (userId: string, editedProfile: FormData) => {
     showToast('successfully update profile', "success")
   } catch (error) {
     showToast('failed to edit post', "error")
+  }
+}
+
+export const saveUserContext = async ( userContext: Partial<IUserContext>) => {
+  try {
+    (await AxiosInstence.post<IGenericResponse>(`user/context/create`, userContext))
+  } catch (error) {
+    showToast('failed to save user context', "error")
+  }
+}
+
+export const checkUserContext = async ( ) => {
+  try {
+    return (await AxiosInstence.get<IGenericResponse>(`user/context/check`)).data
+  } catch (error) {
+    showToast('failed to check user context', "error")
   }
 }
 
