@@ -77,9 +77,22 @@ authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzZlOWIyN
 
 ###
 
-POST http://localhost:5000/api/post/create/ai
+POST http://localhost:5000/api/user/context/create
 content-type: application/json
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzZlOWIyN2ZmODExMTQ1MDBlNjFkYjgiLCJpYXQiOjE3MzUzMDE5MjcsImV4cCI6MTczNTMwNTUyN30.fnZAT6G49RlAgqT2YcsK3zpD6Zo3LW5QIkp6PwhL40I
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2N2ZhNzkxNDhhZjFjZDg2MzU3NzBiNGUiLCJpYXQiOjE3NDQ0NjgyNTQsImV4cCI6MTc0NDQ3MTg1NH0.-se5DydANIuB4hoKEKr-ugEt0GSlaGchp-Wf44wr7sU
+
+
+
+{
+    "descOfProject": "2332",
+    "amountOfUsers": 3232,
+    "budget": 500,
+    "connectDifferentCloudP": true,
+    "highAvailbility": true,
+    "regulations": "232",
+    "securityHighConcern": true
+}
+
 ###
 DELETE  http://localhost:5000/api/post/6752f7a9c552b48bd9710dd2
 content-type: application/json
