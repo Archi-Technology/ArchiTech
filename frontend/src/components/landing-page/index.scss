@@ -1,0 +1,136 @@
+.landing-container {
+  min-height: 100vh;
+  background-color: #000000;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  background-image: radial-gradient(circle, rgba(125, 125, 125, 0.5) 1px, transparent 1px);
+  background-size: 25px 25px;
+}
+
+.landing-header {
+  padding: 20px;
+  z-index: 10;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo-image {
+  height: 40px;
+  width: auto;
+}
+
+.landing-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.bg-element {
+  position: absolute;
+  z-index: 1;
+}
+
+.icon-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.layers-icon {
+  top: 20%;
+  left: 15%;
+  width: 120px;
+  height: 120px;
+}
+
+.cloud-icon {
+  top: 15%;
+  right: 15%;
+  width: 100px;
+  height: 100px;
+}
+
+.cursor-icon {
+  right: 20%;
+  top: 50%;
+  width: 80px;
+  height: 80px;
+}
+
+.network-icon {
+  bottom: 20%;
+  right: 20%;
+  width: 100px;
+  height: 100px;
+}
+
+.terraform-icon {
+  bottom: 20%;
+  left: 15%;
+  width: 100px;
+  height: 100px;
+}
+
+.content {
+  text-align: center;
+  z-index: 10;
+  padding: 0 20px;
+}
+
+.title {
+  font-size: 64px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.subtitle {
+  font-size: 32px;
+  color: #a0a0a0;
+  margin-bottom: 32px;
+}
+
+.login-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #2563eb;
+  color: white;
+  font-weight: 500;
+  padding: 10px 24px;
+  border-radius: 6px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.login-button:hover {
+  background-color: #1d4ed8;
+}
+
+.arrow {
+  font-size: 18px;
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 48px;
+  }
+
+  .subtitle {
+    font-size: 24px;
+  }
+
+  .bg-element {
+    transform: scale(0.8);
+  }
+}
