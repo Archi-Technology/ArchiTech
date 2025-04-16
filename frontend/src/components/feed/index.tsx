@@ -1,17 +1,23 @@
-import React from "react";
-import { SocialPosts } from "../social-posts";
-import { CreatePost } from "../create-post";
-import { feedPostKey } from "../../services/postService";
-import './index.scss'
-import { ChevronDown, Share, Settings } from "lucide-react"
-import { Button } from "../ui/button"
-import ServiceSidebar from "../service-sidebar"
-import DiagramCanvas from "../diagram-canvas"
-import CodePanel from "../code-panel"
-import Chat from "../Chat";
+import React, { useCallback, useState } from "react";
+import { CloudAssistantPopup } from "../cloud-assistant";
+import CodePanel from "../code-panel";
+import DiagramCanvas from "../diagram-canvas";
+import NeededAssistantCheck from "../neededAssistantCheck";
+import ServiceSidebar from "../service-sidebar";
+import './index.scss';
 
 
 export const Feed: React.FC = () => {
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+  const openPopup = useCallback(() => {
+    setIsPopupOpen(true); 
+   } ,[setIsPopupOpen])
+
+   const closePopup = useCallback(() => {
+    setIsPopupOpen(false); 
+   } ,[setIsPopupOpen])
+  
     return (
         <div className="container" >
 
@@ -34,6 +40,8 @@ export const Feed: React.FC = () => {
           <Chat />
           </div>
       </div>
+      {<NeededAssistantCheck openPopup={openPopup}/>}
+      {isPopupOpen && <CloudAssistantPopup onClose={closePopup} />}
     </div>
     )
 }

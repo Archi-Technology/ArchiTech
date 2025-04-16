@@ -49,6 +49,28 @@ export class UserController extends BaseController<IUser, UserService> {
     }
   }
 
+  async saveUserContext(req: Request, res: Response) {
+    try {
+      const user = (req as express.Request & { user?: any }).user;
+      const userData = await this.service.saveUserContext(req.body, user._id);
+
+      res.json( userData );
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
+  async checkUserContext(req: Request, res: Response) {
+    try {
+      const user = (req as express.Request & { user?: any }).user;
+      const isUserContextNeeded = !(await this.service.checkuserContext(user._id));
+
+      res.json( isUserContextNeeded );
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
   async userDetials(req: Request, res: Response) {
     try {
 

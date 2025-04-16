@@ -3,13 +3,16 @@ import mongoose from 'mongoose';
 import PostModel, { IPost } from '../models/post.model';
 import UserModel, { IBaseUser, IUser } from '../models/user.model';
 import { BaseService } from './base.service';
+import UserContextModel, { IBaseUserContext, IUserContext } from '../models/userContext.model';
+import { UserContextService } from './userContext.service';
 
 
 export class UserService extends BaseService<IUser> {
-  private postBaseService: BaseService<IPost>
+  private UserContextService: UserContextService
+
   constructor() {
     super(UserModel);
-    this.postBaseService = new BaseService(PostModel);
+    this.UserContextService = new UserContextService();
   }
 
    async saveUser(user: IBaseUser) {
@@ -21,6 +24,14 @@ export class UserService extends BaseService<IUser> {
     const newUser = new UserModel({ username, password: hashedPassword, email, image: '' });
     return await newUser.save();
 
+  }
+
+  async saveUserContext(userContext: IBaseUserContext, userId: string) {
+    return this.UserContextService.saveUserContext(userContext, userId);
+  }
+
+  async checkuserContext( userId: string) {
+    return this.UserContextService.checkUserContext(userId);
   }
 
   async createUser(user: IBaseUser) {
