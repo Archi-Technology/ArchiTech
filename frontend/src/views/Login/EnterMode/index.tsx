@@ -14,7 +14,7 @@ interface IProp {
 export const EnterMode: React.FC<IProp> = ({selected, options, onSelect}: IProp) => {
     const onChange = useCallback((option: IEnterModeOption) => onSelect(option.key),[onSelect])
     const tabs = useMemo(() => options.map((option) => <div className={classNames('tab', {'selected':option.key === selected})} onClick={() => onChange(option)}>{option.title}</div>),[options, selected])
-    return <div className="tabs">
-        {tabs}
+    return <div className="enter-mode">
+       
     </div>
 }
