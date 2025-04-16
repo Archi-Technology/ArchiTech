@@ -1,11 +1,14 @@
 import { Download } from "lucide-react"
 import { Button } from "../ui/button"
+import terraformIcon from '../../assets/terraformIcon.png';
+
 import './index.scss'
 
 export default function CodePanel() {
     return (
         <>
             <div className="header">
+              
                 <div className="title">TERRAFORM CODE</div>
                 <div className="actions">
                     <button className="actionButton">
