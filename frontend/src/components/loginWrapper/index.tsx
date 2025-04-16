@@ -1,47 +1,30 @@
-import React, { useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { useUser } from "../../contexts/userContext";
-import { useGetUserData } from "../../services/userService";
-import { CircularProgress } from "@mui/material";
+'use client';
 
+import { CircularProgress } from '@mui/material';
+import type React from 'react';
+import { useEffect } from 'react';
+import { Navigate, Outlet, useNavigate } from 'react-router-dom';
+import { useUser } from '../../contexts/userContext';
+import { useGetUserData } from '../../services/userService';
 
-interface IProp {
-    children: React.ReactNode;
-}
+export const LoginWrapper: React.FC = () => {
+  const authtoken = localStorage.getItem('accessToken');
+  const { setUserData, user } = useUser();
+  const { data, isLoading } = useGetUserData(authtoken ? authtoken : null);
+  const navigate = useNavigate();
 
-export const LoginWrapper: React.FC<IProp> = ({ children }: IProp) => {
-    const authtoken = localStorage.getItem('accessToken')
-    const { setUserData, user } = useUser();
-    const { data, isLoading } = useGetUserData(authtoken ? authtoken : null);
-    const navigate = useNavigate();
+  useEffect(() => {
+    if (data) {
+      setUserData(data);
+    }
+  }, [data, setUserData]);
 
-    useEffect(() => {
-        if (!authtoken && !user) {
-            navigate('/login')
-        }
-        else if (data) {
+  if (isLoading) return <CircularProgress />;
 
-            setUserData(data)
+  // If no auth token or user, redirect to login
+  if (!authtoken && !user) {
+    return <Navigate to="/login" replace />;
+  }
 
-        }
-    }, [data, authtoken, user, navigate, setUserData]);
-
-    if (isLoading) return <CircularProgress />
-    return <>{children}</>
-}
-
-//if no auth token - /login
-// interface IUserSeesionHanler {
-//     userid: string
-// }
-// const UserSeesionHanler: React.FC<IUserSeesionHanler> = ({ userid }: IUserSeesionHanler) => {
-//     const { data, isLoading } = useGetUserData(userid);
-//     const { setUserData, user } = useUser();
-
-//     useEffect(() => {
-//         if(data) {
-//             setUserData(data)
-//         }
-//     },[data])
-//     if (isLoading) return <CircularProgress />
-// }
+  return <Outlet />;
+};
