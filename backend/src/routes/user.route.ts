@@ -157,6 +157,9 @@ userRouter.put('/update', userController.updateUser.bind(userController));
  *         description: problem creating user 
  */
 userRouter.post('/create', userController.create.bind(userController));
+userRouter.post('/context/create', userController.saveUserContext.bind(userController));
+userRouter.get('/context/check', userController.checkUserContext.bind(userController));
+
 
 /**
  * @swagger
