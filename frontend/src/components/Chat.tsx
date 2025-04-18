@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import axios from 'axios';
 import './Chat.css';
+import { AxiosInstence } from '../services/axios/AxiosInstance';
+import { IGenericResponse } from '../interfaces/user';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -20,14 +22,14 @@ export default function Chat() {
     setQuestion('');
 
     try {
-      const res = await axios.post('http://localhost:5000/chat', {
+      const res = await AxiosInstence.post<IGenericResponse>('/chat', {
         question,
-        userId: 'demo-user',
       });
+
 
       setMessages([
         ...newMessages,
-        { role: 'assistant', content: res.data } as Message,
+        { role: 'assistant', content: res.data.message} as Message,
       ]);
     } catch (error) {
       setMessages([

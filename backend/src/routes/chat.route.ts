@@ -5,7 +5,7 @@ export const chatRouter = Router();
 
 /**
  * @swagger
- * /chat:
+ * /api/chat:
  *   post:
  *     description: Ask a question
  *     tags:

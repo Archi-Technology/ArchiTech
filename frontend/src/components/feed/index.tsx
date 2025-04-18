@@ -5,6 +5,7 @@ import DiagramCanvas from "../diagram-canvas";
 import NeededAssistantCheck from "../neededAssistantCheck";
 import ServiceSidebar from "../service-sidebar";
 import './index.scss';
+import Chat from "../Chat";
 
 
 export const Feed: React.FC = () => {
