@@ -5,6 +5,7 @@ import DiagramCanvas from "../diagram-canvas";
 import NeededAssistantCheck from "../neededAssistantCheck";
 import ServiceSidebar from "../service-sidebar";
 import './index.scss';
+import Chat from "../Chat";
 
 
 export const Feed: React.FC = () => {
@@ -35,6 +36,10 @@ export const Feed: React.FC = () => {
         <div className="codePanel">
           <CodePanel />
         </div>
+
+        <div className="aiChatPanel">
+          <Chat />
+          </div>
       </div>
       {<NeededAssistantCheck openPopup={openPopup}/>}
       {isPopupOpen && <CloudAssistantPopup onClose={closePopup} />}
