@@ -1,6 +1,7 @@
 import cors from 'cors';
 import dotenv from 'dotenv';
-import express, { Application } from 'express';
+import express from 'express';
+import { Application } from 'express';
 import mongoose from 'mongoose';
 import path from "path";
 import fs from 'fs';
@@ -14,6 +15,7 @@ import { commentRouter } from './routes/comment.route';
 import { postRouter } from './routes/post.route';
 import { userRouter } from './routes/user.route';
 import './cron-jobs/generateAiPosts'
+import { chatRouter } from './routes/chat.route';
 
 
 const appPromise: Promise<Application> = new Promise( async (resolve, reject) => {
@@ -36,7 +38,6 @@ const appPromise: Promise<Application> = new Promise( async (resolve, reject) =>
     app.use("/api/uploads", express.static(uploadsPath));
     
     app.use(uploadMiddleware);
-    // Middleware
     app.use(cors());
 
     app.use('/api', authMiddleware);
@@ -45,6 +46,8 @@ const appPromise: Promise<Application> = new Promise( async (resolve, reject) =>
     app.use('/api/user', userRouter);
     app.use('/api/comment', commentRouter); 
     app.use('/api/post', postRouter);
+    app.use('/api/chat', chatRouter);
+
 
     try {
         await mongoose.connect(config.MONGO_URI as string);

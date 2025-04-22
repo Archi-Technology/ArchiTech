@@ -1,5 +1,5 @@
 import PostModel, { IPost } from '../models/post.model';
-import { downloadBase64Image, generateDescForPostWithAi, generatePostWithAi, subjectsForPost } from './ai.service';
+// import { downloadBase64Image, generateDescForPostWithAi, generatePostWithAi, subjectsForPost } from './ai.service';
 import { BaseService } from './base.service';
 
 export class PostService extends BaseService<IPost> {
@@ -113,16 +113,16 @@ export class PostService extends BaseService<IPost> {
     return allPosts;
   }
 
-  async createPostGeneratedByAI() {
-    const randomIndex = Math.floor(Math.random() * subjectsForPost.length);
-    const postSubject: string = subjectsForPost[randomIndex];
-    const descForPost = await generateDescForPostWithAi(postSubject);
-    const imagePost = await generatePostWithAi(descForPost);
-    const postDate = new Date().getTime();
-    const fileName = `${postSubject}_${postDate}.png`;
-    downloadBase64Image(imagePost, fileName);
-    return this.savePostGeneratedByAI(descForPost, fileName, postDate);
-  }
+  // async createPostGeneratedByAI() {
+  //   const randomIndex = Math.floor(Math.random() * subjectsForPost.length);
+  //   const postSubject: string = subjectsForPost[randomIndex];
+  //   const descForPost = await generateDescForPostWithAi(postSubject);
+  //   const imagePost = await generatePostWithAi(descForPost);
+  //   const postDate = new Date().getTime();
+  //   const fileName = `${postSubject}_${postDate}.png`;
+  //   downloadBase64Image(imagePost, fileName);
+  //   return this.savePostGeneratedByAI(descForPost, fileName, postDate);
+  // }
 }
 
 
