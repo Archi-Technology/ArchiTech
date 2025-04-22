@@ -1,7 +1,8 @@
-import React from 'react';
-import { Outlet, Route, Routes } from 'react-router-dom';
+import type React from 'react';
+import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { Feed } from './components/feed';
+import LandingPage from './components/landing-page';
 import { LoginWrapper } from './components/loginWrapper';
 import Navbar from './components/navbar';
 import './index.scss';
@@ -10,37 +11,36 @@ import Profile from './views/Profile';
 import MapView from './views/Map';
 
 const App: React.FC = () => {
-
-
   return (
-    <div className='whole-app'>
+    <div className="whole-app">
+      <Routes>
+        {/* Landing page route */}
+        <Route path="/landing" element={<LandingPage />} />
 
-        <LoginWrapper>
-          <>
-            <Routes>
-              <Route element={<MainLayout />}>
-                <Route path="/" element={<Feed />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/map" element={<MapView />} />
-              </Route>
-              {/* Add other routes here */}
-            </Routes>
-          </>
-        </LoginWrapper>
-        <Routes>
-          <Route path="/login" element={<LoginScreen />} />
-        </Routes>
-        <ToastContainer position="bottom-left" />
+        {/* Default route redirects to landing page */}
+        <Route path="/" element={<Navigate to="/landing" replace />} />
+
+        {/* Protected routes */}
+        <Route element={<LoginWrapper />}>
+          <Route element={<MainLayout />}>
+            <Route path="/home" element={<Feed />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/map" element={<MapView />} />
+          </Route>
+        </Route>
+
+        {/* Login route */}
+        <Route path="/login" element={<LoginScreen />} />
+      </Routes>
+      <ToastContainer position="bottom-left" />
     </div>
-  )
+  );
 };
 
 const MainLayout: React.FC = () => (
   <>
     <Navbar />
-    {/* <div className="content"> */}
-      <Outlet />
-    {/* </div> */}
+    <Outlet />
   </>
 );
 
