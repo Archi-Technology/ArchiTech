@@ -1,7 +1,7 @@
 .popup-container {
   position: fixed;
   align-self: flex-end;
-  bottom: 0;
+  bottom: 60px;
   margin:20px;
   padding:20px;
   z-index: 50;
