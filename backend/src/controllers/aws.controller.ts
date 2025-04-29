@@ -9,22 +9,69 @@ export class awsController {
   }
   async getS3Pricing(req: Request, res: Response) {
     try {
-      const location = (req.query.location as string) || "EU (Frankfurt)";
-      const storageClass = (req.query.storageClass as string) || "Standard";
-      const gigabytes = parseInt(req.query.gigabytes as string) || 1;
-      const pricePerGb = await this.service.getS3StoragePrice(
-        location,
-        storageClass
+      const { location, storageClass } = req.query;
+
+      if (!location || !storageClass) {
+        res.status(400).json({
+          error: "Missing required parameters: location, storageClass",
+        });
+        return;
+      }
+
+      const price = await this.service.getS3StoragePrice(
+        location as string,
+        storageClass as string
       );
-      if (pricePerGb !== null) {
-        const totalPrice = pricePerGb * gigabytes;
-        res.status(200).json({ price: totalPrice });
+
+      if (price !== null) {
+        res
+          .status(200)
+          .json({
+            location: location,
+            storageClass: storageClass,
+            pricePerGb: price,
+          });
       } else {
         res.status(500).json({ error: "Failed to fetch pricing data." });
       }
     } catch (error: any) {
       console.error("Error fetching S3 pricing:", error);
       res.status(500).json({ error: "Internal server error." });
+    }
+  }
+
+  async getEC2Pricing(req: Request, res: Response): Promise<void> {
+    try {
+      const { instanceType, region, operatingSystem } = req.query;
+
+      if (!instanceType || !region || !operatingSystem) {
+        res.status(400).json({
+          error:
+            "Missing required parameters: instanceType or region or operatingSystem",
+        });
+        return;
+      }
+
+      const price = await this.service.getEC2Pricing(
+        instanceType as string,
+        region as string,
+        operatingSystem as string
+      );
+
+      if (price === null) {
+        res.status(404).json({ error: "Pricing data not found" });
+        return;
+      }
+
+      res.status(200).json({
+        instanceType,
+        region,
+        operatingSystem,
+        pricePerHour: price,
+      });
+    } catch (error) {
+      console.error("Error fetching EC2 pricing:", error);
+      res.status(500).json({ error: "Failed to retrieve EC2 pricing" });
     }
   }
 }

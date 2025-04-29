@@ -20,9 +20,13 @@ export class awsService {
   }
 
   async getS3StoragePrice(
-    location: string = "EU (Frankfurt)",
-    storageClass: string = "Standard"
+    location: string,
+    storageClass: string
   ): Promise<number | null> {
+    
+    location = location.trim();
+    storageClass = storageClass.trim();
+
     const storageClassUsagePatterns: Record<string, string[]> = {
       Standard: ["TimedStorage-ByteHrs"],
       StandardIA: ["TimedStorage-IA-ByteHrs", "TimedStorage-SIA-ByteHrs"],
@@ -107,6 +111,75 @@ export class awsService {
       return null;
     } catch (err) {
       console.error("Error fetching pricing:", err);
+      return null;
+    }
+  }
+
+  async getEC2Pricing(
+    instanceType: string,
+    location: string,
+    operatingSystem: string
+  ): Promise<number | null> {
+    let nextToken: string | undefined = undefined;
+
+    instanceType = instanceType.trim();
+    location = location.trim();
+    operatingSystem = operatingSystem.trim();
+    
+    try {
+      do {
+        console.log(
+          `🔍 Fetching EC2 pricing for: Location='${location}', InstanceType='${instanceType}', OS='${operatingSystem}'`
+        );
+
+        const params: GetProductsCommandInput = {
+          ServiceCode: "AmazonEC2",
+          Filters: [
+            { Type: "TERM_MATCH", Field: "location", Value: location },
+            { Type: "TERM_MATCH", Field: "instanceType", Value: instanceType },
+            {
+              Type: "TERM_MATCH",
+              Field: "operatingSystem",
+              Value: operatingSystem,
+            },
+            { Type: "TERM_MATCH", Field: "preInstalledSw", Value: "NA" },
+            { Type: "TERM_MATCH", Field: "tenancy", Value: "Shared" },
+            { Type: "TERM_MATCH", Field: "capacitystatus", Value: "Used" },
+          ],
+          MaxResults: 100,
+          NextToken: nextToken,
+        };
+
+        const command = new GetProductsCommand(params);
+        const response = await this.client.send(command);
+
+        if (!response.PriceList || response.PriceList.length === 0) {
+          console.error("No EC2 pricing data found.");
+          return null;
+        }
+
+        for (const productString of response.PriceList) {
+          const product = JSON.parse(productString);
+          const terms = product.terms.OnDemand;
+          for (const termKey in terms) {
+            const priceDimensions = terms[termKey].priceDimensions;
+            for (const dimensionKey in priceDimensions) {
+              const pricePerHour = parseFloat(
+                priceDimensions[dimensionKey].pricePerUnit.USD
+              );
+              console.log(`✅ Found EC2 price: $${pricePerHour}/hour`);
+              return pricePerHour;
+            }
+          }
+        }
+
+        nextToken = response.NextToken;
+      } while (nextToken);
+
+      console.error("Still no matching EC2 price found.");
+      return null;
+    } catch (err) {
+      console.error("Error fetching EC2 pricing:", err);
       return null;
     }
   }

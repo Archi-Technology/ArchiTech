@@ -24,13 +24,6 @@ export const awsRouter = Router();
  *         schema:
  *           type: string
  *           example: Standard
- *       - name: gigabytes
- *         in: query
- *         description: The number of gigabytes to be stored in the s3 bucket
- *         required: false
- *         schema:
- *           type: number
- *           example: 1
  *     responses:
  *       200:
  *         description: successfully retrieved s3 cost
@@ -54,4 +47,61 @@ export const awsRouter = Router();
 awsRouter.get(
   "/cost/s3",
   awsControllerInstance.getS3Pricing.bind(awsControllerInstance)
+);
+
+/**
+ * @swagger
+ * /aws/cost/ec2:
+ *   get:
+ *     description: Get cost of EC2 instances
+ *     tags:
+ *       - AWS
+ *     parameters:
+ *       - name: instanceType
+ *         in: query
+ *         description: The type of EC2 instance (e.g., t2.micro, m5.large)
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: i3.large
+ *       - name: region
+ *         in: query
+ *         description: The AWS region (e.g., us-east-1, eu-west-1)
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: Canada (Central)
+ *       - name: operatingSystem
+ *         in: query
+ *         description: The operating system (e.g., Linux, Windows)
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: Windows
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved EC2 cost
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 instanceType:
+ *                   type: string
+ *                   example: t2.micro
+ *                 region:
+ *                   type: string
+ *                   example: us-east-1
+ *                 operatingSystem:
+ *                   type: string
+ *                   example: Linux
+ *                 pricePerHour:
+ *                   type: number
+ *                   example: 0.0116
+ *       500:
+ *         description: Failed to retrieve EC2 cost
+ */
+awsRouter.get(
+  "/cost/ec2",
+  awsControllerInstance.getEC2Pricing.bind(awsControllerInstance)
 );
