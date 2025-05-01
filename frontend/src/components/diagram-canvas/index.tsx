@@ -1,6 +1,4 @@
-
-import ContainerNode from '../canvas/container/container-node';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './index.scss';
 import ReactFlow, {
   MiniMap,
@@ -9,18 +7,20 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
   addEdge,
-  Connection,
-  Edge,
   Node,
+  Edge,
+  Connection,
+  ReactFlowInstance,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
+import ContainerNode from '../canvas/container/container-node';
 import CircleNode from '../canvas/circle-node/circle-node';
+import EarthNode from '../canvas/earth/earth';
 import azureIcon from '../../assets/canvas/azure-svgrepo-com.svg';
 import gcpIcon from '../../assets/canvas/gcp-svgrepo-com.svg';
 import awsIcon from '../../assets/canvas/aws-svgrepo-com.svg';
 import earth from '../../assets/canvas/planet-earth.svg';
-import EarthNode from '../canvas/earth/earth';
 
 const nodeTypes = {
   circle: CircleNode,
@@ -28,12 +28,23 @@ const nodeTypes = {
   bigSquare: ContainerNode,
 };
 
-// Default nodes before expansion
 const defaultNodes: Node[] = [
+  {
+    id: '4',
+    type: 'earth',
+    position: { x: 350, y: 50 },
+    draggable: false,
+    data: {
+      label: 'Internet',
+      color: 'rgb(246,133,0)',
+      imageSrc: earth,
+    },
+  },
   {
     id: '1',
     type: 'circle',
-    position: { x: 100, y: 100 },
+    position: { x: 150, y: 250 },
+    draggable: false,
     data: {
       label: 'Azure',
       color: 'rgb(67,196,237)',
@@ -43,7 +54,8 @@ const defaultNodes: Node[] = [
   {
     id: '2',
     type: 'circle',
-    position: { x: 300, y: 100 },
+    position: { x: 350, y: 250 },
+    draggable: false,
     data: {
       label: 'GCP',
       color: 'rgb(103,155,253)',
@@ -53,75 +65,8 @@ const defaultNodes: Node[] = [
   {
     id: '3',
     type: 'circle',
-    position: { x: 200, y: 300 },
-    data: {
-      label: 'AWS',
-      color: 'rgb(246,133,0)',
-      imageSrc: awsIcon,
-    },
-  },
-  {
-    id: '4',
-    type: 'earth',
-    position: { x: 400, y: 500 },
-    data: {
-      label: 'Internet',
-      color: 'rgb(246,133,0)',
-      imageSrc: earth,
-    },
-  },
-];
-
-// Expanded Azure node with internal children
-const expandedAzureNodes: Node[] = [
-  {
-    id: '1',
-    type: 'bigSquare',
-    position: { x: 100, y: 100 },
-    data: { label: 'Azure Group' },
-    style: {
-      width: 300,
-      height: 300,
-    },
-  },
-  {
-    id: '1-1',
-    type: 'circle',
-    position: { x: 50, y: 60 },
-    data: {
-      label: 'Service A',
-      color: 'rgb(67,196,237)',
-      imageSrc: azureIcon,
-    },
-    parentNode: '1',
-    extent: 'parent',
-  },
-  {
-    id: '1-2',
-    type: 'circle',
-    position: { x: 160, y: 160 },
-    data: {
-      label: 'Service B',
-      color: 'rgb(67,196,237)',
-      imageSrc: azureIcon,
-    },
-    parentNode: '1',
-    extent: 'parent',
-  },
-  {
-    id: '2',
-    type: 'circle',
-    position: { x: 450, y: 100 },
-    data: {
-      label: 'GCP',
-      color: 'rgb(103,155,253)',
-      imageSrc: gcpIcon,
-    },
-  },
-  {
-    id: '3',
-    type: 'circle',
-    position: { x: 350, y: 300 },
+    position: { x: 550, y: 250 },
+    draggable: false,
     data: {
       label: 'AWS',
       color: 'rgb(246,133,0)',
@@ -131,51 +76,166 @@ const expandedAzureNodes: Node[] = [
 ];
 
 const initialEdges: Edge[] = [
-  {
-    id: 'e1-2',
-    source: '4',
-    target: '1',
-    animated: true,
-    type: 'smoothstep',
-    style: { stroke: '#555', strokeWidth: 2 },
-  },
-  {
-    id: 'e2-3',
-    source: '4',
-    target: '2',
-    animated: true,
-    type: 'smoothstep',
-    style: { stroke: '#555', strokeWidth: 2 },
-  },
-  {
-    id: 'e2-3',
-    source: '4',
-    target: '3',
-    animated: true,
-    type: 'smoothstep',
-    style: { stroke: '#555', strokeWidth: 2 },
-  },
+  { id: 'e1-2', source: '4', target: '1', animated: true, type: 'smoothstep', style: { stroke: '#555', strokeWidth: 2 } },
+  { id: 'e2-3', source: '4', target: '2', animated: true, type: 'smoothstep', style: { stroke: '#555', strokeWidth: 2 } },
+  { id: 'e3-4', source: '4', target: '3', animated: true, type: 'smoothstep', style: { stroke: '#555', strokeWidth: 2 } },
 ];
 
 export default function BasicFlow() {
-  const [expanded, setExpanded] = useState(false);
+  const [expandedNodeId, setExpandedNodeId] = useState<string | null>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(defaultNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
+  const reactFlowInstance = useRef<ReactFlowInstance | null>(null);
 
   const onConnect = (connection: Connection) =>
     setEdges((eds) =>
-      addEdge({ ...connection, animated: true, type: 'smoothstep', style: { stroke: '#555', strokeWidth: 2 } }, eds)
+      addEdge(
+        {
+          ...connection,
+          animated: true,
+          type: 'smoothstep',
+          style: { stroke: '#555', strokeWidth: 2 },
+        },
+        eds
+      )
     );
 
+  const containerLabelMap: Record<string, string> = {
+    '1': 'Azure Group',
+    '2': 'GCP Group',
+    '3': 'AWS Group',
+  };
+
+  const iconMap: Record<string, string> = {
+    '1': azureIcon,
+    '2': gcpIcon,
+    '3': awsIcon,
+  };
+
+  const handleOtherNodes = (activeId: string) => {
+    const horizontalSpacing = 800; // Reduce spacing to bring nodes closer
+    const verticalOffset = 50; // Slight vertical adjustment for better positioning
+    setNodes((nds) =>
+      nds.map((n) => {
+        if (['1', '2', '3'].includes(n.id) && n.id !== activeId) {
+          return {
+            ...n,
+            position: {
+              x: n.id === '2' ? n.position.x - horizontalSpacing : n.position.x + horizontalSpacing, // Left for '2', right for others
+              y: n.position.y + verticalOffset, // Adjust vertically to avoid overlap
+            },
+          };
+        }
+        return n;
+      })
+    );
+  };
+
   const onNodeClick = (_: React.MouseEvent, node: Node) => {
-    if (node.id === '1' && !expanded) {
-      setExpanded(true);
-      setNodes(expandedAzureNodes);
+    if (!['1', '2', '3'].includes(node.id) || expandedNodeId === node.id) return;
+    setExpandedNodeId(node.id);
+
+    const containerWidth = 1000;
+
+    // Center the expansion box horizontally in the canvas
+    const canvasCenterX = reactFlowWrapper.current?.clientWidth! / 2;
+    const centeredX = canvasCenterX - containerWidth / 2;
+
+    // Step 1: Replace node with container node
+    setNodes((nds) =>
+      nds.map((n) =>
+        n.id === node.id
+          ? {
+              ...n,
+              type: 'bigSquare',
+              position: { x: centeredX, y: n.position.y }, // Only update x value
+              data: {
+                ...n.data,
+                label: containerLabelMap[node.id],
+                width: 0,
+                height: 0,
+              },
+            }
+          : n
+      )
+    );
+
+    // Step 2: Expand size
+    setTimeout(() => {
+      setNodes((nds) =>
+        nds.map((n) =>
+          n.id === node.id
+            ? {
+                ...n,
+                data: {
+                  ...n.data,
+                  width: containerWidth,
+                  height: 500,
+                },
+              }
+            : n
+        )
+      );
+    }, 10);
+
+    // Step 3: Add children
+    setTimeout(() => {
+      setNodes((nds) => [
+        ...nds,
+        {
+          id: `${node.id}-1`,
+          type: 'circle',
+          position: { x: 50, y: 60 },
+          data: {
+            label: 'Service A',
+            color: nColor(node.id),
+            imageSrc: iconMap[node.id],
+          },
+          parentNode: node.id,
+          extent: 'parent',
+        },
+        {
+          id: `${node.id}-2`,
+          type: 'circle',
+          position: { x: 160, y: 160 },
+          data: {
+            label: 'Service B',
+            color: nColor(node.id),
+            imageSrc: iconMap[node.id],
+          },
+          parentNode: node.id,
+          extent: 'parent',
+        },
+      ]);
+    }, 600);
+
+    // Step 4: Move other SCP nodes
+    handleOtherNodes(node.id);
+  };
+
+  const nColor = (id: string) => {
+    switch (id) {
+      case '1':
+        return 'rgb(67,196,237)';
+      case '2':
+        return 'rgb(103,155,253)';
+      case '3':
+        return 'rgb(246,133,0)';
+      default:
+        return '#ccc';
     }
   };
 
+  useEffect(() => {
+    if (reactFlowInstance.current) {
+      reactFlowInstance.current.fitView({ padding: 0.3 });
+      reactFlowInstance.current.zoomTo(0.55);
+    }
+  }, [nodes, edges]);
+
   return (
-    <div style={{ width: '100%', height: '100%' }}>
+    <div style={{ width: '100%', height: '100%' }} ref={reactFlowWrapper}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -184,8 +244,14 @@ export default function BasicFlow() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeClick={onNodeClick}
-        defaultViewport={{ x: 0, y: 0, zoom: 0.3 }}
         fitView={false}
+        minZoom={0.1}
+        maxZoom={1.5}
+        onInit={(instance: ReactFlowInstance) => {
+          reactFlowInstance.current = instance;
+          instance.fitView({ padding: 0.1 });
+          instance.zoomTo(0.55);
+        }}
       >
         <MiniMap />
         <Controls />
@@ -194,5 +260,3 @@ export default function BasicFlow() {
     </div>
   );
 }
-
-
