@@ -1,22 +1,29 @@
 import React, { createContext, useContext, useRef } from "react";
 
+interface Service {
+  name: string;
+  icon: JSX.Element;
+  vpc: string;
+  subnet: string;
+}
+
 interface CanvasContextProps {
-  addNodeToCanvas: (service: { name: string; icon: JSX.Element }) => void;
-  registerAddNodeFunction: (fn: (service: { name: string; icon: JSX.Element }) => void) => void;
+  addNodeToCanvas: (service: Service) => void;
+  registerAddNodeFunction: (fn: (service: Service) => void) => void;
 }
 
 const CanvasContext = createContext<CanvasContextProps | undefined>(undefined);
 
 export const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const addNodeFunctionRef = useRef<(service: { name: string; icon: JSX.Element }) => void>();
+  const addNodeFunctionRef = useRef<(service: Service) => void>();
 
-  const addNodeToCanvas = (service: { name: string; icon: JSX.Element }) => {
+  const addNodeToCanvas = (service: Service) => {
     if (addNodeFunctionRef.current) {
       addNodeFunctionRef.current(service);
     }
   };
 
-  const registerAddNodeFunction = (fn: (service: { name: string; icon: JSX.Element }) => void) => {
+  const registerAddNodeFunction = (fn: (service: Service) => void) => {
     addNodeFunctionRef.current = fn;
   };
 

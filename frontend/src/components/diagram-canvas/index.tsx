@@ -266,7 +266,7 @@ export default function BasicFlow() {
           type: "circle",
           position: { x: 400, y: 300 }, // Adjust position as needed
           data: {
-            label: service.name,
+            label: `${service.name} (${service.vpc}, ${service.subnet})`, // Include VPC and subnet in the label
             color: "rgb(246,133,0)", // Example color
             imageSrc: service.icon.props.src, // Use the service icon
           },
