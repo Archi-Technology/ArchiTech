@@ -21,6 +21,7 @@ import azureIcon from '../../assets/canvas/azure-svgrepo-com.svg';
 import gcpIcon from '../../assets/canvas/gcp-svgrepo-com.svg';
 import awsIcon from '../../assets/canvas/aws-svgrepo-com.svg';
 import earth from '../../assets/canvas/planet-earth.svg';
+import { ContactlessOutlined } from '@mui/icons-material';
 
 const nodeTypes = {
   circle: CircleNode,
@@ -113,16 +114,26 @@ export default function BasicFlow() {
     '3': awsIcon,
   };
 
-  const handleOtherNodes = (activeId: string) => {
-    const horizontalSpacing = 800; // Reduce spacing to bring nodes closer
-    const verticalOffset = 50; // Slight vertical adjustment for better positioning
+  const handleOtherNodes = (activeId: string, canvasCenterX: number, containerWidth: number) => {
+    const horizontalSpacing = 100; // Reduce spacing to bring nodes closer
+    const verticalOffset = 150; // Slight vertical adjustment for better positioning
+    let leftNodePlaced = false; // Track if the left node has been placed
+    console.log(`right ${canvasCenterX + (containerWidth / 2) + horizontalSpacing}`)
+    console.log(`left ${canvasCenterX - (containerWidth / 2) - horizontalSpacing}`)
+
+
+
     setNodes((nds) =>
       nds.map((n) => {
         if (['1', '2', '3'].includes(n.id) && n.id !== activeId) {
+          const newX = leftNodePlaced
+            ? canvasCenterX + (containerWidth / 2) + horizontalSpacing // Place on the right
+            : canvasCenterX - (containerWidth / 2) - horizontalSpacing; // Place on the left
+          leftNodePlaced = true; // Mark the left node as placed
           return {
             ...n,
             position: {
-              x: n.id === '2' ? n.position.x - horizontalSpacing : n.position.x + horizontalSpacing, // Left for '2', right for others
+              x: newX,
               y: n.position.y + verticalOffset, // Adjust vertically to avoid overlap
             },
           };
@@ -136,11 +147,16 @@ export default function BasicFlow() {
     if (!['1', '2', '3'].includes(node.id) || expandedNodeId === node.id) return;
     setExpandedNodeId(node.id);
 
-    const containerWidth = 1000;
+    const canvasWidth = reactFlowWrapper.current?.clientWidth || 0; // Dynamically get canvas width
+    const containerWidth = canvasWidth * 1.2; // Use 80% of the canvas width for the box
 
     // Center the expansion box horizontally in the canvas
-    const canvasCenterX = reactFlowWrapper.current?.clientWidth! / 2;
-    const centeredX = canvasCenterX - containerWidth / 2;
+    const canvasCenterX = canvasWidth / 2;
+    const startOfBox = canvasCenterX - (containerWidth / 2);
+
+    console.log(`$ width: ${canvasWidth}`)
+    console.log(`$ startOfBox: ${startOfBox}`)
+    console.log(`$ canvasCenterX: ${canvasCenterX}`)
 
     // Step 1: Replace node with container node
     setNodes((nds) =>
@@ -149,13 +165,18 @@ export default function BasicFlow() {
           ? {
               ...n,
               type: 'bigSquare',
-              position: { x: centeredX, y: n.position.y }, // Only update x value
+              position: { x: startOfBox, y: n.position.y }, // Only update x value
               data: {
                 ...n.data,
                 label: containerLabelMap[node.id],
                 width: 0,
                 height: 0,
               },
+            }
+          : n.id === '4'
+          ? {
+              ...n,
+              position: { x: canvasCenterX, y: n.position.y - 130 }, // Move Earth node to the middle of the screen in x-axis
             }
           : n
       )
@@ -171,7 +192,7 @@ export default function BasicFlow() {
                 data: {
                   ...n.data,
                   width: containerWidth,
-                  height: 500,
+                  height: 1000,
                 },
               }
             : n
@@ -211,7 +232,7 @@ export default function BasicFlow() {
     }, 600);
 
     // Step 4: Move other SCP nodes
-    handleOtherNodes(node.id);
+    handleOtherNodes(node.id, canvasCenterX, containerWidth);
   };
 
   const nColor = (id: string) => {

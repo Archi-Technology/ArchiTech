@@ -1,6 +1,6 @@
 import React from 'react';
 import { NodeProps } from 'reactflow';
-import azureIcon from '../../../assets/canvas/azure-svgrepo-com.svg'; // Adjust path as needed
+import azureIcon from '../../../assets/canvas/azure-svgrepo-com.svg';
 
 const ContainerNode = ({ data }: NodeProps) => {
   const width = data?.width ?? 100;
@@ -9,30 +9,31 @@ const ContainerNode = ({ data }: NodeProps) => {
   return (
     <div
       style={{
-        width,
-        height,
+        width: `${width}px`,
+        height: `${height}px`,
         border: '3px solid #ccc',
         borderRadius: '24px',
         backgroundColor: 'transparent',
         position: 'relative',
         transition: 'width 0.5s ease, height 0.5s ease',
         boxSizing: 'border-box',
+        overflow: 'visible', // Let labels/icons outside show without affecting layout
       }}
     >
-      {/* Border mask (hides part of the top border) */}
+      {/* Border mask (to hide top border segment) */}
       <div
         style={{
           position: 'absolute',
-          top: -10, // overlaps border
+          top: -10,
           left: 25,
           width: 100,
           height: 24,
-          backgroundColor: 'rgb(241,245,249)', // match canvas background
+          backgroundColor: 'rgb(241,245,249)', // Match canvas background
           zIndex: 1,
         }}
       />
 
-      {/* Logo and label on top of the border */}
+      {/* Logo + Label */}
       <div
         style={{
           position: 'absolute',
@@ -41,7 +42,7 @@ const ContainerNode = ({ data }: NodeProps) => {
           display: 'flex',
           alignItems: 'center',
           gap: 6,
-          zIndex: 2, // above mask
+          zIndex: 2,
         }}
       >
         <div
@@ -53,23 +54,25 @@ const ContainerNode = ({ data }: NodeProps) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            overflow: 'hidden', // Ensure the image fits within the circle
+            overflow: 'hidden',
           }}
         >
           <img
             src={azureIcon}
             alt="Azure"
             style={{
-              width: '16px', 
-              height: '16px', 
-              objectFit: 'contain',  
+              width: '16px',
+              height: '16px',
+              objectFit: 'contain',
             }}
           />
         </div>
-        <span style={{ fontWeight: 600, fontSize: 13, color: '#444' }}>Azure</span>
+        <span style={{ fontWeight: 600, fontSize: 13, color: '#444' }}>
+          Azure
+        </span>
       </div>
 
-      {/* Optional inner label */}
+      {/* Inner label */}
       <div
         style={{
           textAlign: 'center',
