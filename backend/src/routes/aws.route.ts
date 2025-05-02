@@ -105,3 +105,26 @@ awsRouter.get(
   "/cost/ec2",
   awsControllerInstance.getEC2Pricing.bind(awsControllerInstance)
 );
+
+/**
+ * @swagger
+ * /aws/cost/elb:
+ *   get:
+ *     summary: Get pricing for ELB
+ *     parameters:
+ *       - in: query
+ *         name: region
+ *         schema:
+ *           type: string
+ *         description: Region substring to filter pricing data
+ *       - in: query
+ *         name: os
+ *         schema:
+ *           type: string
+ *         description: Operating system substring to filter pricing data
+ *     responses:
+ *       200:
+ *         description: ELB pricing data
+ *       500:
+ *         description: Server error
+ */

@@ -23,7 +23,6 @@ export class awsService {
     location: string,
     storageClass: string
   ): Promise<number | null> {
-    
     location = location.trim();
     storageClass = storageClass.trim();
 
@@ -125,7 +124,7 @@ export class awsService {
     instanceType = instanceType.trim();
     location = location.trim();
     operatingSystem = operatingSystem.trim();
-    
+
     try {
       do {
         console.log(
@@ -180,6 +179,48 @@ export class awsService {
       return null;
     } catch (err) {
       console.error("Error fetching EC2 pricing:", err);
+      return null;
+    }
+  }
+
+  async getELBPricing(
+    region: string,
+    loadBalancerType: string
+  ): Promise<number | null> {
+    try {
+      const pricing = new this.service.Pricing({ region: "us-east-1" }); // Pricing only available in us-east-1
+
+      const data = await pricing
+        .getProducts({
+          ServiceCode: "AmazonEC2",
+          Filters: [
+            { Type: "TERM_MATCH", Field: "location", Value: region },
+            {
+              Type: "TERM_MATCH",
+              Field: "productFamily",
+              Value: "Load Balancer",
+            },
+            {
+              Type: "TERM_MATCH",
+              Field: "usagetype",
+              Value: `LoadBalancerUsage:${loadBalancerType.toUpperCase()}`,
+            },
+          ],
+          FormatVersion: "aws_v1",
+          MaxResults: 1,
+        })
+        .promise();
+
+      const products = data.PriceList || [];
+      if (!products.length) return null;
+
+      const product = JSON.parse(products[0]);
+      const priceDimensions = Object.values(product.terms.OnDemand)[0].priceDimensions;
+      const pricePerUnit = Object.values(priceDimensions)[0].pricePerUnit.USD;
+
+      return parseFloat(pricePerUnit);
+    } catch (error) {
+      console.error("Error in getELBPricing:", error);
       return null;
     }
   }
