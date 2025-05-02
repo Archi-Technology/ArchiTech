@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { awsService } from "../services/aws.service";
+import { awsService, LoadBalancerType } from "../services/aws.service";
 
 export class awsController {
   service: awsService = new awsService();
@@ -73,37 +73,37 @@ export class awsController {
     }
   }
 
-    async getELBPricing(req: Request, res: Response): Promise<void> {
-        try {
-        const { region, os } = req.query;
-    
-        if (!region || !os) {
-            res.status(400).json({
-            error: "Missing required parameters: region or os",
-            });
-            return;
-        }
-    
-        const price = await this.service.getELBPrice(
-            region as string,
-            os as string
-        );
-    
-        if (price === null) {
-            res.status(404).json({ error: "Pricing data not found" });
-            return;
-        }
-    
-        res.status(200).json({
-            region,
-            os,
-            pricePerHour: price,
+  async getELBPricing(req: Request, res: Response): Promise<void> {
+    try {
+      const { region, lbType } = req.query;
+
+      if (!region || !lbType) {
+        res.status(400).json({
+          error: "Missing required parameters: region or os",
         });
-        } catch (error) {
-        console.error("Error fetching ELB pricing:", error);
-        res.status(500).json({ error: "Failed to retrieve ELB pricing" });
-        }
+        return;
+      }
+
+      const price = await this.service.getElbPricing(
+        region as string,
+        lbType as LoadBalancerType
+      );
+
+      if (price === null) {
+        res.status(404).json({ error: "Pricing data not found" });
+        return;
+      }
+
+      res.status(200).json({
+        region,
+        lbType,
+        pricePerHour: price,
+      });
+    } catch (error) {
+      console.error("Error fetching ELB pricing:", error);
+      res.status(500).json({ error: "Failed to retrieve ELB pricing" });
     }
+  }
 }
 
 export const awsControllerInstance = new awsController();

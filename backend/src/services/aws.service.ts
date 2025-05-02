@@ -6,6 +6,9 @@ import {
 import dotenv from "dotenv";
 dotenv.config();
 
+// Define the LoadBalancerType type
+export type LoadBalancerType = "application" | "network" | "classic";
+
 export class awsService {
   client: PricingClient;
 
@@ -128,7 +131,7 @@ export class awsService {
     try {
       do {
         console.log(
-          `🔍 Fetching EC2 pricing for: Location='${location}', InstanceType='${instanceType}', OS='${operatingSystem}'`
+          `Fetching EC2 pricing for: Location='${location}', InstanceType='${instanceType}', OS='${operatingSystem}'`
         );
 
         const params: GetProductsCommandInput = {
@@ -166,7 +169,7 @@ export class awsService {
               const pricePerHour = parseFloat(
                 priceDimensions[dimensionKey].pricePerUnit.USD
               );
-              console.log(`✅ Found EC2 price: $${pricePerHour}/hour`);
+              console.log(`Found EC2 price: $${pricePerHour}/hour`);
               return pricePerHour;
             }
           }
@@ -183,44 +186,89 @@ export class awsService {
     }
   }
 
-  async getELBPricing(
-    region: string,
-    loadBalancerType: string
+  async getElbPricing(
+    location: string,
+    loadBalancerType: LoadBalancerType
   ): Promise<number | null> {
-    try {
-      const pricing = new this.service.Pricing({ region: "us-east-1" }); // Pricing only available in us-east-1
+    const productFamilyMap: Record<LoadBalancerType, string> = {
+      application: "Load Balancer-Application",
+      network: "Load Balancer-Network",
+      classic: "Load Balancer",
+    };
 
-      const data = await pricing
-        .getProducts({
+    const productFamily = productFamilyMap[loadBalancerType];
+    if (!productFamily) {
+      console.error(`Unknown load balancer type: ${loadBalancerType}`);
+      return null;
+    }
+
+    let nextToken: string | undefined = undefined;
+
+    try {
+      do {
+        const params: GetProductsCommandInput = {
           ServiceCode: "AmazonEC2",
           Filters: [
-            { Type: "TERM_MATCH", Field: "location", Value: region },
+            { Type: "TERM_MATCH", Field: "location", Value: location },
             {
               Type: "TERM_MATCH",
               Field: "productFamily",
-              Value: "Load Balancer",
-            },
-            {
-              Type: "TERM_MATCH",
-              Field: "usagetype",
-              Value: `LoadBalancerUsage:${loadBalancerType.toUpperCase()}`,
+              Value: productFamily,
             },
           ],
-          FormatVersion: "aws_v1",
-          MaxResults: 1,
-        })
-        .promise();
+          MaxResults: 100,
+          NextToken: nextToken,
+        };
 
-      const products = data.PriceList || [];
-      if (!products.length) return null;
+        const command = new GetProductsCommand(params);
+        const response = await this.client.send(command);
 
-      const product = JSON.parse(products[0]);
-      const priceDimensions = Object.values(product.terms.OnDemand)[0].priceDimensions;
-      const pricePerUnit = Object.values(priceDimensions)[0].pricePerUnit.USD;
+        if (!response.PriceList || response.PriceList.length === 0) {
+          console.warn("No ELB pricing data found for given filters.");
+          return null;
+        }
 
-      return parseFloat(pricePerUnit);
-    } catch (error) {
-      console.error("Error in getELBPricing:", error);
+        console.log(`Found ${response.PriceList.length} products.`);
+
+        for (const productString of response.PriceList) {
+          const product = JSON.parse(productString);
+          const attributes = product.product.attributes;
+          const usageType = attributes.usagetype || "";
+
+          const isHourlyUsage =
+            usageType.includes("LoadBalancerUsage") ||
+            usageType.includes("LCUUsage");
+
+          if (isHourlyUsage) {
+            const terms = product.terms.OnDemand;
+            for (const termKey in terms) {
+              const priceDimensions = terms[termKey].priceDimensions;
+              for (const dimensionKey in priceDimensions) {
+                const pricePerHour = parseFloat(
+                  priceDimensions[dimensionKey].pricePerUnit.USD
+                );
+
+                console.log(
+                  `Found ELB price for ${loadBalancerType} in ${location}: $${pricePerHour}/hour`
+                );
+
+                return pricePerHour;
+              }
+            }
+          } else {
+            console.log("Skipping non-hourly usage product");
+          }
+        }
+
+        nextToken = response.NextToken;
+      } while (nextToken);
+
+      console.error(
+        `No matching ELB price found for type '${loadBalancerType}' in '${location}'.`
+      );
+      return null;
+    } catch (err) {
+      console.error("Error fetching ELB pricing:", err);
       return null;
     }
   }

@@ -16,7 +16,7 @@ export const awsRouter = Router();
  *         required: false
  *         schema:
  *           type: string
- *           example: EU (Frankfurt)   
+ *           example: EU (Frankfurt)
  *       - name: storageClass
  *         in: query
  *         description: The storage class of the s3 bucket
@@ -110,21 +110,29 @@ awsRouter.get(
  * @swagger
  * /aws/cost/elb:
  *   get:
- *     summary: Get pricing for ELB
+ *     description: Get pricing for ELB
+ *     tags:
+ *       - AWS
  *     parameters:
  *       - in: query
  *         name: region
  *         schema:
  *           type: string
+ *           example: "US East (N. Virginia)"
  *         description: Region substring to filter pricing data
  *       - in: query
- *         name: os
+ *         name: lbType
  *         schema:
  *           type: string
- *         description: Operating system substring to filter pricing data
+ *           example: "application"
+ *         description: Type of load balancer (application, network, classic)
  *     responses:
  *       200:
  *         description: ELB pricing data
  *       500:
  *         description: Server error
  */
+awsRouter.get(
+  "/cost/elb",
+  awsControllerInstance.getELBPricing.bind(awsControllerInstance)
+);
