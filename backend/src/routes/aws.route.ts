@@ -136,3 +136,45 @@ awsRouter.get(
   "/cost/elb",
   awsControllerInstance.getELBPricing.bind(awsControllerInstance)
 );
+
+/**
+ * @swagger
+ * /aws/cost/rds:
+ *   get:
+ *     description: Get pricing for Amazon RDS instances
+ *     tags:
+ *       - AWS
+ *     parameters:
+ *       - in: query
+ *         name: region
+ *         schema:
+ *           type: string
+ *           example: "US East (N. Virginia)"
+ *         required: true
+ *         description: Region for the RDS instance
+ *       - in: query
+ *         name: instanceType
+ *         schema:
+ *           type: string
+ *           example: db.t3.micro
+ *         required: true
+ *         description: RDS instance type
+ *       - in: query
+ *         name: databaseEngine
+ *         schema:
+ *           type: string
+ *           example: PostgreSQL
+ *         required: true
+ *         description: RDS database engine (e.g., MySQL, PostgreSQL)
+ *     responses:
+ *       200:
+ *         description: RDS pricing data
+ *       400:
+ *         description: Missing or invalid parameters
+ *       500:
+ *         description: Server error
+ */
+awsRouter.get(
+  "/cost/rds",
+  awsControllerInstance.getRDSPricing.bind(awsControllerInstance)
+);

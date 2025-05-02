@@ -272,4 +272,69 @@ export class awsService {
       return null;
     }
   }
+
+  async getRDSPricing(
+    location: string,
+    instanceType: string,
+    databaseEngine: string
+  ): Promise<number | null> {
+    let nextToken: string | undefined = undefined;
+
+    try {
+      do {
+        const params: GetProductsCommandInput = {
+          ServiceCode: "AmazonRDS",
+          Filters: [
+            { Type: "TERM_MATCH", Field: "location", Value: location },
+            { Type: "TERM_MATCH", Field: "instanceType", Value: instanceType },
+            {
+              Type: "TERM_MATCH",
+              Field: "databaseEngine",
+              Value: databaseEngine,
+            },
+            {
+              Type: "TERM_MATCH",
+              Field: "deploymentOption",
+              Value: "Single-AZ",
+            },
+          ],
+          MaxResults: 100,
+          NextToken: nextToken,
+        };
+
+        const command = new GetProductsCommand(params);
+        const response = await this.client.send(command);
+
+        if (!response.PriceList || response.PriceList.length === 0) {
+          console.warn("No RDS pricing data found.");
+          return null;
+        }
+
+        console.log(`Found ${response.PriceList.length} products.`);
+        for (const productString of response.PriceList) {
+          const product = JSON.parse(productString);
+          const terms = product.terms.OnDemand;
+          for (const termKey in terms) {
+            const priceDimensions = terms[termKey].priceDimensions;
+            for (const dimensionKey in priceDimensions) {
+              const price = parseFloat(
+                priceDimensions[dimensionKey].pricePerUnit.USD
+              );
+              console.log(
+                `Found RDS price for ${databaseEngine} in ${location}: $${price}/hour`
+              );
+              return price;
+            }
+          }
+        }
+
+        nextToken = response.NextToken;
+      } while (nextToken);
+
+      return null;
+    } catch (err) {
+      console.error("Error fetching RDS pricing:", err);
+      return null;
+    }
+  }
 }

@@ -27,7 +27,7 @@ export class awsController {
         res.status(200).json({
           location: location,
           storageClass: storageClass,
-          pricePerGb: price,
+          pricePerGbPerMonth: price,
         });
       } else {
         res.status(500).json({ error: "Failed to fetch pricing data." });
@@ -102,6 +102,41 @@ export class awsController {
     } catch (error) {
       console.error("Error fetching ELB pricing:", error);
       res.status(500).json({ error: "Failed to retrieve ELB pricing" });
+    }
+  }
+
+  async getRDSPricing(req: Request, res: Response): Promise<void> {
+    try {
+      const { region, instanceType, databaseEngine } = req.query;
+
+      if (!region || !instanceType || !databaseEngine) {
+        res.status(400).json({
+          error:
+            "Missing required parameters: region, instanceType, or databaseEngine",
+        });
+        return;
+      }
+
+      const price = await this.service.getRDSPricing(
+        region as string,
+        instanceType as string,
+        databaseEngine as string
+      );
+
+      if (price === null) {
+        res.status(404).json({ error: "Pricing data not found" });
+        return;
+      }
+
+      res.status(200).json({
+        region,
+        instanceType,
+        databaseEngine,
+        pricePerHour: price,
+      });
+    } catch (error) {
+      console.error("Error fetching RDS pricing:", error);
+      res.status(500).json({ error: "Failed to retrieve RDS pricing" });
     }
   }
 }
