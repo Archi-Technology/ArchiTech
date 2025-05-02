@@ -22,6 +22,7 @@ import gcpIcon from '../../assets/canvas/gcp-svgrepo-com.svg';
 import awsIcon from '../../assets/canvas/aws-svgrepo-com.svg';
 import earth from '../../assets/canvas/planet-earth.svg';
 import { ContactlessOutlined } from '@mui/icons-material';
+import { useCanvas } from "../../contexts/canvasContext"; // Import canvas context
 
 const nodeTypes = {
   circle: CircleNode,
@@ -88,6 +89,7 @@ export default function BasicFlow() {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
   const reactFlowInstance = useRef<ReactFlowInstance | null>(null);
+  const { registerAddNodeFunction } = useCanvas(); // Access the function to register node addition
 
   const onConnect = (connection: Connection) =>
     setEdges((eds) =>
@@ -254,6 +256,24 @@ export default function BasicFlow() {
       reactFlowInstance.current.zoomTo(0.55);
     }
   }, [nodes, edges]);
+
+  useEffect(() => {
+    registerAddNodeFunction((service) => {
+      setNodes((nds) => [
+        ...nds,
+        {
+          id: `${service.name}-${Date.now()}`,
+          type: "circle",
+          position: { x: 400, y: 300 }, // Adjust position as needed
+          data: {
+            label: service.name,
+            color: "rgb(246,133,0)", // Example color
+            imageSrc: service.icon.props.src, // Use the service icon
+          },
+        },
+      ]);
+    });
+  }, [registerAddNodeFunction, setNodes]);
 
   return (
     <div style={{ width: '100%', height: '100%' }} ref={reactFlowWrapper}>
