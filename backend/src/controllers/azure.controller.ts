@@ -86,6 +86,29 @@ export class AzureController {
       return res.status(500).json({ error: "Internal server error." });
     }
   }
+
+  async getLoadBalancerPricing(req: Request, res: Response) {
+    const { region, type } = req.query;
+
+    if (!region || !type) {
+      return res.status(400).json({
+        error: "Missing required parameters: region, loadBalancerType",
+      });
+    }
+
+    const price = await this.service.getLoadBalancerPrice(
+      region as string,
+      type as string
+    );
+
+    if (price) {
+      return res.status(200).json(price);
+    } else {
+      return res
+        .status(404)
+        .json({ error: "No pricing data found for specified parameters." });
+    }
+  }
 }
 
 export const azureControllerInstance = new AzureController();

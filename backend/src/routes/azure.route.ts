@@ -137,3 +137,35 @@ azureRouter.get("/cost/vm", async (req, res) => {
     res.status(500).send({ error: "Internal Server Error" });
   }
 });
+
+/**
+ * @swagger
+ * /azure/cost/loadbalancer:
+ *   get:
+ *     description: Get cost estimation for Azure Load Balancer
+ *     tags:
+ *       - Azure
+ *     parameters:
+ *       - in: query
+ *         name: region
+ *         required: true
+ *         schema: { type: string }
+ *         example: eastus
+ *       - in: query
+ *         name: type
+ *         required: true
+ *         schema: { type: string }
+ *         example: Basic
+ *     responses:
+ *       200:
+ *         description: Cost retrieved
+ *       500:
+ *         description: Internal error
+ */
+azureRouter.get("/cost/loadbalancer", async (req, res) => {
+  try {
+    await azureControllerInstance.getLoadBalancerPricing(req, res);
+  } catch (err) {
+    res.status(500).send({ error: "Internal Server Error" });
+  }
+});

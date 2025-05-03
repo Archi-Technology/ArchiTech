@@ -100,4 +100,57 @@ export class AzureService {
       return null;
     }
   }
+
+  async getLoadBalancerPrice(
+    region: string,
+    loadBalancerType: string
+  ): Promise<any | null> {
+    try {
+      if (loadBalancerType.toLowerCase() === "basic") {
+        return {
+          region,
+          loadBalancerType,
+          totalHourlyCost: 0,
+          pricingDetails: [],
+        };
+      }
+
+      const filter = encodeURIComponent(
+        `serviceName eq 'Load Balancer' and skuName eq '${loadBalancerType}'`
+      );
+
+      const response = await axios.get(
+        `${this.pricingApiUrl}?$filter=${filter}`
+      );
+
+      const items = response.data.Items;
+
+      if (!items || items.length === 0) {
+        console.warn("No pricing items found for Load Balancer.");
+        return null;
+      }
+
+      const summarized = items.map((item: any) => ({
+        skuName: item.skuName,
+        meterName: item.meterName,
+        retailPrice: item.retailPrice,
+        unitOfMeasure: item.unitOfMeasure,
+      }));
+
+      const totalHourlyCost = items.reduce(
+        (sum: number, item: any) => sum + item.retailPrice,
+        0
+      );
+
+      return {
+        region,
+        loadBalancerType,
+        totalHourlyCost: parseFloat(totalHourlyCost.toFixed(4)),
+        pricingDetails: summarized,
+      };
+    } catch (err) {
+      console.error("Error fetching Load Balancer pricing:", err);
+      return null;
+    }
+  }
 }
