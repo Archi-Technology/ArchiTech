@@ -9,6 +9,7 @@ import './index.scss';
 import { LoginScreen } from './views/Login';
 import Profile from './views/Profile';
 import MapView from './views/Map';
+import Projects from './views/Project/Projects';
 
 const App: React.FC = () => {
   return (
@@ -28,6 +29,7 @@ const App: React.FC = () => {
             <Route path="/map" element={<MapView />} />
           </Route>
         </Route>
+        <Route path="/projects" element={<Projects />} />
 
         {/* Login route */}
         <Route path="/login" element={<LoginScreen />} />

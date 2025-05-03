@@ -4,10 +4,10 @@ import { CommentService } from "../services/comment.service";
 import { BaseController } from "./base.controller";
 
 
-export class CommentController extends BaseController<IComment, CommentService> {
-  constructor() {
-    super(new CommentService());
-  }
+  export class CommentController extends BaseController<IComment, CommentService> {
+    constructor() {
+      super(new CommentService());
+    }
 
   async CommentsByPostId(req: Request, res: Response) {
     try {

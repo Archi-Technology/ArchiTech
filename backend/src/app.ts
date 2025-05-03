@@ -14,6 +14,7 @@ import { authRouter } from './routes/auth.route';
 import { commentRouter } from './routes/comment.route';
 import { postRouter } from './routes/post.route';
 import { userRouter } from './routes/user.route';
+import { projectRouter } from './routes/project.route';
 import './cron-jobs/generateAiPosts'
 import { chatRouter } from './routes/chat.route';
 
@@ -47,6 +48,7 @@ const appPromise: Promise<Application> = new Promise( async (resolve, reject) =>
     app.use('/api/comment', commentRouter); 
     app.use('/api/post', postRouter);
     app.use('/api/chat', chatRouter);
+    app.use('/api/project', projectRouter);
 
 
     try {
