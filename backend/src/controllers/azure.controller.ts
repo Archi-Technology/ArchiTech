@@ -58,6 +58,34 @@ export class AzureController {
       return res.status(500).json({ error: "Internal server error." });
     }
   }
+
+  async getVmPricing(req: Request, res: Response) {
+    try {
+      const { region, vmSize, osType, savingPlan } = req.query;
+
+      if (!region || !vmSize || !osType) {
+        return res.status(400).json({
+          error: "Missing required parameters: region, vmSize, osType",
+        });
+      }
+
+      const price = await this.service.getVmPricing({
+        region: region as string,
+        vmSize: vmSize as string,
+        osType: osType as string,
+        savingPlan: savingPlan === "true",
+      });
+
+      if (price) {
+        return res.status(200).json(price);
+      } else {
+        return res.status(500).json({ error: "Failed to fetch VM pricing." });
+      }
+    } catch (error) {
+      console.error("Error fetching Azure VM pricing:", error);
+      return res.status(500).json({ error: "Internal server error." });
+    }
+  }
 }
 
 export const azureControllerInstance = new AzureController();

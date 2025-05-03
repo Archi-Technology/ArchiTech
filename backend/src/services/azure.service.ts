@@ -15,6 +15,13 @@ export interface BlobPricingParams {
   lifecyclePolicyEnabled?: boolean;
 }
 
+export interface VmPricingParams {
+  region: string;
+  vmSize: string;
+  osType: string;
+  savingPlan?: boolean;
+}
+
 export class AzureService {
   private pricingApiUrl = "https://prices.azure.com/api/retail/prices";
 
@@ -59,5 +66,38 @@ export class AzureService {
       return parseFloat(item.retailPrice);
     }
     return null;
+  }
+
+  async getVmPricing(params: VmPricingParams): Promise<any | null> {
+    try {
+      const baseFilter = `serviceName eq 'Virtual Machines' and armRegionName eq '${params.region}' and armSkuName eq '${params.vmSize}' and contains(productName, '${params.osType}')`;
+      const fullFilter = encodeURIComponent(baseFilter);
+
+      const response = await axios.get(
+        `${this.pricingApiUrl}?$filter=${fullFilter}`
+      );
+      const priceItems = response.data.Items;
+
+      if (!priceItems || priceItems.length === 0) {
+        console.error("No pricing found for VM with provided parameters.");
+        return null;
+      }
+
+      const vmItem = priceItems[0];
+      const unitPrice = parseFloat(vmItem.retailPrice);
+      const unitOfMeasure = vmItem.unitOfMeasure;
+
+      return {
+        region: params.region,
+        vmSize: params.vmSize,
+        osType: params.osType,
+        savingPlanApplied: !!params.savingPlan,
+        unitPrice,
+        unitOfMeasure,
+      };
+    } catch (error) {
+      console.error("Error fetching VM pricing:", error);
+      return null;
+    }
   }
 }

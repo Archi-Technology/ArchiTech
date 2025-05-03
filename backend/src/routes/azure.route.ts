@@ -88,13 +88,52 @@ export const azureRouter = Router();
  *       500:
  *         description: Internal error
  */
-azureRouter.get(
-  "/cost/blob",
-  async (req, res) => {
-    try {
-      await azureControllerInstance.getBlobPricing(req, res);
-    } catch (error) {
-      res.status(500).send({ error: "Internal Server Error" });
-    }
+azureRouter.get("/cost/blob", async (req, res) => {
+  try {
+    await azureControllerInstance.getBlobPricing(req, res);
+  } catch (error) {
+    res.status(500).send({ error: "Internal Server Error" });
   }
-);
+});
+
+/**
+ * @swagger
+ * /azure/cost/vm:
+ *   get:
+ *     description: Get cost estimation for Azure Virtual Machines
+ *     tags:
+ *       - Azure
+ *     parameters:
+ *       - in: query
+ *         name: region
+ *         schema: { type: string }
+ *         required: true
+ *         example: eastus
+ *       - in: query
+ *         name: vmSize
+ *         schema: { type: string }
+ *         required: true
+ *         example: Standard_D2s_v3
+ *       - in: query
+ *         name: osType
+ *         schema: { type: string }
+ *         required: true
+ *         example: Windows
+ *       - in: query
+ *         name: savingPlan
+ *         schema: { type: boolean }
+ *         required: false
+ *         example: false
+ *     responses:
+ *       200:
+ *         description: VM pricing retrieved
+ *       500:
+ *         description: Internal error
+ */
+azureRouter.get("/cost/vm", async (req, res) => {
+  try {
+    await azureControllerInstance.getVmPricing(req, res);
+  } catch (error) {
+    res.status(500).send({ error: "Internal Server Error" });
+  }
+});
