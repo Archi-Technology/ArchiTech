@@ -10,21 +10,7 @@ export class AzureController {
 
   async getBlobPricing(req: Request, res: Response) {
     try {
-      const {
-        region,
-        storageTier,
-        redundancy,
-        dataStoredGB,
-        operations,
-        dataRetrievalGB,
-        blobType,
-        blobSizeMB,
-        numberOfBlobs,
-        snapshotsEnabled,
-        versioningEnabled,
-        lifecyclePolicyEnabled,
-        savingPlan,
-      } = req.query;
+      const { region, storageTier, redundancy, dataStoredGB } = req.query;
 
       if (!region || !storageTier || !redundancy || !dataStoredGB) {
         return res.status(400).json({
@@ -38,14 +24,6 @@ export class AzureController {
         storageTier: storageTier as string,
         redundancy: redundancy as string,
         dataStoredGB: Number(dataStoredGB),
-        operations: operations ? JSON.parse(operations as string) : {},
-        dataRetrievalGB: Number(dataRetrievalGB || 0),
-        blobType: blobType as string,
-        blobSizeMB: Number(blobSizeMB || 0),
-        numberOfBlobs: Number(numberOfBlobs || 0),
-        snapshotsEnabled: snapshotsEnabled === "true",
-        versioningEnabled: versioningEnabled === "true",
-        lifecyclePolicyEnabled: lifecyclePolicyEnabled === "true",
       });
 
       if (price) {
@@ -61,7 +39,7 @@ export class AzureController {
 
   async getVmPricing(req: Request, res: Response) {
     try {
-      const { region, vmSize, osType, savingPlan } = req.query;
+      const { region, vmSize, osType } = req.query;
 
       if (!region || !vmSize || !osType) {
         return res.status(400).json({
@@ -73,7 +51,6 @@ export class AzureController {
         region: region as string,
         vmSize: vmSize as string,
         osType: osType as string,
-        savingPlan: savingPlan === "true",
       });
 
       if (price) {

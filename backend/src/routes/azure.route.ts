@@ -68,11 +68,6 @@ azureRouter.get("/cost/blob", async (req, res) => {
  *         schema: { type: string }
  *         required: true
  *         example: Windows
- *       - in: query
- *         name: savingPlan
- *         schema: { type: boolean }
- *         required: false
- *         example: false
  *     responses:
  *       200:
  *         description: VM pricing retrieved

@@ -5,21 +5,12 @@ export interface BlobPricingParams {
   storageTier: string;
   redundancy: string;
   dataStoredGB: number;
-  operations: Record<string, number>;
-  dataRetrievalGB: number;
-  blobType?: string;
-  blobSizeMB?: number;
-  numberOfBlobs?: number;
-  snapshotsEnabled?: boolean;
-  versioningEnabled?: boolean;
-  lifecyclePolicyEnabled?: boolean;
 }
 
 export interface VmPricingParams {
   region: string;
   vmSize: string;
   osType: string;
-  savingPlan?: boolean;
 }
 
 export interface SqlDbPricingParams {
@@ -34,7 +25,6 @@ export class AzureService {
 
   async getBlobStoragePrice(params: BlobPricingParams): Promise<any | null> {
     try {
-      // Fetch storage pricing
       const storagePricePerGB = await this.getStoragePricePerGB(
         params.region,
         params.storageTier,
@@ -98,7 +88,6 @@ export class AzureService {
         region: params.region,
         vmSize: params.vmSize,
         osType: params.osType,
-        savingPlanApplied: !!params.savingPlan,
         unitPrice,
         unitOfMeasure,
       };
