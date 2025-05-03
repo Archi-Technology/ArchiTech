@@ -4,16 +4,19 @@ import express from "express";
 import { Application } from "express";
 import mongoose from "mongoose";
 import path from "path";
-import fs from "fs";
-import swaggerJSDoc from "swagger-jsdoc";
-import swaggerUi from "swagger-ui-express";
-import { config } from "./config/config";
-import { authMiddleware } from "./middlewares/authMiddleware";
-import { chatRouter } from "./routes/chat.route";
-import { azureRouter } from "./routes/azure.route";
+import fs from 'fs';
+import swaggerJSDoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import { config } from './config/config';
+import { uploadMiddleware } from './config/multer';
+import { authMiddleware } from './middlewares/authMiddleware';
+import { authRouter } from './routes/auth.route';
+import { userRouter } from './routes/user.route';
+import { chatRouter } from './routes/chat.route';
+import { awsRouter } from './routes/aws.route';
 
-const appPromise: Promise<Application> = new Promise(
-  async (resolve, reject) => {
+
+const appPromise: Promise<Application> = new Promise( async (resolve, reject) => {
     const app = express();
 
     app.use(express.json());
@@ -30,10 +33,12 @@ const appPromise: Promise<Application> = new Promise(
     }
 
     app.use(cors());
-
-    app.use("/api", authMiddleware);
-
-    app.use("/api/chat", chatRouter);
+  
+    app.use('/api', authMiddleware);
+    app.use('/api/auth', authRouter);
+    app.use('/api/user', userRouter);
+    app.use('/api/chat', chatRouter);
+    app.use('/aws', awsRouter);
     app.use("/azure", azureRouter);
 
     try {

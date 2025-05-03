@@ -218,6 +218,12 @@
     text-align: center;
   }
   
+  .service-icon-img {
+    width: 40px; /* Adjust size as needed */
+    height: 40px;
+    object-fit: contain;
+  }
+  
   .empty-state {
     padding: 1rem;
     text-align: center;

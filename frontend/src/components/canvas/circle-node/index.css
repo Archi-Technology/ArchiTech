@@ -1,0 +1,30 @@
+/* circle-node.css */
+.circle-node-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .circle-node {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  
+  .circle-image {
+    width: 60%;
+    height: 60%;
+    object-fit: cover;
+
+  }
+  
+  .circle-label {
+    margin-top: 8px;
+    font-weight: bold;
+    text-align: center;
+  }
+  
