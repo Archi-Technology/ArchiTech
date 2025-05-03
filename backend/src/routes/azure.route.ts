@@ -31,57 +31,6 @@ export const azureRouter = Router();
  *         schema: { type: number }
  *         required: true
  *         example: 100
- *       - in: query
- *         name: operations
- *         schema:
- *           type: string
- *         required: false
- *         description: |
- *           JSON string like:
- *           {
- *             "read": 1000,
- *             "write": 500
- *           }
- *       - in: query
- *         name: dataRetrievalGB
- *         schema: { type: number }
- *         required: false
- *         example: 10
- *       - in: query
- *         name: blobType
- *         schema: { type: string }
- *         required: false
- *         example: BlockBlob
- *       - in: query
- *         name: blobSizeMB
- *         schema: { type: number }
- *         required: false
- *         example: 10
- *       - in: query
- *         name: numberOfBlobs
- *         schema: { type: number }
- *         required: false
- *         example: 1000
- *       - in: query
- *         name: snapshotsEnabled
- *         schema: { type: boolean }
- *         required: false
- *         example: true
- *       - in: query
- *         name: versioningEnabled
- *         schema: { type: boolean }
- *         required: false
- *         example: false
- *       - in: query
- *         name: lifecyclePolicyEnabled
- *         schema: { type: boolean }
- *         required: false
- *         example: true
- *       - in: query
- *         name: savingPlan
- *         schema: { type: boolean }
- *         required: false
- *         example: false
  *     responses:
  *       200:
  *         description: Cost retrieved
@@ -210,4 +159,3 @@ azureRouter.get("/cost/sql", async (req, res) => {
     res.status(500).send({ error: "Internal Server Error" });
   }
 });
-

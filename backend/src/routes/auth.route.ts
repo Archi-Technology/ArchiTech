@@ -7,6 +7,8 @@ export const authRouter = Router();
  * /auth/register:
  *   post:
  *     description: registrer user
+ *     tags:
+ *       - Auth
  *     parameters:
  *       - name: username
  *         in: body
@@ -56,6 +58,8 @@ authRouter.post('/register',authController.register.bind(authController));
  * /auth/login:
  *   post:
  *     description: user login
+ *     tags:
+ *       - Auth
  *     parameters:
  *       - name: username
  *         in: body
@@ -99,6 +103,8 @@ authRouter.post('/login/google',authController.googleSignin.bind(authController)
  * /auth/logout:
  *   post:
  *     description: user logout
+ *     tags:
+ *       - Auth
  *     parameters:
  *       - name: refresh token
  *         in: header
@@ -121,6 +127,8 @@ authRouter.post('/logout',authController.logout.bind(authController));
  * /auth/refresh:
  *   post:
  *     description: user refersh tokens
+ *     tags:
+ *       - Auth
  *     parameters:
  *       - name: refresh token
  *         in: header
