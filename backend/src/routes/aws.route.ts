@@ -32,15 +32,15 @@ export const awsRouter = Router();
  *             schema:
  *               type: object
  *               properties:
- *                 id:
- *                   type: integer
- *                   example: 123
- *                 username:
+ *                 region:
  *                   type: string
- *                   example: "Sample Name"
- *                 password:
+ *                   example: "EU (Frankfurt)"
+ *                 storageClass:
  *                   type: string
- *                   example: encryptedpassword
+ *                   example: "Standard"
+ *                 cost:
+ *                   type: number
+ *                   example: 0.023
  *       500:
  *         description: failed to retrieve s3 cost
  */
