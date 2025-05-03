@@ -109,6 +109,33 @@ export class AzureController {
         .json({ error: "No pricing data found for specified parameters." });
     }
   }
+
+  async getSqlDbPricing(req: Request, res: Response) {
+    try {
+      const { region, skuName, productName } = req.query;
+
+      if (!region || !skuName || !productName) {
+        return res
+          .status(400)
+          .json({ error: "region, skuName, and productName are required." });
+      }
+
+      const result = await this.service.getSqlDbPricing({
+        region: region as string,
+        skuName: skuName as string,
+        productName: productName as string,
+      });
+
+      if (result) {
+        return res.status(200).json(result);
+      } else {
+        return res.status(404).json({ error: "No pricing found." });
+      }
+    } catch (e) {
+      console.error("Error:", e);
+      return res.status(500).json({ error: "Internal error" });
+    }
+  }
 }
 
 export const azureControllerInstance = new AzureController();

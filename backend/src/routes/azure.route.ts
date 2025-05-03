@@ -169,3 +169,45 @@ azureRouter.get("/cost/loadbalancer", async (req, res) => {
     res.status(500).send({ error: "Internal Server Error" });
   }
 });
+
+/**
+ * @swagger
+ * /azure/cost/sql:
+ *   get:
+ *     description: Get Azure SQL Database vCore-based pricing
+ *     tags:
+ *       - Azure
+ *     parameters:
+ *       - in: query
+ *         name: region
+ *         required: true
+ *         schema: { type: string }
+ *         example: uaecentral
+ *       - in: query
+ *         name: skuName
+ *         required: true
+ *         schema: { type: string }
+ *         example: 36 vCore
+ *       - in: query
+ *         name: productName
+ *         required: true
+ *         schema: { type: string }
+ *         example: SQL Database Single/Elastic Pool General Purpose - Compute FSv2 Series
+ *     responses:
+ *       200:
+ *         description: Pricing retrieved
+ *       400:
+ *         description: Missing or invalid parameters
+ *       404:
+ *         description: No pricing data found
+ *       500:
+ *         description: Server error
+ */
+azureRouter.get("/cost/sql", async (req, res) => {
+  try {
+    await azureControllerInstance.getSqlDbPricing(req, res);
+  } catch (error) {
+    res.status(500).send({ error: "Internal Server Error" });
+  }
+});
+

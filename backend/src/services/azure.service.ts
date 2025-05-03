@@ -22,6 +22,13 @@ export interface VmPricingParams {
   savingPlan?: boolean;
 }
 
+export interface SqlDbPricingParams {
+  region: string;
+  skuName: string;
+  licenseType?: string;
+  tier?: string;
+}
+
 export class AzureService {
   private pricingApiUrl = "https://prices.azure.com/api/retail/prices";
 
@@ -150,6 +157,40 @@ export class AzureService {
       };
     } catch (err) {
       console.error("Error fetching Load Balancer pricing:", err);
+      return null;
+    }
+  }
+
+  async getSqlDbPricing(params: {
+    region: string;
+    skuName: string;
+    productName: string;
+  }): Promise<any | null> {
+    try {
+      const filter = encodeURIComponent(
+        `serviceName eq 'SQL Database' and armRegionName eq '${params.region}' and contains(skuName, '${params.skuName}') and contains(productName, '${params.productName}') and type eq 'Consumption'`
+      );
+
+      const response = await axios.get(
+        `${this.pricingApiUrl}?$filter=${filter}`
+      );
+      const items = response.data.Items;
+
+      if (!items || items.length === 0) {
+        console.warn("No SQL DB pricing found:", params);
+        return null;
+      }
+
+      const price = items[0];
+      return {
+        region: params.region,
+        sku: params.skuName,
+        productName: params.productName,
+        unitOfMeasure: price.unitOfMeasure,
+        pricePerUnit: price.retailPrice,
+      };
+    } catch (error) {
+      console.error("Error fetching SQL DB pricing:", error);
       return null;
     }
   }
