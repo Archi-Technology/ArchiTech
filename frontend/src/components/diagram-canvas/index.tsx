@@ -154,11 +154,7 @@ export default function BasicFlow() {
 
     // Center the expansion box horizontally in the canvas
     const canvasCenterX = canvasWidth / 2;
-    const startOfBox = canvasCenterX - (containerWidth / 2);
-
-    console.log(`$ width: ${canvasWidth}`)
-    console.log(`$ startOfBox: ${startOfBox}`)
-    console.log(`$ canvasCenterX: ${canvasCenterX}`)
+    const startOfBox = canvasCenterX - containerWidth / 2;
 
     // Step 1: Replace node with container node
     setNodes((nds) =>
@@ -202,12 +198,36 @@ export default function BasicFlow() {
       );
     }, 10);
 
-    // Step 3: Add children
+    // Step 3: Add VPC and Subnet nodes
     setTimeout(() => {
       setNodes((nds) => [
         ...nds,
         {
-          id: `${node.id}-1`,
+          id: `${node.id}-vpc`,
+          type: 'bigSquare',
+          position: { x: 100, y: 100 },
+          data: {
+            label: 'VPC',
+            width: 800,
+            height: 400,
+          },
+          parentNode: node.id, // VPC is a child of the clicked node
+          extent: 'parent',
+        },
+        {
+          id: `${node.id}-subnet`,
+          type: 'bigSquare',
+          position: { x: 50, y: 50 },
+          data: {
+            label: 'Subnet',
+            width: 600,
+            height: 300,
+          },
+          parentNode: `${node.id}-vpc`, // Subnet is a child of the VPC
+          extent: 'parent',
+        },
+        {
+          id: `${node.id}-service-a`,
           type: 'circle',
           position: { x: 50, y: 60 },
           data: {
@@ -215,11 +235,11 @@ export default function BasicFlow() {
             color: nColor(node.id),
             imageSrc: iconMap[node.id],
           },
-          parentNode: node.id,
+          parentNode: `${node.id}-subnet`, // Service A is a child of the Subnet
           extent: 'parent',
         },
         {
-          id: `${node.id}-2`,
+          id: `${node.id}-service-b`,
           type: 'circle',
           position: { x: 160, y: 160 },
           data: {
@@ -227,7 +247,7 @@ export default function BasicFlow() {
             color: nColor(node.id),
             imageSrc: iconMap[node.id],
           },
-          parentNode: node.id,
+          parentNode: `${node.id}-subnet`, // Service B is a child of the Subnet
           extent: 'parent',
         },
       ]);
