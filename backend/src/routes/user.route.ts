@@ -2,55 +2,6 @@ import { Router } from "express";
 import { userController } from "../controllers/user.controller";
 
 export const userRouter = Router();
-/**
- * @swagger
- * /user/:userid/posts:
- *   get:
- *     description: get all user posts
- *     tags:
- *       - User
- *     parameters:
- *       - name: userid
- *         in: params
- *         description: The user id
- *         required: true
- *         schema:
- *           type: string
- *           example: 67543ee35ed1086ec36400c6
- *     responses:
- *       200:
- *         description: sucsses fetching all user posts
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   _id:
- *                     type: string
- *                     example: 67543ee35ed1086ec36400c6
- *                   userId:
- *                     type: string
- *                     example: 67543ee35ed1086ec36400c6
- *                   date:
- *                     type: date
- *                     example: 2024-12-07T12:26:11.003Z
- *                   image:
- *                     type: string
- *                     example: img.png
- *                   likes:
- *                     type: array
- *                     items:
- *                       type: string
- *                       example: 67543ee35ed1086ec36400c6
- *       400:
- *         description: problem fetching all posts
- */
-userRouter.get(
-  "/:userid/posts",
-  userController.getUserPosts.bind(userController)
-);
 
 /**
  * @swagger
@@ -91,41 +42,6 @@ userRouter.get(
  *         description: problem fetching all posts
  */
 userRouter.get("/data", userController.userData.bind(userController));
-
-/**
- * @swagger
- * /user/update:
- *   put:
- *     description: update a user
- *     tags:
- *       - User
- *     parameters:
- *       - name: username
- *         in: body
- *         description: The username to update
- *         required: false
- *         schema:
- *           type: string
- *           example: newtestusername
- *       - name: image
- *         in: body
- *         description: The image to update
- *         required: false
- *         schema:
- *           type: string
- *           example: newimg.png
- *     responses:
- *       200:
- *         description: sucsses updating user
- *         content:
- *           application/json:
- *             schema:
- *               type: string
- *               example: update entity sucssfully
- *       400:
- *         description: problem updating user
- */
-userRouter.put("/update", userController.updateUser.bind(userController));
 
 /**
  * @swagger

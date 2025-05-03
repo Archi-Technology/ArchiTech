@@ -8,12 +8,12 @@ import fs from 'fs';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { config } from './config/config';
-import { uploadMiddleware } from './config/multer';
 import { authMiddleware } from './middlewares/authMiddleware';
 import { authRouter } from './routes/auth.route';
 import { userRouter } from './routes/user.route';
 import { chatRouter } from './routes/chat.route';
 import { awsRouter } from './routes/aws.route';
+import { azureRouter } from './routes/azure.route';
 
 
 const appPromise: Promise<Application> = new Promise( async (resolve, reject) => {
