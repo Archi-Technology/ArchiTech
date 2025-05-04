@@ -48,7 +48,7 @@ const appPromise: Promise<Application> = new Promise( async (resolve, reject) =>
     app.use('/api/comment', commentRouter); 
     app.use('/api/post', postRouter);
     app.use('/api/chat', chatRouter);
-    app.use('/api/project', projectRouter);
+    app.use('/api/projects', projectRouter);
 
 
     try {

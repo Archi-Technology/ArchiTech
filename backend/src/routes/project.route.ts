@@ -13,7 +13,7 @@ export const projectRouter = Router();
 
 /**
  * @swagger
- * /projects:
+ * /api/projects:
  *   get:
  *     summary: Fetch all projects for the authenticated user
  *     tags: [Projects]
@@ -33,7 +33,7 @@ projectRouter.get('/', projectController.getAll.bind(projectController));
 
 /**
  * @swagger
- * /projects:
+ * /api/projects:
  *   post:
  *     summary: Create a new project
  *     tags: [Projects]
@@ -66,7 +66,7 @@ projectRouter.post('/', projectController.create.bind(projectController));
 
 /**
  * @swagger
- * /projects/{id}:
+ * /api/projects/{id}:
  *   put:
  *     summary: Update an existing project
  *     tags: [Projects]
@@ -107,7 +107,7 @@ projectRouter.put('/:id', projectController.update.bind(projectController));
 
 /**
  * @swagger
- * /projects/{id}:
+ * /api/projects/{id}:
  *   delete:
  *     summary: Delete a project by ID
  *     tags: [Projects]
