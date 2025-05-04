@@ -14,11 +14,14 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@aws-sdk/client-pricing": "^3.797.0",
     "@google/generative-ai": "^0.21.0",
     "@types/jest": "^29.5.14",
     "@types/supertest": "^6.0.2",
+    "axios": "^1.9.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
+    "cron-jobs": "^1.0.3",
     "express": "^4.21.1",
     "express-session": "^1.18.1",
     "fs": "^0.0.1-security",
@@ -35,6 +38,7 @@
     "ts-jest": "^29.2.5"
   },
   "devDependencies": {
+    "@types/axios": "^0.9.36",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
