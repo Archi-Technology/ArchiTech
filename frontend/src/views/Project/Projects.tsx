@@ -7,9 +7,15 @@ import {
   Button,
   Paper,
   Container,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
 } from '@mui/material';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import AddIcon from '@mui/icons-material/Add';
+import CloseIcon from '@mui/icons-material/Close';
 import { getAllProjects, createProject } from '../../services/projectService';
 
 interface Project {
@@ -21,6 +27,7 @@ interface Project {
 
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [openDialog, setOpenDialog] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -68,7 +75,6 @@ export default function Projects() {
       }}
     >
       <Container>
-        {/* TOP ACTIONS */}
         <Grid container spacing={4} mb={4}>
           <Grid item xs={12} md={6}>
             <Paper elevation={3} sx={{ p: 4, bgcolor: '#1a1a1a' }}>
@@ -85,7 +91,12 @@ export default function Projects() {
                 Access your ongoing projects and pick up where you left off.
               </Typography>
               <Box mt={3}>
-                <Button fullWidth variant="contained" sx={{ bgcolor: '#fff', color: '#000' }}>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  sx={{ bgcolor: '#fff', color: '#000' }}
+                  onClick={() => setOpenDialog(true)}
+                >
                   View Existing Projects
                 </Button>
               </Box>
@@ -120,7 +131,6 @@ export default function Projects() {
           </Grid>
         </Grid>
 
-        {/* RECENT PROJECTS */}
         {projects.length > 0 && (
           <>
             <Typography variant="subtitle1" mb={2} color="white">
@@ -150,6 +160,55 @@ export default function Projects() {
             </Grid>
           </>
         )}
+
+        <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth maxWidth="sm">
+          <DialogTitle>
+            Select a Project
+            <IconButton
+              aria-label="close"
+              onClick={() => setOpenDialog(false)}
+              sx={{
+                position: 'absolute',
+                right: 8,
+                top: 8,
+                color: (theme) => theme.palette.grey[500],
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent dividers>
+            {projects.length === 0 ? (
+              <Typography>No projects available.</Typography>
+            ) : (
+              projects.map((project) => (
+                <Box
+                  key={project._id}
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  mb={2}
+                >
+                  <Typography>{project.name}</Typography>
+                  <Button
+                    variant="outlined"
+                    onClick={() => {
+                      navigate(`/home?projectId=${project._id}`);
+                      setOpenDialog(false);
+                    }}
+                  >
+                    Open
+                  </Button>
+                </Box>
+              ))
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenDialog(false)} color="secondary">
+              Cancel
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Container>
     </Box>
   );
