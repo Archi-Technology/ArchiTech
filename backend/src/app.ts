@@ -12,7 +12,6 @@ import { authMiddleware } from './middlewares/authMiddleware';
 import { authRouter } from './routes/auth.route';
 import { userRouter } from './routes/user.route';
 import { projectRouter } from './routes/project.route';
-//import './cron-jobs/generateAiPosts'
 import { chatRouter } from './routes/chat.route';
 import { awsRouter } from './routes/aws.route';
 import { azureRouter } from './routes/azure.route';

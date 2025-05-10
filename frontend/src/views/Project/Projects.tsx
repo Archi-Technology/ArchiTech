@@ -12,11 +12,14 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
+  TextField,
 } from '@mui/material';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
-import { getAllProjects, createProject } from '../../services/projectService';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { getAllProjects, createProject, updateProject, deleteProject } from '../../services/projectService';
 
 interface Project {
   _id: string;
@@ -28,27 +31,51 @@ interface Project {
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
+  const [editMode, setEditMode] = useState<string | null>(null);
+  const [newProjectName, setNewProjectName] = useState('');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const data = await getAllProjects();
-        setProjects(data);
-      } catch (err) {
-        console.error('Error fetching projects', err);
-      }
-    };
+  const fetchProjects = async () => {
+    try {
+      const data = await getAllProjects();
+      setProjects(data);
+    } catch (err) {
+      console.error('Error fetching projects', err);
+    }
+  };
 
+  useEffect(() => {
     fetchProjects();
   }, []);
 
   const handleCreateProject = async () => {
     try {
       await createProject('New Project');
+      await fetchProjects();
       navigate('/home');
     } catch (err) {
       console.error('Error creating project', err);
+    }
+  };
+
+  const handleEditProject = async (projectId: string, newName: string) => {
+    try {
+      await updateProject(projectId, newName, projects.find(p => p._id === projectId)?.data || {});
+      setEditMode(null);
+      await fetchProjects();
+    } catch (err) {
+      console.error('Error updating project', err);
+    }
+  };
+
+  const handleDeleteProject = async (projectId: string) => {
+    if (window.confirm('Are you sure you want to delete this project?')) {
+      try {
+        await deleteProject(projectId);
+        await fetchProjects();
+      } catch (err) {
+        console.error('Error deleting project', err);
+      }
     }
   };
 
@@ -161,52 +188,93 @@ export default function Projects() {
           </>
         )}
 
-        <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth maxWidth="sm">
+        <Dialog
+          open={openDialog}
+          onClose={() => setOpenDialog(false)}
+          maxWidth="md"
+          fullWidth
+        >
           <DialogTitle>
-            Select a Project
-            <IconButton
-              aria-label="close"
-              onClick={() => setOpenDialog(false)}
-              sx={{
-                position: 'absolute',
-                right: 8,
-                top: 8,
-                color: (theme) => theme.palette.grey[500],
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
+            <Box display="flex" justifyContent="space-between" alignItems="center">
+              <Typography variant="h6">Your Projects</Typography>
+              <IconButton onClick={() => setOpenDialog(false)}>
+                <CloseIcon />
+              </IconButton>
+            </Box>
           </DialogTitle>
           <DialogContent dividers>
-            {projects.length === 0 ? (
-              <Typography>No projects available.</Typography>
-            ) : (
-              projects.map((project) => (
-                <Box
-                  key={project._id}
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  mb={2}
-                >
-                  <Typography>{project.name}</Typography>
-                  <Button
-                    variant="outlined"
-                    onClick={() => {
-                      navigate(`/home?projectId=${project._id}`);
-                      setOpenDialog(false);
-                    }}
-                  >
-                    Open
-                  </Button>
-                </Box>
-              ))
-            )}
+            <Grid container spacing={2}>
+              {projects.map((project) => (
+                <Grid item xs={12} key={project._id}>
+                  <Paper sx={{ p: 2, bgcolor: '#1a1a1a' }}>
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                      <Box display="flex" alignItems="center" flex={1}>
+                        <FolderOpenIcon sx={{ mr: 1, color: '#fff' }} />
+                        {editMode === project._id ? (
+                          <TextField
+                            value={newProjectName}
+                            onChange={(e) => setNewProjectName(e.target.value)}
+                            size="small"
+                            fullWidth
+                            autoFocus
+                            onBlur={() => {
+                              if (newProjectName.trim()) {
+                                handleEditProject(project._id, newProjectName);
+                              }
+                              setEditMode(null);
+                            }}
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter' && newProjectName.trim()) {
+                                handleEditProject(project._id, newProjectName);
+                              }
+                            }}
+                            sx={{ input: { color: '#fff' } }}
+                          />
+                        ) : (
+                          <Typography color="white">{project.name}</Typography>
+                        )}
+                      </Box>
+                      <Box>
+                        <IconButton
+                          onClick={() => {
+                            setEditMode(project._id);
+                            setNewProjectName(project.name);
+                          }}
+                          size="small"
+                          sx={{ color: '#fff' }}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton
+                          onClick={() => handleDeleteProject(project._id)}
+                          size="small"
+                          sx={{ color: '#fff' }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          onClick={() => {
+                            setOpenDialog(false);
+                            navigate(`/home?projectId=${project._id}`);
+                          }}
+                          sx={{ ml: 1 }}
+                        >
+                          Open
+                        </Button>
+                      </Box>
+                    </Box>
+                    <Typography variant="caption" color="gray" display="block" mt={1}>
+                      Last edited: {formatDate(project.lastEdited)}
+                    </Typography>
+                  </Paper>
+                </Grid>
+              ))}
+            </Grid>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setOpenDialog(false)} color="secondary">
-              Cancel
-            </Button>
+            <Button onClick={() => setOpenDialog(false)}>Close</Button>
           </DialogActions>
         </Dialog>
       </Container>
