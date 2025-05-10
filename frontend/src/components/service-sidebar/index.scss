@@ -224,6 +224,11 @@
     object-fit: contain;
   }
   
+  .service-icon img {
+    width: 2rem; /* Increase width */
+    height: 2rem; /* Increase height */
+  }
+  
   .empty-state {
     padding: 1rem;
     text-align: center;

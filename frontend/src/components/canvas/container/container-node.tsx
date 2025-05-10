@@ -1,8 +1,7 @@
 import React from 'react';
 import { NodeProps } from 'reactflow';
-import azureIcon from '../../../assets/canvas/azure-svgrepo-com.svg';
 
-const ContainerNode = ({ data }: NodeProps) => {
+const ContainerNode = ({ data, title = "Azure", icon }: NodeProps & { title?: string; icon?: string }) => {
   const width = data?.width ?? 100;
   const height = data?.height ?? 100;
 
@@ -50,7 +49,7 @@ const ContainerNode = ({ data }: NodeProps) => {
             width: 22,
             height: 22,
             borderRadius: '50%',
-            backgroundColor: 'rgb(67,196,237)',
+            backgroundColor: data.color,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -58,8 +57,8 @@ const ContainerNode = ({ data }: NodeProps) => {
           }}
         >
           <img
-            src={azureIcon}
-            alt="Azure"
+            src={data.icon}
+            alt={title}
             style={{
               width: '16px',
               height: '16px',
@@ -68,7 +67,7 @@ const ContainerNode = ({ data }: NodeProps) => {
           />
         </div>
         <span style={{ fontWeight: 600, fontSize: 13, color: '#444' }}>
-          Azure
+          {data.label}
         </span>
       </div>
 

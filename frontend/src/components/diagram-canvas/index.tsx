@@ -21,6 +21,8 @@ import azureIcon from '../../assets/canvas/azure-svgrepo-com.svg';
 import gcpIcon from '../../assets/canvas/gcp-svgrepo-com.svg';
 import awsIcon from '../../assets/canvas/aws-svgrepo-com.svg';
 import earth from '../../assets/canvas/planet-earth.svg';
+import vpcIcon from '../../assets/canvas/cloud-svgrepo-com.svg';
+import subnetIcon from '../../assets/canvas/network-wired-svgrepo-com.svg';
 import { ContactlessOutlined } from '@mui/icons-material';
 import { useCanvas } from "../../contexts/canvasContext"; // Import canvas context
 
@@ -114,9 +116,9 @@ export default function BasicFlow() {
     );
 
   const containerLabelMap: Record<string, string> = {
-    '1': 'Azure Group',
-    '2': 'GCP Group',
-    '3': 'AWS Group',
+    '1': 'Azure',
+    '2': 'GCP',
+    '3': 'AWS',
   };
 
   const iconMap: Record<string, string> = {
@@ -176,6 +178,8 @@ export default function BasicFlow() {
           data: {
           ...n.data,
           label: containerLabelMap[node.id],
+          icon: node.id === '1' ? azureIcon : node.id === '3' ? awsIcon : node.id === '2' ? gcpIcon : n.data.icon,
+          color: node.id === '1' ? 'rgb(67,196,237)' : node.id === '2' ? 'rgb(103,155,253)' : n.data.color,
           width: 0,
           height: 0,
           },
@@ -216,11 +220,13 @@ export default function BasicFlow() {
           type: 'bigSquare',
           position: { x: 100, y: 100 },
           data: {
-        label: 'VPC',
-        width: 800,
-        height: 400,
+            label: node.id === '1' ? 'VNet' : 'VPC', // Use "VNet" for Azure
+            icon: vpcIcon,
+            color: node.data.color,
+            width: 800,
+            height: 400,
           },
-          parentNode: node.id, // VPC is a child of the clicked node
+          parentNode: node.id, // VPC/VNet is a child of the clicked node
           extent: 'parent',
         } as Node,
         {
@@ -228,11 +234,13 @@ export default function BasicFlow() {
           type: 'bigSquare',
           position: { x: 50, y: 50 },
           data: {
-        label: 'Subnet',
-        width: 600,
-        height: 300,
+            label: 'Subnet',
+            icon: subnetIcon,
+            color: node.data.color,
+            width: 600,
+            height: 300,
           },
-          parentNode: `${node.id}-vpc`, // Subnet is a child of the VPC
+          parentNode: `${node.id}-vpc`, // Subnet is a child of the VPC/VNet
           extent: 'parent',
         } as Node,
         {

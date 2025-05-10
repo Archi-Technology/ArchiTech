@@ -10,20 +10,28 @@ import route53Icon from "../../assets/canvas/aws/route53.svg";
 import ecsIcon from "../../assets/canvas/aws/ecs.svg";
 import elbIcon from "../../assets/canvas/aws/elb.svg";
 import { useCanvas } from "../../contexts/canvasContext"; // Import canvas context
+import { useServices } from "../../contexts/serviceContext"; // Import useServices
 import ServicePopup from "../service-popup"; // Import the popup component
 
 export default function ServiceSidebar() {
     const [activeTab, setActiveTab] = useState("catalog");
     const { addNodeToCanvas } = useCanvas(); // Access the function to add nodes to the canvas
+    const services = useServices(); // Access services from context
     const [selectedService, setSelectedService] = useState<Service | null>(null); // Track the selected service
 
     const handleServiceClick = (service: Service) => {
         setSelectedService(service); // Open the popup with the selected service
     };
 
-    const handlePopupConfirm = (vpc: string, subnet: string) => {
+    const handlePopupConfirm = (cloud: string, addressRange: string) => {
         if (selectedService) {
-            addNodeToCanvas({ ...selectedService, vpc, subnet }); // Pass VPC and subnet to the canvas
+            addNodeToCanvas({ 
+                ...selectedService, 
+                vpc: selectedService.vpc || "", 
+                subnet: selectedService.subnet || "", 
+                cloud, 
+                addressRange 
+            }); // Pass cloud and address range to the canvas
             setSelectedService(null); // Close the popup
         }
     };
@@ -98,45 +106,7 @@ export default function ServiceSidebar() {
   interface Service {
     name: string;
     icon: JSX.Element;
-    vpc?: string; // Optional property
-    subnet?: string; // Optional property
+    vpc?: string | undefined; // Optional property
+    subnet?: string | undefined; // Optional property
+    cloud?: string; // Optional property for target cloud
   }
-
-  const services: Service[] = [
-    {
-      name: "EC2",
-      icon: <img src={ec2Icon} alt="EC2" className="service-icon-img" />,
-    },
-    {
-      name: "S3",
-      icon: <img src={s3Icon} alt="S3" className="service-icon-img" />,
-    },
-    {
-      name: "Lambda",
-      icon: <img src={lambdaIcon} alt="Lambda" className="service-icon-img" />,
-    },
-    {
-      name: "API Gateway",
-      icon: <img src={apiGatewayIcon} alt="API Gateway" className="service-icon-img" />,
-    },
-    {
-      name: "VPC",
-      icon: <img src={vpcIcon} alt="VPC" className="service-icon-img" />,
-    },
-    {
-      name: "CloudFront",
-      icon: <img src={cloudFrontIcon} alt="CloudFront" className="service-icon-img" />,
-    },
-    {
-      name: "Route 53",
-      icon: <img src={route53Icon} alt="Route 53" className="service-icon-img" />,
-    },
-    {
-      name: "ECS",
-      icon: <img src={ecsIcon} alt="ECS" className="service-icon-img" />,
-    },
-    {
-      name: "ELB",
-      icon: <img src={elbIcon} alt="ELB" className="service-icon-img" />,
-    },
-  ];

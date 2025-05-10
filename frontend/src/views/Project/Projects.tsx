@@ -20,6 +20,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { getAllProjects, createProject, updateProject, deleteProject } from '../../services/projectService';
+import { createVPC } from '../../services/canvasService';
 
 interface Project {
   _id: string;
@@ -50,7 +51,7 @@ export default function Projects() {
 
   const handleCreateProject = async () => {
     try {
-      await createProject('New Project');
+
       await fetchProjects();
       navigate('/home');
     } catch (err) {
@@ -256,6 +257,7 @@ export default function Projects() {
                           variant="contained"
                           size="small"
                           onClick={() => {
+                            sessionStorage.setItem('selectedProjectId', project._id); // Save project ID in session storage
                             setOpenDialog(false);
                             navigate(`/home?projectId=${project._id}`);
                           }}
