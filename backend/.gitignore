@@ -1,6 +1,8 @@
 # Node modules
 node_modules/
 
+google_sa.json
+
 coverage
 
 src/config/uploads/

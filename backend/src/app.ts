@@ -14,6 +14,7 @@ import { userRouter } from './routes/user.route';
 import { chatRouter } from './routes/chat.route';
 import { awsRouter } from './routes/aws.route';
 import { azureRouter } from './routes/azure.route';
+import { gcpRouter } from './routes/gcp.route';
 
 
 const appPromise: Promise<Application> = new Promise( async (resolve, reject) => {
@@ -40,6 +41,7 @@ const appPromise: Promise<Application> = new Promise( async (resolve, reject) =>
     app.use('/api/chat', chatRouter);
     app.use('/aws', awsRouter);
     app.use("/azure", azureRouter);
+    app.use("/gcp", gcpRouter);
 
     try {
       await mongoose.connect(config.MONGO_URI as string);
