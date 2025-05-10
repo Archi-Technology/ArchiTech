@@ -60,7 +60,7 @@ export const registerUser = async (email: string, username: string, password: st
     password
   }));
 
-  await loginUser(username, password);
+  await loginUser(email, password);
 };
 
 export const logout = async () => {
