@@ -16,6 +16,7 @@ import "./index.scss"
 import { Controller, type SubmitHandler, useForm } from "react-hook-form"
 import { Box, Button, TextField, Typography, Divider } from "@mui/material"
 import { type CredentialResponse, GoogleLogin } from "@react-oauth/google"
+import { rawListeners } from "process"
 
 type FormInputs = {
     username: string
@@ -27,7 +28,7 @@ interface IProp {
     enterMode: EneterModes
     setEnterMode: React.Dispatch<React.SetStateAction<EneterModes>>
     onRegister: (email: string, username: string, password: string) => Promise<void>
-    onLogin: (username: string, password: string) => Promise<void>
+    onLogin: (username: string, password: string) => Promise<boolean>
     onGoogleSignIn: (credentialResponse: CredentialResponse) => Promise<void>
 }
 
@@ -46,16 +47,27 @@ export const LoginCard: React.FC<IProp> = ({ onLogin, onRegister, enterMode, set
         showToast("failed to sign in with google", "error")
     }, [])
 
-    const onSubmit: SubmitHandler<FormInputs> = useCallback(
-        async (data) => {
-            if (enterMode == EneterModes.REGISTER) {
-                await onRegister(data!.email, data.username, data.password)
-            } else {
-                await onLogin(data.username, data.password)
-            }
-        },
-        [enterMode, onRegister, onLogin],
-    )
+const navigate = useNavigate();
+
+const onSubmit: SubmitHandler<FormInputs> = useCallback(
+    async (data) => {
+      try {
+        let success = false;
+
+        if (enterMode === EneterModes.REGISTER) {
+          await onRegister(data.email, data.username, data.password);
+          success = true;
+        } else {
+            success = await onLogin(data.username, data.password);
+        }
+  
+        navigate('/projects');
+      } catch (error) {
+        console.error('Login failed', error);
+      }
+    },
+    [enterMode, onRegister, onLogin, navigate],
+  );
 
     return (
         <div className="login-card">
@@ -258,16 +270,18 @@ const LoginContainer: React.FC = () => {
                 await enterModeFunction(...args)
                 navigate("/home")
                 showToast(`successfully ${enterModeText[enterMode]}`, "success")
+                return true            
             } catch (error) {
                 showToast(`failed to ${enterModeText[enterMode]}`, "error")
             }
+            return false
         },
         [navigate, setUserData, enterMode],
     )
 
     const onLogin = useCallback(
-        async (username: string, password: string) => {
-            await onSubmit(loginUser, username, password)
+        async (username: string, password: string): Promise<boolean> => {
+            return await onSubmit(loginUser, username, password)
         },
         [loginUser, onSubmit],
     )
