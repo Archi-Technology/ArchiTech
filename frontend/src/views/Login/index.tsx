@@ -27,7 +27,7 @@ interface IProp {
     enterMode: EneterModes
     setEnterMode: React.Dispatch<React.SetStateAction<EneterModes>>
     onRegister: (email: string, username: string, password: string) => Promise<void>
-    onLogin: (username: string, password: string) => Promise<void>
+    onLogin: (email: string, password: string) => Promise<void>
     onGoogleSignIn: (credentialResponse: CredentialResponse) => Promise<void>
 }
 
@@ -51,7 +51,7 @@ export const LoginCard: React.FC<IProp> = ({ onLogin, onRegister, enterMode, set
             if (enterMode == EneterModes.REGISTER) {
                 await onRegister(data!.email, data.username, data.password)
             } else {
-                await onLogin(data.username, data.password)
+                await onLogin(data.email, data.password)
             }
         },
         [enterMode, onRegister, onLogin],
@@ -266,8 +266,8 @@ const LoginContainer: React.FC = () => {
     )
 
     const onLogin = useCallback(
-        async (username: string, password: string) => {
-            await onSubmit(loginUser, username, password)
+        async (email: string, password: string) => {
+            await onSubmit(loginUser, email, password)
         },
         [loginUser, onSubmit],
     )

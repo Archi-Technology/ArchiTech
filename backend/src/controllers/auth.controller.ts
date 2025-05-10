@@ -29,13 +29,13 @@ export class AuthController extends BaseController<IUser, AuthService> {
   }
 
   async login(req: Request, res: Response) {
-    const { username, password} = req.body;
+    const { email, password} = req.body;
     try {
-      if(!username || !password) {
-        throw new Error('no username or password provided');
+      if(!email || !password) {
+        throw new Error('no email or password provided');
       }
 
-      const authTokens: IAuthTokens = await this.service.loginUser(username, password);
+      const authTokens: IAuthTokens = await this.service.loginUser(email, password);
       res.status(200).json(authTokens);
     } catch (error: any) {
       res.status(400).json({ message: error.message });

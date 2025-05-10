@@ -42,10 +42,10 @@ export const useGetUserData = (userid: string | null) =>
   );
 
 
-export const loginUser = async (username: string, password: string) => {
+export const loginUser = async (email: string, password: string) => {
 
   const data = (await axios.post<ILoginResponse>('http://localhost:5000/api/auth/login', {
-    username,
+    email,
     password
   })).data;
 
