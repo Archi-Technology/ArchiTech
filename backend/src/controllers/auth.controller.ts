@@ -86,7 +86,7 @@ export class AuthController extends BaseController<IUser, AuthService> {
 
       const ticket = await client.verifyIdToken({
         idToken: credential,
-        audience: config.GOOGLE_CLIENT_ID, // Replace with your Google Client ID
+        audience: [config.GOOGLE_CLIENT_ID], // Ensure this matches the client ID used to generate the token
       });
 
       const payload = ticket.getPayload();
@@ -100,30 +100,3 @@ export class AuthController extends BaseController<IUser, AuthService> {
 }
 
 export const authController = new AuthController();
-
-
-
-
-
-
-
-
-
-// authRouter.get('/google', async (req: Request, res: Response) => {
-//   // try {
-//       passport.authenticate('google', { scope: ['profile', 'email'] })
-  
-//   // } catch (error:any) {
-//   //   res.status(400).json({ message: error.message });
-//   // }
-// });
-
-// authRouter.get(
-//   '/google/callback',
-//   passport.authenticate('google', {
-//     failureRedirect: '/login',
-//   }),
-//   (req, res) => {
-//     res.redirect('http://localhost:3000/'); // Redirect after login
-//   }
-// );
