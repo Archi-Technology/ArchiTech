@@ -29,13 +29,13 @@ export class AuthController extends BaseController<IUser, AuthService> {
   }
 
   async login(req: Request, res: Response) {
-    const { username, password} = req.body;
+    const { email, password} = req.body;
     try {
-      if(!username || !password) {
-        throw new Error('no username or password provided');
+      if(!email || !password) {
+        throw new Error('no email or password provided');
       }
 
-      const authTokens: IAuthTokens = await this.service.loginUser(username, password);
+      const authTokens: IAuthTokens = await this.service.loginUser(email, password);
       res.status(200).json(authTokens);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
@@ -86,7 +86,7 @@ export class AuthController extends BaseController<IUser, AuthService> {
 
       const ticket = await client.verifyIdToken({
         idToken: credential,
-        audience: config.GOOGLE_CLIENT_ID, // Replace with your Google Client ID
+        audience: [config.GOOGLE_CLIENT_ID], // Ensure this matches the client ID used to generate the token
       });
 
       const payload = ticket.getPayload();
@@ -100,30 +100,3 @@ export class AuthController extends BaseController<IUser, AuthService> {
 }
 
 export const authController = new AuthController();
-
-
-
-
-
-
-
-
-
-// authRouter.get('/google', async (req: Request, res: Response) => {
-//   // try {
-//       passport.authenticate('google', { scope: ['profile', 'email'] })
-  
-//   // } catch (error:any) {
-//   //   res.status(400).json({ message: error.message });
-//   // }
-// });
-
-// authRouter.get(
-//   '/google/callback',
-//   passport.authenticate('google', {
-//     failureRedirect: '/login',
-//   }),
-//   (req, res) => {
-//     res.redirect('http://localhost:3000/'); // Redirect after login
-//   }
-// );

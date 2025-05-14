@@ -25,11 +25,11 @@ export class AuthService extends BaseService<IUser> {
 
   }
 
-  async loginUser(username: string, password: string) {
-    const user = await this.getUserModelByUserName(username);
+  async loginUser(email: string, password: string) {
+    const user = await this.getUserModelByEmail(email);
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) throw new Error('bad username or password');
+    if (!isPasswordValid) throw new Error('bad email or password');
 
 
     const { accessToken, refreshToken } = this.generateAuthKeys(user._id);
@@ -81,8 +81,8 @@ export class AuthService extends BaseService<IUser> {
     return { accessToken: accessToken, refreshToken: refreshToken };
   }
 
-  async getUserModelByUserName(username: string) {
-    const user = await this.userService.getModelByFilter({ username });
+  async getUserModelByEmail(email: string) {
+    const user = await this.userService.getModelByFilter({ email });
     if (!user) throw new Error('User not found');
     return user;
   }
