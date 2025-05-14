@@ -91,15 +91,24 @@ export default function BasicFlow() {
   const reactFlowInstance = useRef<ReactFlowInstance | null>(null);
   const { registerAddNodeFunction } = useCanvas(); // Access the function to register node addition
 
+  interface CustomConnection extends Connection {
+    animated: boolean;
+    type: string;
+    style: {
+      stroke: string;
+      strokeWidth: number;
+    };
+  }
+
   const onConnect = (connection: Connection) =>
-    setEdges((eds) =>
+    setEdges((eds: Edge[]) =>
       addEdge(
         {
           ...connection,
           animated: true,
           type: 'smoothstep',
           style: { stroke: '#555', strokeWidth: 2 },
-        },
+        } as CustomConnection,
         eds
       )
     );
@@ -125,22 +134,22 @@ export default function BasicFlow() {
 
 
 
-    setNodes((nds) =>
-      nds.map((n) => {
-        if (['1', '2', '3'].includes(n.id) && n.id !== activeId) {
-          const newX = leftNodePlaced
-            ? canvasCenterX + (containerWidth / 2) + horizontalSpacing // Place on the right
-            : canvasCenterX - (containerWidth / 2) - horizontalSpacing; // Place on the left
-          leftNodePlaced = true; // Mark the left node as placed
-          return {
-            ...n,
-            position: {
-              x: newX,
-              y: n.position.y + verticalOffset, // Adjust vertically to avoid overlap
-            },
-          };
-        }
-        return n;
+    setNodes((nds: Node[]) =>
+      nds.map((n: Node) => {
+      if (['1', '2', '3'].includes(n.id) && n.id !== activeId) {
+        const newX: number = leftNodePlaced
+        ? canvasCenterX + (containerWidth / 2) + horizontalSpacing // Place on the right
+        : canvasCenterX - (containerWidth / 2) - horizontalSpacing; // Place on the left
+        leftNodePlaced = true; // Mark the left node as placed
+        return {
+        ...n,
+        position: {
+          x: newX,
+          y: n.position.y + verticalOffset, // Adjust vertically to avoid overlap
+        },
+        };
+      }
+      return n;
       })
     );
   };
@@ -157,99 +166,99 @@ export default function BasicFlow() {
     const startOfBox = canvasCenterX - containerWidth / 2;
 
     // Step 1: Replace node with container node
-    setNodes((nds) =>
-      nds.map((n) =>
-        n.id === node.id
-          ? {
-              ...n,
-              type: 'bigSquare',
-              position: { x: startOfBox, y: n.position.y }, // Only update x value
-              data: {
-                ...n.data,
-                label: containerLabelMap[node.id],
-                width: 0,
-                height: 0,
-              },
-            }
-          : n.id === '4'
-          ? {
-              ...n,
-              position: { x: canvasCenterX, y: n.position.y - 130 }, // Move Earth node to the middle of the screen in x-axis
-            }
-          : n
+    setNodes((nds: Node[]) =>
+      nds.map((n: Node) =>
+      n.id === node.id
+        ? {
+          ...n,
+          type: 'bigSquare',
+          position: { x: startOfBox, y: n.position.y }, // Only update x value
+          data: {
+          ...n.data,
+          label: containerLabelMap[node.id],
+          width: 0,
+          height: 0,
+          },
+        }
+        : n.id === '4'
+        ? {
+          ...n,
+          position: { x: canvasCenterX, y: n.position.y - 130 }, // Move Earth node to the middle of the screen in x-axis
+        }
+        : n
       )
     );
 
     // Step 2: Expand size
     setTimeout(() => {
-      setNodes((nds) =>
-        nds.map((n) =>
+      setNodes((nds: Node[]) =>
+        nds.map((n: Node) =>
           n.id === node.id
-            ? {
-                ...n,
-                data: {
-                  ...n.data,
-                  width: containerWidth,
-                  height: 1000,
-                },
-              }
-            : n
+        ? {
+            ...n,
+            data: {
+          ...n.data,
+          width: containerWidth,
+          height: 1000,
+            },
+          }
+        : n
         )
       );
     }, 10);
 
     // Step 3: Add VPC and Subnet nodes
     setTimeout(() => {
-      setNodes((nds) => [
+      setNodes((nds: Node[]) => [
         ...nds,
         {
           id: `${node.id}-vpc`,
           type: 'bigSquare',
           position: { x: 100, y: 100 },
           data: {
-            label: 'VPC',
-            width: 800,
-            height: 400,
+        label: 'VPC',
+        width: 800,
+        height: 400,
           },
           parentNode: node.id, // VPC is a child of the clicked node
           extent: 'parent',
-        },
+        } as Node,
         {
           id: `${node.id}-subnet`,
           type: 'bigSquare',
           position: { x: 50, y: 50 },
           data: {
-            label: 'Subnet',
-            width: 600,
-            height: 300,
+        label: 'Subnet',
+        width: 600,
+        height: 300,
           },
           parentNode: `${node.id}-vpc`, // Subnet is a child of the VPC
           extent: 'parent',
-        },
+        } as Node,
         {
           id: `${node.id}-service-a`,
           type: 'circle',
           position: { x: 50, y: 60 },
           data: {
-            label: 'Service A',
-            color: nColor(node.id),
-            imageSrc: iconMap[node.id],
+        label: 'Service A',
+        color: nColor(node.id),
+        imageSrc: iconMap[node.id],
           },
           parentNode: `${node.id}-subnet`, // Service A is a child of the Subnet
           extent: 'parent',
-        },
+        } as Node,
         {
           id: `${node.id}-service-b`,
           type: 'circle',
           position: { x: 160, y: 160 },
           data: {
-            label: 'Service B',
-            color: nColor(node.id),
-            imageSrc: iconMap[node.id],
+        label: 'Service B',
+        color: nColor(node.id),
+        imageSrc: iconMap[node.id],
           },
           parentNode: `${node.id}-subnet`, // Service B is a child of the Subnet
           extent: 'parent',
-        },
+        } as Node,
       ]);
     }, 600);
 
@@ -279,18 +288,18 @@ export default function BasicFlow() {
 
   useEffect(() => {
     registerAddNodeFunction((service) => {
-      setNodes((nds) => [
+      setNodes((nds: Node[]) => [
         ...nds,
         {
           id: `${service.name}-${Date.now()}`,
           type: "circle",
           position: { x: 400, y: 300 }, // Adjust position as needed
           data: {
-            label: `${service.name} (${service.vpc}, ${service.subnet})`, // Include VPC and subnet in the label
-            color: "rgb(246,133,0)", // Example color
-            imageSrc: service.icon.props.src, // Use the service icon
+        label: `${service.name} (${service.vpc}, ${service.subnet})`, // Include VPC and subnet in the label
+        color: "rgb(246,133,0)", // Example color
+        imageSrc: (service.icon.props as { src: string }).src, // Use the service icon
           },
-        },
+        } as Node,
       ]);
     });
   }, [registerAddNodeFunction, setNodes]);

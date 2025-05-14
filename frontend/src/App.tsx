@@ -7,6 +7,7 @@ import { LoginWrapper } from './components/loginWrapper';
 import Navbar from './components/navbar';
 import './index.scss';
 import { LoginScreen } from './views/Login';
+import Projects from './views/Project/Projects';
 
 const App: React.FC = () => {
   return (
@@ -24,6 +25,7 @@ const App: React.FC = () => {
             <Route path="/home" element={<Feed />} />
           </Route>
         </Route>
+        <Route path="/projects" element={<Projects />} />
 
         {/* Login route */}
         <Route path="/login" element={<LoginScreen />} />

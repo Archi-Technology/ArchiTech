@@ -59,6 +59,8 @@ export const LoginCard: React.FC<IProp> = ({
     mode: 'onChange',
   });
 
+  const navigate = useNavigate();
+
   const googleErrorMessage = useCallback(() => {
     showToast('failed to sign in with google', 'error');
   }, []);
@@ -70,6 +72,7 @@ export const LoginCard: React.FC<IProp> = ({
       } else {
         await onLogin(data.email, data.password);
       }
+      navigate('/projects');
     },
     [enterMode, onRegister, onLogin],
   );
@@ -293,7 +296,7 @@ const LoginContainer: React.FC = () => {
     async (enterModeFunction: Function, ...args: any[]) => {
       try {
         await enterModeFunction(...args);
-        navigate('/home');
+        navigate('/projects');
         showToast(`successfully ${enterModeText[enterMode]}`, 'success');
       } catch (error) {
         showToast(`failed to ${enterModeText[enterMode]}`, 'error');

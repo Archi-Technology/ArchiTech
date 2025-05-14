@@ -11,6 +11,7 @@ import { config } from './config/config';
 import { authMiddleware } from './middlewares/authMiddleware';
 import { authRouter } from './routes/auth.route';
 import { userRouter } from './routes/user.route';
+import { projectRouter } from './routes/project.route';
 import { chatRouter } from './routes/chat.route';
 import { awsRouter } from './routes/aws.route';
 import { azureRouter } from './routes/azure.route';
@@ -39,7 +40,16 @@ const appPromise: Promise<Application> = new Promise(async (resolve, reject) => 
     fs.mkdirSync(uploadsPath, { recursive: true });
   }
 
-  app.use(cors());
+    app.use(cors());
+  
+    app.use('/api', authMiddleware);
+    app.use('/api/auth', authRouter);
+    app.use('/api/user', userRouter);
+    app.use('/api/chat', chatRouter);
+    app.use('/api/projects', projectRouter);
+
+    app.use('/aws', awsRouter);
+    app.use("/azure", azureRouter);
 
   app.use('/api', authMiddleware);
   app.use('/api/auth', authRouter);

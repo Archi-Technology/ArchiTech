@@ -21,6 +21,7 @@
     "axios": "^1.9.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
+    "cron-jobs": "^1.0.3",
     "express": "^4.21.1",
     "express-session": "^1.18.1",
     "fs": "^0.0.1-security",
