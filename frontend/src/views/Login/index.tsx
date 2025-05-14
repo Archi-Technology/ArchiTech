@@ -72,7 +72,6 @@ export const LoginCard: React.FC<IProp> = ({
       } else {
         await onLogin(data.email, data.password);
       }
-      navigate('/projects');
     },
     [enterMode, onRegister, onLogin],
   );
@@ -180,8 +179,12 @@ export const LoginCard: React.FC<IProp> = ({
                   variant="outlined"
                   fullWidth
                   margin="normal"
-                  error={!!errors.username}
-                  helperText={errors.username?.message}
+                  error={isRegisterMode ? !!errors.username : !!errors.email}
+                  helperText={
+                    isRegisterMode
+                      ? errors.username?.message
+                      : errors.email?.message
+                  }
                   InputProps={{
                     startAdornment: (
                       <Box sx={{ mr: 1, color: 'text.secondary' }}>
@@ -295,7 +298,7 @@ const LoginContainer: React.FC = () => {
   const onSubmit = useCallback(
     async (enterModeFunction: Function, ...args: any[]) => {
       try {
-        await enterModeFunction(...args);
+        const res = await enterModeFunction(...args);
         navigate('/projects');
         showToast(`successfully ${enterModeText[enterMode]}`, 'success');
       } catch (error) {
