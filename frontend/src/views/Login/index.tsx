@@ -4,7 +4,7 @@ import type React from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import logo from '../../assets/logoNew.png';
+import logo from '../../assets/logoNewBlack.png';
 import loginImage from '../../assets/images/login.png';
 import { enterModeOptions, enterModeText } from '../../consts/login';
 import { showToast } from '../../consts/toast';
