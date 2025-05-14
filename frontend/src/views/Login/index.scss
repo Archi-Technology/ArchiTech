@@ -7,13 +7,13 @@
 
   .logo-container {
     position: absolute;
+    top: 0px;
     left: 20px;
     display: flex;
     align-items: center;
-    top: 0%;
     .logo {
-      width: 150px;
-      height: 'auto';
+      width: 120px;
+      height: auto;
       background: none;
     }
   }
@@ -34,10 +34,14 @@
   }
 
   .one {
-    width: fit-content;
+    width: 100%;
+    max-width: 80%;
+    margin: 0 auto;
   }
   .two {
-    width: fit-content;
+    width: 100%;
+    max-width: 80%;
+    margin: 0 auto;
   }
 
   .text-wrapper {
@@ -45,7 +49,8 @@
     flex-direction: column;
     align-items: center;
     padding: 10px;
-    width: fit-content;
+    width: 100%;
+    text-align: center;
   }
 
   .login-gif {
@@ -195,6 +200,22 @@
 
 .google-button-container {
   margin-bottom: 10px;
+}
+
+.MuiTextField-root {
+  margin-top: 8px !important;
+  margin-bottom: 8px !important;
+}
+
+.text.one {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.text.two {
+  font-size: 16px;
+  line-height: 1.5;
 }
 
 @media (max-width: 768px) {

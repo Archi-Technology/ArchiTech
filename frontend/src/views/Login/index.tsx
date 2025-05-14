@@ -79,8 +79,14 @@ export const LoginCard: React.FC<IProp> = ({
   return (
     <div className="login-card">
       <div className="header">
-        <span className="title">Log in to your account</span>
-        <span className="desc">Welcome back! Select your login method</span>
+        <span className="title">
+          {enterMode === EneterModes.LOGIN ? 'Log in to your account' : 'Register an account'}
+        </span>
+        <span className="desc">
+          {enterMode === EneterModes.LOGIN
+            ? 'Welcome back! Select your login method'
+            : 'Register a new account to use ArchiTech'}
+        </span>
       </div>
 
       <div className="card-data">
@@ -250,7 +256,7 @@ export const LoginCard: React.FC<IProp> = ({
         <Typography
           variant="body2"
           sx={{
-            mt: 3,
+            mt: 1,
             textAlign: 'center',
           }}
         >
@@ -343,15 +349,14 @@ const LoginContainer: React.FC = () => {
 export const LoginScreen: React.FC = () => {
   return (
     <div className="login-screen">
+      <div className="logo-container">
+        <img
+          src={logo || '/placeholder.svg'}
+          alt="ArchiTech"
+          className="logo"
+        />
+      </div>
       <div className="login-container">
-        <div className="logo-container">
-          <img
-            src={logo || '/placeholder.svg'}
-            alt="ArchiTech"
-            className="logo"
-            style={{ width: '150px', height: 'auto', background: 'none' }}
-          />
-        </div>
         <div className="login-form">
           <LoginContainer />
         </div>
