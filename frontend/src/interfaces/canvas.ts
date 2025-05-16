@@ -7,7 +7,7 @@ export enum ServiceType  {
     OBJECT_STORAGE = 'ObjectStorage'
 }
 
-export enum CloudsProvider {    
+export enum CloudProvider {    
     GCP = 'GCP',
     AZURE = 'AZURE',
     IWS = 'AWS',
@@ -23,7 +23,7 @@ interface IBaseService {
     name: string;
     type: ServiceType;
     parentId: string;
-    cloudsProvider: CloudsProvider;
+    cloudProvider: CloudProvider;
     connnectedTo: string[];
     extraData: JSON;
 }

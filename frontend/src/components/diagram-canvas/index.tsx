@@ -26,6 +26,7 @@ import subnetIcon from '../../assets/canvas/network-wired-svgrepo-com.svg';
 import { ContactlessOutlined } from '@mui/icons-material';
 import { useCanvas } from "../../contexts/canvasContext"; // Import canvas context
 import { fetchProjectData } from '../../services/canvasService'; // Import fetchProjectData
+import { ServiceType } from '../../interfaces/canvas'; // Import ServiceType
 
 const nodeTypes = {
   circle: CircleNode,
@@ -128,6 +129,32 @@ export default function BasicFlow() {
     '3': awsIcon,
   };
 
+  const getIconForType = (type: ServiceType) => {
+    switch (type) {
+      case ServiceType.VPC:
+        return vpcIcon;
+      case ServiceType.Subnet:
+        return subnetIcon;
+        return earth;
+      // Add more cases as needed for other service types
+      default:
+        return undefined;
+    }
+  };
+
+  const getColorForCloud = (cloudProvider: string) => {
+    switch (cloudProvider) {
+      case 'AWS':
+        return 'rgb(246,133,0)';
+      case 'Azure':
+        return 'rgb(67,196,237)';
+      case 'GCP':
+        return 'rgb(103,155,253)';
+      default:
+        return '#ccc';
+    }
+  };
+
   const handleOtherNodes = (activeId: string, canvasCenterX: number, containerWidth: number) => {
     const horizontalSpacing = 100; // Reduce spacing to bring nodes closer
     const verticalOffset = 150; // Slight vertical adjustment for better positioning
@@ -212,64 +239,64 @@ export default function BasicFlow() {
       );
     }, 10);
 
-    // Step 3: Add VPC and Subnet nodes
-    setTimeout(() => {
-      setNodes((nds: Node[]) => [
-        ...nds,
-        {
-          id: `${node.id}-vpc`,
-          type: 'bigSquare',
-          position: { x: 100, y: 100 },
-          data: {
-            label: node.id === '1' ? 'VNet' : 'VPC', // Use "VNet" for Azure
-            icon: vpcIcon,
-            color: node.data.color,
-            width: 800,
-            height: 400,
-          },
-          parentNode: node.id, // VPC/VNet is a child of the clicked node
-          extent: 'parent',
-        } as Node,
-        {
-          id: `${node.id}-subnet`,
-          type: 'bigSquare',
-          position: { x: 50, y: 50 },
-          data: {
-            label: 'Subnet',
-            icon: subnetIcon,
-            color: node.data.color,
-            width: 600,
-            height: 300,
-          },
-          parentNode: `${node.id}-vpc`, // Subnet is a child of the VPC/VNet
-          extent: 'parent',
-        } as Node,
-        {
-          id: `${node.id}-service-a`,
-          type: 'circle',
-          position: { x: 50, y: 60 },
-          data: {
-            label: 'Service A',
-            color: nColor(node.id),
-            imageSrc: iconMap[node.id],
-          },
-          parentNode: `${node.id}-subnet`, // Service A is a child of the Subnet
-          extent: 'parent',
-        } as Node,
-        {
-          id: `${node.id}-service-b`,
-          type: 'circle',
-          position: { x: 160, y: 160 },
-          data: {
-            label: 'Service B',
-            color: nColor(node.id),
-            imageSrc: iconMap[node.id],
-          },
-          parentNode: `${node.id}-subnet`, // Service B is a child of the Subnet
-          extent: 'parent',
-        } as Node,
-      ]);
-    }, 600);
+    // // Step 3: Add VPC and Subnet nodes
+    // setTimeout(() => {
+    //   setNodes((nds: Node[]) => [
+    //     ...nds,
+    //     {
+    //       id: `${node.id}-vpc`,
+    //       type: 'bigSquare',
+    //       position: { x: 100, y: 100 },
+    //       data: {
+    //         label: node.id === '1' ? 'VNet' : 'VPC', // Use "VNet" for Azure
+    //         icon: vpcIcon,
+    //         color: node.data.color,
+    //         width: 800,
+    //         height: 400,
+    //       },
+    //       parentNode: node.id, // VPC/VNet is a child of the clicked node
+    //       extent: 'parent',
+    //     } as Node,
+    //     {
+    //       id: `${node.id}-subnet`,
+    //       type: 'bigSquare',
+    //       position: { x: 50, y: 50 },
+    //       data: {
+    //         label: 'Subnet',
+    //         icon: subnetIcon,
+    //         color: node.data.color,
+    //         width: 600,
+    //         height: 300,
+    //       },
+    //       parentNode: `${node.id}-vpc`, // Subnet is a child of the VPC/VNet
+    //       extent: 'parent',
+    //     } as Node,
+    //     {
+    //       id: `${node.id}-service-a`,
+    //       type: 'circle',
+    //       position: { x: 50, y: 60 },
+    //       data: {
+    //         label: 'Service A',
+    //         color: nColor(node.id),
+    //         imageSrc: iconMap[node.id],
+    //       },
+    //       parentNode: `${node.id}-subnet`, // Service A is a child of the Subnet
+    //       extent: 'parent',
+    //     } as Node,
+    //     {
+    //       id: `${node.id}-service-b`,
+    //       type: 'circle',
+    //       position: { x: 160, y: 160 },
+    //       data: {
+    //         label: 'Service B',
+    //         color: nColor(node.id),
+    //         imageSrc: iconMap[node.id],
+    //       },
+    //       parentNode: `${node.id}-subnet`, // Service B is a child of the Subnet
+    //       extent: 'parent',
+    //     } as Node,
+    //   ]);
+    // }, 600);
 
     // Step 4: Move other SCP nodes
     handleOtherNodes(node.id, canvasCenterX, containerWidth);
@@ -321,28 +348,81 @@ export default function BasicFlow() {
 
         const projectData = await fetchProjectData();
 
-        const dynamicNodes: Node[] = projectData.map((node) => ({
-          id: node._id,
-          type: node.type,
-          // position:node.position 
-          position: {x: 0, y: 0},
-          data: {
-            label: node.name,
-            // icon: node.data.icon,
-            // color: node.data.color,
-            // width: node.data.width,
-            // height: node.data.height,
-          },
-          parentNode: node.parentId,
-          extent: 'parent',
-        }));
+        // Helper functions for sizing
+        const VPC_BASE_WIDTH = 800, VPC_BASE_HEIGHT = 400;
+        const SUBNET_BASE_WIDTH = 600, SUBNET_BASE_HEIGHT = 300;
+        const NODE_BASE_WIDTH = 120, NODE_BASE_HEIGHT = 120;
+
+        // Count VPCs per cloudProvider
+        const vpcCounts: Record<string, number> = {};
+        projectData.forEach((node: any) => {
+          if (node.type === ServiceType.VPC) {
+            vpcCounts[node.cloudProvider] = (vpcCounts[node.cloudProvider] || 0) + 1;
+          }
+        });
+
+        // Count subnets per VPC
+        const subnetCounts: Record<string, number> = {};
+        projectData.forEach((node: any) => {
+          if (node.type === ServiceType.Subnet && node.parentId) {
+            subnetCounts[node.parentId] = (subnetCounts[node.parentId] || 0) + 1;
+          }
+        });
+
+        // Count children per parentId (for other nodes)
+        const childCounts: Record<string, number> = {};
+        projectData.forEach((node: any) => {
+          if (node.parentId) {
+            childCounts[node.parentId] = (childCounts[node.parentId] || 0) + 1;
+          }
+        });
+
+        const dynamicNodes: Node[] = projectData.map((node: any) => {
+          let width = NODE_BASE_WIDTH, height = NODE_BASE_HEIGHT;
+          if (node.type === ServiceType.VPC) {
+            const count = vpcCounts[node.cloudProvider] || 1;
+            width = VPC_BASE_WIDTH / count;
+            height = VPC_BASE_HEIGHT / count;
+          } else if (node.type === ServiceType.Subnet) {
+            const count = subnetCounts[node.parentId] || 1;
+            width = SUBNET_BASE_WIDTH / count;
+            height = SUBNET_BASE_HEIGHT / count;
+          } else {
+            const count = childCounts[node.parentId] || 1;
+            width = NODE_BASE_WIDTH / count;
+            height = NODE_BASE_HEIGHT / count;
+          }
+
+          // Determine parentNode for VPC nodes
+          let parentNode = node.parentId;
+          if (node.type === ServiceType.VPC) {
+            // Map cloudProvider to the correct cloud node id
+            if (node.cloudProvider === 'Azure') parentNode = '1';
+            else if (node.cloudProvider === 'GCP') parentNode = '2';
+            else if (node.cloudProvider === 'AWS') parentNode = '3';
+          }
+
+          return {
+            id: node._id,
+            type: node.type === ServiceType.VPC || node.type === ServiceType.Subnet ? 'bigSquare' : 'circle',
+            position: { x: 0, y: 0 },
+            data: {
+              label: node.name,
+              icon: getIconForType(node.type),
+              color: getColorForCloud(node.cloudProvider),
+              width,
+              height,
+            },
+            parentNode,
+            extent: 'parent', 
+          } as Node;
+        });
 
         const dynamicEdges: Edge[] = [];
-
         projectData
-          .filter((node) => node.connnectedTo)
-          .forEach((node) => (
-            node.connnectedTo.forEach((connectedNode) => {
+          .filter((node: any) => node.connnectedTo)
+          .forEach((node: any) => (
+            node.connnectedTo.forEach((connectedNode: string) => {
               dynamicEdges.push({
                 id: `${node._id}-${connectedNode}`,
                 source: node._id,
