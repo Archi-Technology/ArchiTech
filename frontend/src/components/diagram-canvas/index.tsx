@@ -146,7 +146,7 @@ export default function BasicFlow() {
     switch (cloudProvider) {
       case 'AWS':
         return 'rgb(246,133,0)';
-      case 'Azure':
+      case 'AZURE':
         return 'rgb(67,196,237)';
       case 'GCP':
         return 'rgb(103,155,253)';
@@ -469,6 +469,8 @@ export default function BasicFlow() {
             else if (node.cloudProvider === 'AWS') parentNode = '3';
           }
 
+       
+
           return {
             id: node._id,
             type: node.type === ServiceType.VPC || node.type === ServiceType.Subnet ? 'bigSquare' : 'circle',
@@ -500,6 +502,7 @@ export default function BasicFlow() {
               })
             })
           ));
+
 
         setNodes((nds) => [...defaultNodes, ...dynamicNodes]);
         setEdges((eds) => [...initialEdges, ...dynamicEdges]);

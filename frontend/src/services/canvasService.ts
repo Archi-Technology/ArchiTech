@@ -40,14 +40,34 @@ export const fetchProjectData = async () => {
     data: [
       {
         projectId: '1',
-        _id: '5',
+        _id: '7',
         name: 'vpc1',
         type: ServiceType.VPC,
         parentId: null,
         cloudProvider: CloudProvider.AZURE,
         connnectedTo: [],
         extraData: null
-      }
+      },
+      // {
+      //   projectId: '1',
+      //   _id: '8',
+      //   name: 'vpc2',
+      //   type: ServiceType.VPC,
+      //   parentId: null,
+      //   cloudProvider: CloudProvider.AZURE,
+      //   connnectedTo: [],
+      //   extraData: null
+      // },
+      // {
+      //   projectId: '1',
+      //   _id: '9',
+      //   name: 'vpc3',
+      //   type: ServiceType.Subnet,
+      //   parentId: null,
+      //   cloudProvider: CloudProvider.AZURE,
+      //   connnectedTo: [],
+      //   extraData: null
+      // }
     ]
 
   }
