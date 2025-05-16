@@ -110,7 +110,7 @@ const services: Service[] = [
   },
   {
     name: 'Object Storage',
-    icon: <img src={objectStorageIcon} alt="SObject Storage3" className="service-icon-img" />,
+    icon: <img src={objectStorageIcon} alt="Object Storage" className="service-icon-img" />,
   },
   {
     name: 'Load Balancer',

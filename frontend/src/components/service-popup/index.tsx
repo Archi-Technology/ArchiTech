@@ -3,18 +3,37 @@ import { useState, useEffect } from 'react';
 import {
   getAllAvailableLocations,
   translateLocationToRegionCodes,
-} from '../../utils/regionMapper';
+} from '../../utils/Mappers/regionMapper';
 
 import {
   translateInstanceTypeCategory,
   getAllAvailableInstanceCategories,
-} from '../../utils/typeMapper';
+} from '../../utils/Mappers/typeMapper';
 
 import {
   translateOSTypeToCloudOptions,
   getAllAvailableOSNames,
-} from '../../utils/osMapper';
-import { set } from 'react-hook-form';
+} from '../../utils/Mappers/osMapper';
+
+import {
+  translateStorageClassToCloudOptions,
+  getAllAvailableObjectStorageClasses,
+} from '../../utils/Mappers/objectStorageMapper';
+
+import {
+  translateLoadBalancerTypeToCloudOptions,
+  getAllAvailableLoadBalancerTypes,
+} from '../../utils/Mappers/loadBalancerMapper';
+
+import {
+  translateDBInstanceTypeToCloudOptions,
+  getAllAvailableDBInstanceTypes,
+} from '../../utils/Mappers/dbInstanceTypeMapper';
+
+import {
+  translateDBEngineToCloudOptions,
+  getAllAvailableDBEngineNames,
+} from '../../utils/Mappers/dbEngineMapper';
 
 interface ServicePopupProps {
   service: { name: string; icon: JSX.Element };
@@ -27,54 +46,28 @@ interface ServicePopupProps {
   regions?: { id: string; name: string }[];
   oses?: string[];
   storageClasses?: string[];
-}
-
-interface RegionMapEntry {
-  name: string;
-  aws: string | string[];
-  azure: string | string[];
+  lbTypes?: string[];
+  dbInstanceTypes?: string[];
+  dbEngines?: string[];
 }
 
 export default function ServicePopup({
   service,
   onConfirm,
   onCancel,
-  availableVPCs,
-  availableSubnets,
-  pricingOptions,
-  instanceTypes = [],
-  regions = [],
-  oses = [],
-  storageClasses = [],
 }: ServicePopupProps) {
   const [selectedVPC, setSelectedVPC] = useState<string>('');
   const [selectedSubnet, setSelectedSubnet] = useState<string>('');
   const [selectedPricing, setSelectedPricing] = useState<string>('');
   const [selectedInstanceType, setSelectedInstanceType] = useState<string>('');
   const [selectedRegion, setSelectedRegion] = useState<string>('');
-
   const [selectedOS, setSelectedOS] = useState<string>('');
   const [selectedStorageClass, setSelectedStorageClass] = useState<string>('');
+  const [selectedLBType, setSelectedLBType] = useState<string>('');
+  const [selectedDBInstanceType, setSelectedDBInstanceType] =
+    useState<string>('');
+  const [selectedDBEngine, setSelectedDBEngine] = useState<string>('');
   const [recommendation, setRecommendation] = useState<string>('');
-  const [regionOptions, setRegionOptions] = useState<
-    { id: string; name: string }[]
-  >([]);
-
-  const handleRegionChange = (region: string) => {
-    setSelectedRegion(region);
-    // const translation = translateLocationToRegionCodes(region, 'azure');
-    // console.log('Region translation:', translation);
-  };
-  const handleInstanceTypeChange = (instanceType: string) => {
-    setSelectedInstanceType(instanceType);
-    // const translatedTypes = translateInstanceTypeCategory(instanceType, 'aws');
-    // console.log('Translated instance types:', translatedTypes);
-  };
-  const handleOsChange = (os: string) => {
-    setSelectedOS(os);
-    // const translatedOS = translateOSTypeToCloudOptions(os, 'aws');
-    // console.log('Translated OS:', translatedOS);
-  };
 
   useEffect(() => {
     setRecommendation(
@@ -90,12 +83,23 @@ export default function ServicePopup({
         os: selectedOS,
         pricing: selectedPricing,
       });
-    } else if (service.name === 'Bucket') {
+    } else if (service.name === 'Object Storage') {
       onConfirm({
-        vpc: selectedVPC,
-        subnet: selectedSubnet,
         region: selectedRegion,
         storageClass: selectedStorageClass,
+        pricing: selectedPricing,
+      });
+    } else if (service.name === 'Load Balancer') {
+      onConfirm({
+        region: selectedRegion,
+        lbType: selectedLBType,
+        pricing: selectedPricing,
+      });
+    } else if (service.name === 'Database') {
+      onConfirm({
+        region: selectedRegion,
+        dbInstanceType: selectedDBInstanceType,
+        engine: selectedDBEngine,
         pricing: selectedPricing,
       });
     }
@@ -113,14 +117,14 @@ export default function ServicePopup({
           <div className="popup-service-icon">{service.icon}</div>
           <div className="popup-service-name">{service.name}</div>
         </div>
+
         {service.name === 'Virtual Machine' && (
           <>
             <div className="popup-selection">
-              <label htmlFor="instance-type-select">Instance Type:</label>
+              <label>Instance Type:</label>
               <select
-                id="instance-type-select"
                 value={selectedInstanceType}
-                onChange={(e) => handleInstanceTypeChange(e.target.value)}
+                onChange={(e) => setSelectedInstanceType(e.target.value)}
               >
                 <option value="">-- Select Instance Type --</option>
                 {getAllAvailableInstanceCategories().map((type) => (
@@ -131,11 +135,10 @@ export default function ServicePopup({
               </select>
             </div>
             <div className="popup-selection">
-              <label htmlFor="region-select">Region:</label>
+              <label>Region:</label>
               <select
-                id="region-select"
                 value={selectedRegion}
-                onChange={(e) => handleRegionChange(e.target.value)}
+                onChange={(e) => setSelectedRegion(e.target.value)}
               >
                 <option value="">-- Select Region --</option>
                 {getAllAvailableLocations().map((loc) => (
@@ -146,11 +149,10 @@ export default function ServicePopup({
               </select>
             </div>
             <div className="popup-selection">
-              <label htmlFor="os-select">Operating System:</label>
+              <label>Operating System:</label>
               <select
-                id="os-select"
                 value={selectedOS}
-                onChange={(e) => handleOsChange(e.target.value)}
+                onChange={(e) => setSelectedOS(e.target.value)}
               >
                 <option value="">-- Select OS --</option>
                 {getAllAvailableOSNames().map((os) => (
@@ -162,32 +164,31 @@ export default function ServicePopup({
             </div>
           </>
         )}
-        {service.name === 'Bucket' && (
+
+        {service.name === 'Object Storage' && (
           <>
             <div className="popup-selection">
-              <label htmlFor="region-select">Region:</label>
+              <label>Region:</label>
               <select
-                id="region-select"
                 value={selectedRegion}
                 onChange={(e) => setSelectedRegion(e.target.value)}
               >
                 <option value="">-- Select Region --</option>
-                {regionOptions.map((region) => (
-                  <option key={region.id} value={region.id}>
-                    {region.name}
+                {getAllAvailableLocations().map((loc) => (
+                  <option key={loc} value={loc}>
+                    {loc}
                   </option>
                 ))}
               </select>
             </div>
             <div className="popup-selection">
-              <label htmlFor="storage-class-select">Storage Class:</label>
+              <label>Storage Class:</label>
               <select
-                id="storage-class-select"
                 value={selectedStorageClass}
                 onChange={(e) => setSelectedStorageClass(e.target.value)}
               >
                 <option value="">-- Select Storage Class --</option>
-                {storageClasses.map((sc) => (
+                {getAllAvailableObjectStorageClasses().map((sc) => (
                   <option key={sc} value={sc}>
                     {sc}
                   </option>
@@ -196,18 +197,103 @@ export default function ServicePopup({
             </div>
           </>
         )}
+
+        {service.name === 'Load Balancer' && (
+          <>
+            <div className="popup-selection">
+              <label>Region:</label>
+              <select
+                value={selectedRegion}
+                onChange={(e) => setSelectedRegion(e.target.value)}
+              >
+                <option value="">-- Select Region --</option>
+                {getAllAvailableLocations().map((loc) => (
+                  <option key={loc} value={loc}>
+                    {loc}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="popup-selection">
+              <label>Load Balancer Type:</label>
+              <select
+                value={selectedLBType}
+                onChange={(e) => setSelectedLBType(e.target.value)}
+              >
+                <option value="">-- Select Type --</option>
+                {getAllAvailableLoadBalancerTypes().map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </>
+        )}
+
+        {service.name === 'Database' && (
+          <>
+            <div className="popup-selection">
+              <label>Region:</label>
+              <select
+                value={selectedRegion}
+                onChange={(e) => setSelectedRegion(e.target.value)}
+              >
+                <option value="">-- Select Region --</option>
+                {getAllAvailableLocations().map((loc) => (
+                  <option key={loc} value={loc}>
+                    {loc}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="popup-selection">
+              <label>DB Instance Type:</label>
+              <select
+                value={selectedDBInstanceType}
+                onChange={(e) => setSelectedDBInstanceType(e.target.value)}
+              >
+                <option value="">-- Select Type --</option>
+                {getAllAvailableDBInstanceTypes().map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="popup-selection">
+              <label>DB Engine:</label>
+              <select
+                value={selectedDBEngine}
+                onChange={(e) => setSelectedDBEngine(e.target.value)}
+              >
+                <option value="">-- Select Engine --</option>
+                {getAllAvailableDBEngineNames().map((engine) => (
+                  <option key={engine} value={engine}>
+                    {engine}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </>
+        )}
+
         <div className="popup-actions">
           <button
             className="popup-button confirm"
             onClick={handleConfirm}
             disabled={
-              !selectedVPC ||
-              !selectedSubnet ||
               !selectedPricing ||
               (service.name === 'Virtual Machine' &&
                 (!selectedInstanceType || !selectedRegion || !selectedOS)) ||
               (service.name === 'Bucket' &&
-                (!selectedRegion || !selectedStorageClass))
+                (!selectedRegion || !selectedStorageClass)) ||
+              (service.name === 'Load Balancer' &&
+                (!selectedRegion || !selectedLBType)) ||
+              (service.name === 'DB' &&
+                (!selectedRegion ||
+                  !selectedDBInstanceType ||
+                  !selectedDBEngine))
             }
           >
             Confirm
