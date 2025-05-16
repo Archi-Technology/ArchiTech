@@ -1,205 +1,222 @@
-import "./index.scss";
-import { useState, useEffect } from "react";
+import './index.scss';
+import { useState, useEffect } from 'react';
+import {
+  getAllAvailableLocations,
+  translateLocationToRegionCodes,
+} from '../../utils/regionMapper';
+
+import {
+  translateInstanceTypeCategory,
+  getAllAvailableInstanceCategories,
+} from '../../utils/typeMapper';
+
+import {
+  translateOSTypeToCloudOptions,
+  getAllAvailableOSNames,
+} from '../../utils/osMapper';
+import { set } from 'react-hook-form';
 
 interface ServicePopupProps {
-    service: { name: string; icon: JSX.Element };
-    onConfirm: (vpc: string, subnet: string) => void;
-    onCancel: () => void;
+  service: { name: string; icon: JSX.Element };
+  onConfirm: (params: any) => void;
+  onCancel: () => void;
+  availableVPCs: { id: string; name: string }[];
+  availableSubnets: { id: string; name: string }[];
+  pricingOptions: any[];
+  instanceTypes?: { id: string; name: string }[];
+  regions?: { id: string; name: string }[];
+  oses?: string[];
+  storageClasses?: string[];
 }
 
-const availableVPCs = [
-    { id: "vpc-1", name: "VPC 1" },
-    { id: "vpc-2", name: "VPC 2" },
-];
+interface RegionMapEntry {
+  name: string;
+  aws: string | string[];
+  azure: string | string[];
+}
 
-const availableSubnets = [
-    { id: "subnet-1", name: "Subnet 1" },
-    { id: "subnet-2", name: "Subnet 2" },
-];
+export default function ServicePopup({
+  service,
+  onConfirm,
+  onCancel,
+  availableVPCs,
+  availableSubnets,
+  pricingOptions,
+  instanceTypes = [],
+  regions = [],
+  oses = [],
+  storageClasses = [],
+}: ServicePopupProps) {
+  const [selectedVPC, setSelectedVPC] = useState<string>('');
+  const [selectedSubnet, setSelectedSubnet] = useState<string>('');
+  const [selectedPricing, setSelectedPricing] = useState<string>('');
+  const [selectedInstanceType, setSelectedInstanceType] = useState<string>('');
+  const [selectedRegion, setSelectedRegion] = useState<string>('');
 
-const pricingOptions = [
-    {
-        id: "us-east-1a",
-        region: "US East (N. Virginia)",
-        availabilityZone: "us-east-1a",
-        onDemand: "$0.10",
-        reserved: "$0.07",
-        spot: "$0.03",
-    },
-    {
-        id: "us-east-1b",
-        region: "US East (N. Virginia)",
-        availabilityZone: "us-east-1b",
-        onDemand: "$0.11",
-        reserved: "$0.08",
-        spot: "$0.04",
-    },
-    {
-        id: "us-west-1a",
-        region: "US West (N. California)",
-        availabilityZone: "us-west-1a",
-        onDemand: "$0.12",
-        reserved: "$0.09",
-        spot: "$0.05",
-    },
-];
+  const [selectedOS, setSelectedOS] = useState<string>('');
+  const [selectedStorageClass, setSelectedStorageClass] = useState<string>('');
+  const [recommendation, setRecommendation] = useState<string>('');
+  const [regionOptions, setRegionOptions] = useState<
+    { id: string; name: string }[]
+  >([]);
 
-const instanceTypes = [
-    { id: "t2.micro", name: "t2.micro" },
-    { id: "t2.small", name: "t2.small" },
-    { id: "m5.large", name: "m5.large" },
-    { id: "c5.xlarge", name: "c5.xlarge" },
-];
+  const handleRegionChange = (region: string) => {
+    setSelectedRegion(region);
+    // const translation = translateLocationToRegionCodes(region, 'azure');
+    // console.log('Region translation:', translation);
+  };
+  const handleInstanceTypeChange = (instanceType: string) => {
+    setSelectedInstanceType(instanceType);
+    // const translatedTypes = translateInstanceTypeCategory(instanceType, 'aws');
+    // console.log('Translated instance types:', translatedTypes);
+  };
+  const handleOsChange = (os: string) => {
+    setSelectedOS(os);
+    // const translatedOS = translateOSTypeToCloudOptions(os, 'aws');
+    // console.log('Translated OS:', translatedOS);
+  };
 
-export default function ServicePopup({ service, onConfirm, onCancel }: ServicePopupProps) {
-    const [selectedVPC, setSelectedVPC] = useState<string>("");
-    const [selectedSubnet, setSelectedSubnet] = useState<string>("");
-    const [selectedPricing, setSelectedPricing] = useState<string>("");
-    const [selectedInstanceType, setSelectedInstanceType] = useState<string>(""); // New state for instance type
-    const [recommendation, setRecommendation] = useState<string>("");
-
-    useEffect(() => {
-        // Simulate chatbot recommendation
-        setRecommendation(`Based on your selection, we recommend using the "${service.name}" service in the "us-east-1a" availability zone with the "Reserved" pricing option for optimal cost and performance.`);
-    }, [service]);
-
-    const handleConfirm = () => {
-        if (selectedVPC && selectedSubnet && selectedPricing && (service.name !== "EC2" || selectedInstanceType)) {
-            onConfirm(selectedVPC, selectedSubnet);
-        }
-    };
-
-    return (
-        <div className="popup-overlay">
-            <div className="popup-content">
-                <div className="popup-recommendation">
-                    <div className="chatbot-icon">🤖</div>
-                    <p>{recommendation}</p>
-                </div>
-                <h3>Confirm Add Service</h3>
-                <div className="popup-service">
-                    <div className="popup-service-icon">{service.icon}</div>
-                    <div className="popup-service-name">{service.name}</div>
-                </div>
-                <div className="popup-selection">
-                    <label htmlFor="vpc-select">Select VPC:</label>
-                    <select
-                        id="vpc-select"
-                        value={selectedVPC}
-                        onChange={(e) => setSelectedVPC(e.target.value)}
-                    >
-                        <option value="">-- Select VPC --</option>
-                        {availableVPCs.map((vpc) => (
-                            <option key={vpc.id} value={vpc.id}>
-                                {vpc.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <div className="popup-selection">
-                    <label htmlFor="subnet-select">Select Subnet:</label>
-                    <select
-                        id="subnet-select"
-                        value={selectedSubnet}
-                        onChange={(e) => setSelectedSubnet(e.target.value)}
-                    >
-                        <option value="">-- Select Subnet --</option>
-                        {availableSubnets.map((subnet) => (
-                            <option key={subnet.id} value={subnet.id}>
-                                {subnet.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                {service.name === "EC2" && (
-                    <div className="popup-selection">
-                        <label htmlFor="instance-type-select">Select Instance Type:</label>
-                        <select
-                            id="instance-type-select"
-                            value={selectedInstanceType}
-                            onChange={(e) => setSelectedInstanceType(e.target.value)}
-                        >
-                            <option value="">-- Select Instance Type --</option>
-                            {instanceTypes.map((type) => (
-                                <option key={type.id} value={type.id}>
-                                    {type.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                )}
-                <div className="popup-pricing">
-                    <h4>Pricing Options</h4>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Region</th>
-                                <th>Availability Zone</th>
-                                <th>On-Demand</th>
-                                <th>Reserved</th>
-                                <th>Spot</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {pricingOptions.map((option) => (
-                                <tr
-                                    key={option.id}
-                                    onClick={() => setSelectedPricing(option.id)}
-                                    className={selectedPricing === option.id ? "selected" : ""}
-                                >
-                                    <td>{option.region}</td>
-                                    <td>{option.availabilityZone}</td>
-                                    <td>
-                                        <span
-                                            style={{
-                                                backgroundColor: "#d1fae5",
-                                                padding: "0.25rem 0.5rem",
-                                                borderRadius: "0.25rem",
-                                            }}
-                                        >
-                                            {option.onDemand}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span
-                                            style={{
-                                                backgroundColor: "#bfdbfe",
-                                                padding: "0.25rem 0.5rem",
-                                                borderRadius: "0.25rem",
-                                            }}
-                                        >
-                                            {option.reserved}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span
-                                            style={{
-                                                backgroundColor: "#fde68a",
-                                                padding: "0.25rem 0.5rem",
-                                                borderRadius: "0.25rem",
-                                            }}
-                                        >
-                                            {option.spot}
-                                        </span>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-                <div className="popup-actions">
-                    <button
-                        className="popup-button confirm"
-                        onClick={handleConfirm}
-                        disabled={!selectedVPC || !selectedSubnet || !selectedPricing || (service.name === "EC2" && !selectedInstanceType)}
-                    >
-                        Confirm
-                    </button>
-                    <button className="popup-button cancel" onClick={onCancel}>
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
+  useEffect(() => {
+    setRecommendation(
+      `Based on your selection, we recommend using the "${service.name}" service for optimal cost and performance.`,
     );
+  }, [service]);
+
+  const handleConfirm = () => {
+    if (service.name === 'Virtual Machine') {
+      onConfirm({
+        instanceType: selectedInstanceType,
+        region: selectedRegion,
+        os: selectedOS,
+        pricing: selectedPricing,
+      });
+    } else if (service.name === 'Bucket') {
+      onConfirm({
+        vpc: selectedVPC,
+        subnet: selectedSubnet,
+        region: selectedRegion,
+        storageClass: selectedStorageClass,
+        pricing: selectedPricing,
+      });
+    }
+  };
+
+  return (
+    <div className="popup-overlay">
+      <div className="popup-content">
+        <div className="popup-recommendation">
+          <div className="chatbot-icon">🤖</div>
+          <p>{recommendation}</p>
+        </div>
+        <h3>Confirm Add Service</h3>
+        <div className="popup-service">
+          <div className="popup-service-icon">{service.icon}</div>
+          <div className="popup-service-name">{service.name}</div>
+        </div>
+        {service.name === 'Virtual Machine' && (
+          <>
+            <div className="popup-selection">
+              <label htmlFor="instance-type-select">Instance Type:</label>
+              <select
+                id="instance-type-select"
+                value={selectedInstanceType}
+                onChange={(e) => handleInstanceTypeChange(e.target.value)}
+              >
+                <option value="">-- Select Instance Type --</option>
+                {getAllAvailableInstanceCategories().map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="popup-selection">
+              <label htmlFor="region-select">Region:</label>
+              <select
+                id="region-select"
+                value={selectedRegion}
+                onChange={(e) => handleRegionChange(e.target.value)}
+              >
+                <option value="">-- Select Region --</option>
+                {getAllAvailableLocations().map((loc) => (
+                  <option key={loc} value={loc}>
+                    {loc}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="popup-selection">
+              <label htmlFor="os-select">Operating System:</label>
+              <select
+                id="os-select"
+                value={selectedOS}
+                onChange={(e) => handleOsChange(e.target.value)}
+              >
+                <option value="">-- Select OS --</option>
+                {getAllAvailableOSNames().map((os) => (
+                  <option key={os} value={os}>
+                    {os}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </>
+        )}
+        {service.name === 'Bucket' && (
+          <>
+            <div className="popup-selection">
+              <label htmlFor="region-select">Region:</label>
+              <select
+                id="region-select"
+                value={selectedRegion}
+                onChange={(e) => setSelectedRegion(e.target.value)}
+              >
+                <option value="">-- Select Region --</option>
+                {regionOptions.map((region) => (
+                  <option key={region.id} value={region.id}>
+                    {region.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="popup-selection">
+              <label htmlFor="storage-class-select">Storage Class:</label>
+              <select
+                id="storage-class-select"
+                value={selectedStorageClass}
+                onChange={(e) => setSelectedStorageClass(e.target.value)}
+              >
+                <option value="">-- Select Storage Class --</option>
+                {storageClasses.map((sc) => (
+                  <option key={sc} value={sc}>
+                    {sc}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </>
+        )}
+        <div className="popup-actions">
+          <button
+            className="popup-button confirm"
+            onClick={handleConfirm}
+            disabled={
+              !selectedVPC ||
+              !selectedSubnet ||
+              !selectedPricing ||
+              (service.name === 'Virtual Machine' &&
+                (!selectedInstanceType || !selectedRegion || !selectedOS)) ||
+              (service.name === 'Bucket' &&
+                (!selectedRegion || !selectedStorageClass))
+            }
+          >
+            Confirm
+          </button>
+          <button className="popup-button cancel" onClick={onCancel}>
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }

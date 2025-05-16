@@ -17,7 +17,7 @@ export default function ServiceSidebar() {
     setSelectedService(service); // Open the popup with the selected service
   };
 
-  const handlePopupConfirm = (vpc: string, subnet: string) => {
+  const handlePopupConfirm = ({ vpc, subnet }: { vpc: string; subnet: string }) => {
     if (selectedService) {
       addNodeToCanvas({ ...selectedService, vpc, subnet }); // Pass VPC and subnet to the canvas
       setSelectedService(null); // Close the popup
@@ -70,6 +70,9 @@ export default function ServiceSidebar() {
           service={selectedService}
           onConfirm={handlePopupConfirm}
           onCancel={handlePopupCancel}
+          availableVPCs={[]} // TODO: Replace with actual VPCs
+          availableSubnets={[]} // TODO: Replace with actual subnets
+          pricingOptions={[]} // TODO: Replace with actual pricing options
         />
       )}
     </div>
