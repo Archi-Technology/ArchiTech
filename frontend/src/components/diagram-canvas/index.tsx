@@ -377,26 +377,93 @@ export default function BasicFlow() {
           }
         });
 
+        // Calculate positions for dynamic nodes
+        // 1. Group nodes by parentId (or cloudProvider for VPCs)
+        const vpcGroups: Record<string, any[]> = {};
+        const subnetGroups: Record<string, any[]> = {};
+        const childGroups: Record<string, any[]> = {};
+
+        projectData.forEach((node: any) => {
+          if (node.type === ServiceType.VPC) {
+            if (!vpcGroups[node.cloudProvider]) vpcGroups[node.cloudProvider] = [];
+            vpcGroups[node.cloudProvider].push(node);
+          } else if (node.type === ServiceType.Subnet) {
+            if (!subnetGroups[node.parentId]) subnetGroups[node.parentId] = [];
+            subnetGroups[node.parentId].push(node);
+          } else if (node.parentId) {
+            if (!childGroups[node.parentId]) childGroups[node.parentId] = [];
+            childGroups[node.parentId].push(node);
+          }
+        });
+
+        // Helper to get base position for cloud nodes
+        const cloudBasePositions: Record<string, { x: number, y: number }> = {
+          '1': { x: 150, y: 250 }, // Azure
+          '2': { x: 350, y: 250 }, // GCP
+          '3': { x: 550, y: 250 }, // AWS
+        };
+
+        // Helper to get VPC node id for parent lookup
+        const vpcIdMap: Record<string, string> = {};
+        projectData.forEach((node: any) => {
+          if (node.type === ServiceType.VPC) {
+            vpcIdMap[node._id] = node.cloudProvider;
+          }
+        });
+
         const dynamicNodes: Node[] = projectData.map((node: any) => {
           let width = NODE_BASE_WIDTH, height = NODE_BASE_HEIGHT;
+          let position = { x: 0, y: 0 };
+
           if (node.type === ServiceType.VPC) {
             const count = vpcCounts[node.cloudProvider] || 1;
             width = VPC_BASE_WIDTH / count;
             height = VPC_BASE_HEIGHT / count;
+            // Position VPCs horizontally under their cloud node
+            const group = vpcGroups[node.cloudProvider] || [];
+            const idx = group.findIndex((n) => n._id === node._id);
+            const base = cloudBasePositions[
+              node.cloudProvider === 'Azure' ? '1' :
+              node.cloudProvider === 'GCP' ? '2' :
+              node.cloudProvider === 'AWS' ? '3' : '1'
+            ];
+            position = {
+              x: base.x + idx * width - ((group.length - 1) * width) / 2,
+              y: base.y + 120,
+            };
           } else if (node.type === ServiceType.Subnet) {
             const count = subnetCounts[node.parentId] || 1;
             width = SUBNET_BASE_WIDTH / count;
             height = SUBNET_BASE_HEIGHT / count;
+            // Position subnets horizontally under their VPC node
+            const group = subnetGroups[node.parentId] || [];
+            const idx = group.findIndex((n) => n._id === node._id);
+            // Find parent VPC node position
+            const parentVPCNode = dynamicNodes.find((n) => n.id === node.parentId);
+            const parentPos = parentVPCNode?.position || { x: 0, y: 0 };
+            position = {
+              x: parentPos.x + idx * width - ((group.length - 1) * width) / 2,
+              y: parentPos.y + 100,
+            };
           } else {
             const count = childCounts[node.parentId] || 1;
             width = NODE_BASE_WIDTH / count;
             height = NODE_BASE_HEIGHT / count;
+            // Position other nodes horizontally under their parent
+            const group = childGroups[node.parentId] || [];
+            const idx = group.findIndex((n) => n._id === node._id);
+            // Find parent node position
+            const parentNode = dynamicNodes.find((n) => n.id === node.parentId);
+            const parentPos = parentNode?.position || { x: 0, y: 0 };
+            position = {
+              x: parentPos.x + idx * width - ((group.length - 1) * width) / 2,
+              y: parentPos.y + 80,
+            };
           }
 
           // Determine parentNode for VPC nodes
           let parentNode = node.parentId;
           if (node.type === ServiceType.VPC) {
-            // Map cloudProvider to the correct cloud node id
             if (node.cloudProvider === 'Azure') parentNode = '1';
             else if (node.cloudProvider === 'GCP') parentNode = '2';
             else if (node.cloudProvider === 'AWS') parentNode = '3';
@@ -405,7 +472,7 @@ export default function BasicFlow() {
           return {
             id: node._id,
             type: node.type === ServiceType.VPC || node.type === ServiceType.Subnet ? 'bigSquare' : 'circle',
-            position: { x: 0, y: 0 },
+            position,
             data: {
               label: node.name,
               icon: getIconForType(node.type),
