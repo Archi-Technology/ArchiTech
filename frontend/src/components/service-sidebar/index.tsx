@@ -1,142 +1,120 @@
-import "./index.scss"
-import { useState } from "react"
-import ec2Icon from "../../assets/canvas/aws/ec2.svg";
-import s3Icon from "../../assets/canvas/aws/s3.svg";
-import lambdaIcon from "../../assets/canvas/aws/lambda.svg";
-import apiGatewayIcon from "../../assets/canvas/aws/api-gateway.svg";
-import vpcIcon from "../../assets/canvas/aws/vpc.svg";
-import cloudFrontIcon from "../../assets/canvas/aws/cloudfront.svg";
-import route53Icon from "../../assets/canvas/aws/route53.svg";
-import ecsIcon from "../../assets/canvas/aws/ecs.svg";
-import elbIcon from "../../assets/canvas/aws/elb.svg";
-import { useCanvas } from "../../contexts/canvasContext"; // Import canvas context
-import ServicePopup from "../service-popup"; // Import the popup component
+import './index.scss';
+import { useState } from 'react';
+import virtualMachineIcon from '../../assets/canvas/virtualmachine.png';
+import objectStorageIcon from '../../assets/canvas/objectstorage.png';
+import databaseIcon from '../../assets/canvas/database.png';
+import loadBalancerIcon from '../../assets/canvas/loadbalancer.png';
+
+import { useCanvas } from '../../contexts/canvasContext'; // Import canvas context
+import ServicePopup from '../service-popup'; // Import the popup component
 
 export default function ServiceSidebar() {
-    const [activeTab, setActiveTab] = useState("catalog");
-    const { addNodeToCanvas } = useCanvas(); // Access the function to add nodes to the canvas
-    const [selectedService, setSelectedService] = useState<Service | null>(null); // Track the selected service
+  const [activeTab, setActiveTab] = useState('catalog');
+  const { addNodeToCanvas } = useCanvas(); // Access the function to add nodes to the canvas
+  const [selectedService, setSelectedService] = useState<Service | null>(null); // Track the selected service
 
-    const handleServiceClick = (service: Service) => {
-        setSelectedService(service); // Open the popup with the selected service
-    };
+  const handleServiceClick = (service: Service) => {
+    setSelectedService(service); // Open the popup with the selected service
+  };
 
-    const handlePopupConfirm = (vpc: string, subnet: string) => {
-        if (selectedService) {
-            addNodeToCanvas({ ...selectedService, vpc, subnet }); // Pass VPC and subnet to the canvas
-            setSelectedService(null); // Close the popup
-        }
-    };
+  const handlePopupConfirm = (vpc: string, subnet: string) => {
+    if (selectedService) {
+      addNodeToCanvas({ ...selectedService, vpc, subnet }); // Pass VPC and subnet to the canvas
+      setSelectedService(null); // Close the popup
+    }
+  };
 
-    const handlePopupCancel = () => {
-        setSelectedService(null); // Close the popup without adding a node
-    };
+  const handlePopupCancel = () => {
+    setSelectedService(null); // Close the popup without adding a node
+  };
 
-    return (
-      <div className="sidebar">
-        <div className="search-container">
-          <div className="search-input-wrapper">
-            <span className="search-icon">🔍</span>
-            <input type="text" placeholder="Search resources..." className="search-input" />
-          </div>
-        </div>
-  
-        <div className="tabs">
-          <div className="tabs-list">
-            <button
-              className={`tab-button ${activeTab === "catalog" ? "active-tab" : ""}`}
-              onClick={() => setActiveTab("catalog")}
-            >
-              AWS
-            </button>
-            <button
-              className={`tab-button ${activeTab === "modules" ? "active-tab" : ""}`}
-              onClick={() => setActiveTab("modules")}
-            >
-              Azure
-            </button>
-          </div>
-  
-          <div className="tab-content">
-            {activeTab === "catalog" ? (
-              <div className="service-grid">
-                {services.map((service) => (
-                  <ServiceCard key={service.name} {...service} onClick={() => handleServiceClick(service)} />
-                ))}
-              </div>
-            ) : (
-              <div className="empty-state">No modules available</div>
-            )}
-          </div>
-        </div>
-        {selectedService && (
-          <ServicePopup
-            service={selectedService}
-            onConfirm={handlePopupConfirm}
-            onCancel={handlePopupCancel}
+  return (
+    <div className="sidebar">
+      <div className="search-container">
+        <div className="search-input-wrapper">
+          <span className="search-icon">🔍</span>
+          <input
+            type="text"
+            placeholder="Search resources..."
+            className="search-input"
           />
-        )}
+        </div>
       </div>
-    )
-  }
-  
-  interface ServiceCardProps {
-    name: string;
-    icon: JSX.Element;
-    onClick: () => void;
-  }
-  
-  function ServiceCard({ name, icon, onClick }: ServiceCardProps) {
-    return (
-      <div className="service-card" onClick={onClick}>
-        <div className="service-icon">{icon}</div>
-        <div className="service-name">{name}</div>
-      </div>
-    )
-  }
-  
-  interface Service {
-    name: string;
-    icon: JSX.Element;
-    vpc?: string; // Optional property
-    subnet?: string; // Optional property
-  }
 
-  const services: Service[] = [
-    {
-      name: "EC2",
-      icon: <img src={ec2Icon} alt="EC2" className="service-icon-img" />,
-    },
-    {
-      name: "S3",
-      icon: <img src={s3Icon} alt="S3" className="service-icon-img" />,
-    },
-    {
-      name: "Lambda",
-      icon: <img src={lambdaIcon} alt="Lambda" className="service-icon-img" />,
-    },
-    {
-      name: "API Gateway",
-      icon: <img src={apiGatewayIcon} alt="API Gateway" className="service-icon-img" />,
-    },
-    {
-      name: "VPC",
-      icon: <img src={vpcIcon} alt="VPC" className="service-icon-img" />,
-    },
-    {
-      name: "CloudFront",
-      icon: <img src={cloudFrontIcon} alt="CloudFront" className="service-icon-img" />,
-    },
-    {
-      name: "Route 53",
-      icon: <img src={route53Icon} alt="Route 53" className="service-icon-img" />,
-    },
-    {
-      name: "ECS",
-      icon: <img src={ecsIcon} alt="ECS" className="service-icon-img" />,
-    },
-    {
-      name: "ELB",
-      icon: <img src={elbIcon} alt="ELB" className="service-icon-img" />,
-    },
-  ];
+      <div className="tabs">
+          <button
+            className={`tab-button ${activeTab === 'catalog' ? 'active-tab' : ''}`}
+            onClick={() => setActiveTab('catalog')}
+          >
+            Catalog
+          </button>
+
+        <div className="tab-content">
+          {activeTab === 'catalog' ? (
+            <div className="service-grid">
+              {services.map((service) => (
+                <ServiceCard
+                  key={service.name}
+                  {...service}
+                  onClick={() => handleServiceClick(service)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state">No modules available</div>
+          )}
+        </div>
+      </div>
+      {selectedService && (
+        <ServicePopup
+          service={selectedService}
+          onConfirm={handlePopupConfirm}
+          onCancel={handlePopupCancel}
+        />
+      )}
+    </div>
+  );
+}
+
+interface ServiceCardProps {
+  name: string;
+  icon: JSX.Element;
+  onClick: () => void;
+}
+
+function ServiceCard({ name, icon, onClick }: ServiceCardProps) {
+  return (
+    <div className="service-card" onClick={onClick}>
+      <div className="service-icon">{icon}</div>
+      <div className="service-name">{name}</div>
+    </div>
+  );
+}
+
+interface Service {
+  name: string;
+  icon: JSX.Element;
+  vpc?: string; // Optional property
+  subnet?: string; // Optional property
+}
+
+const services: Service[] = [
+  {
+    name: 'Virtual Machine',
+    icon: (
+      <img src={virtualMachineIcon} alt="Virtual Machine" className="service-icon-img" />
+    ),
+  },
+  {
+    name: 'Object Storage',
+    icon: <img src={objectStorageIcon} alt="SObject Storage3" className="service-icon-img" />,
+  },
+  {
+    name: 'Load Balancer',
+    icon: <img src={loadBalancerIcon} alt="Load Balancer" className="service-icon-img" />,
+  },
+  {
+    name: 'Database',
+    icon: <img src={databaseIcon} alt="Database" className="service-icon-img" />,
+  }
+];
