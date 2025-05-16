@@ -25,6 +25,7 @@ import vpcIcon from '../../assets/canvas/cloud-svgrepo-com.svg';
 import subnetIcon from '../../assets/canvas/network-wired-svgrepo-com.svg';
 import { ContactlessOutlined } from '@mui/icons-material';
 import { useCanvas } from "../../contexts/canvasContext"; // Import canvas context
+import { fetchProjectData } from '../../services/canvasService'; // Import fetchProjectData
 
 const nodeTypes = {
   circle: CircleNode,
@@ -138,20 +139,20 @@ export default function BasicFlow() {
 
     setNodes((nds: Node[]) =>
       nds.map((n: Node) => {
-      if (['1', '2', '3'].includes(n.id) && n.id !== activeId) {
-        const newX: number = leftNodePlaced
-        ? canvasCenterX + (containerWidth / 2) + horizontalSpacing // Place on the right
-        : canvasCenterX - (containerWidth / 2) - horizontalSpacing; // Place on the left
-        leftNodePlaced = true; // Mark the left node as placed
-        return {
-        ...n,
-        position: {
-          x: newX,
-          y: n.position.y + verticalOffset, // Adjust vertically to avoid overlap
-        },
-        };
-      }
-      return n;
+        if (['1', '2', '3'].includes(n.id) && n.id !== activeId) {
+          const newX: number = leftNodePlaced
+            ? canvasCenterX + (containerWidth / 2) + horizontalSpacing // Place on the right
+            : canvasCenterX - (containerWidth / 2) - horizontalSpacing; // Place on the left
+          leftNodePlaced = true; // Mark the left node as placed
+          return {
+            ...n,
+            position: {
+              x: newX,
+              y: n.position.y + verticalOffset, // Adjust vertically to avoid overlap
+            },
+          };
+        }
+        return n;
       })
     );
   };
@@ -170,26 +171,26 @@ export default function BasicFlow() {
     // Step 1: Replace node with container node
     setNodes((nds: Node[]) =>
       nds.map((n: Node) =>
-      n.id === node.id
-        ? {
-          ...n,
-          type: 'bigSquare',
-          position: { x: startOfBox, y: n.position.y }, // Only update x value
-          data: {
-          ...n.data,
-          label: containerLabelMap[node.id],
-          icon: node.id === '1' ? azureIcon : node.id === '3' ? awsIcon : node.id === '2' ? gcpIcon : n.data.icon,
-          color: node.id === '1' ? 'rgb(67,196,237)' : node.id === '2' ? 'rgb(103,155,253)' : n.data.color,
-          width: 0,
-          height: 0,
-          },
-        }
-        : n.id === '4'
-        ? {
-          ...n,
-          position: { x: canvasCenterX, y: n.position.y - 130 }, // Move Earth node to the middle of the screen in x-axis
-        }
-        : n
+        n.id === node.id
+          ? {
+            ...n,
+            type: 'bigSquare',
+            position: { x: startOfBox, y: n.position.y }, // Only update x value
+            data: {
+              ...n.data,
+              label: containerLabelMap[node.id],
+              icon: node.id === '1' ? azureIcon : node.id === '3' ? awsIcon : node.id === '2' ? gcpIcon : n.data.icon,
+              color: node.id === '1' ? 'rgb(67,196,237)' : node.id === '2' ? 'rgb(103,155,253)' : n.data.color,
+              width: 0,
+              height: 0,
+            },
+          }
+          : n.id === '4'
+            ? {
+              ...n,
+              position: { x: canvasCenterX, y: n.position.y - 130 }, // Move Earth node to the middle of the screen in x-axis
+            }
+            : n
       )
     );
 
@@ -198,15 +199,15 @@ export default function BasicFlow() {
       setNodes((nds: Node[]) =>
         nds.map((n: Node) =>
           n.id === node.id
-        ? {
-            ...n,
-            data: {
-          ...n.data,
-          width: containerWidth,
-          height: 1000,
-            },
-          }
-        : n
+            ? {
+              ...n,
+              data: {
+                ...n.data,
+                width: containerWidth,
+                height: 1000,
+              },
+            }
+            : n
         )
       );
     }, 10);
@@ -248,9 +249,9 @@ export default function BasicFlow() {
           type: 'circle',
           position: { x: 50, y: 60 },
           data: {
-        label: 'Service A',
-        color: nColor(node.id),
-        imageSrc: iconMap[node.id],
+            label: 'Service A',
+            color: nColor(node.id),
+            imageSrc: iconMap[node.id],
           },
           parentNode: `${node.id}-subnet`, // Service A is a child of the Subnet
           extent: 'parent',
@@ -260,9 +261,9 @@ export default function BasicFlow() {
           type: 'circle',
           position: { x: 160, y: 160 },
           data: {
-        label: 'Service B',
-        color: nColor(node.id),
-        imageSrc: iconMap[node.id],
+            label: 'Service B',
+            color: nColor(node.id),
+            imageSrc: iconMap[node.id],
           },
           parentNode: `${node.id}-subnet`, // Service B is a child of the Subnet
           extent: 'parent',
@@ -303,14 +304,65 @@ export default function BasicFlow() {
           type: "circle",
           position: { x: 400, y: 300 }, // Adjust position as needed
           data: {
-        label: `${service.name} (${service.vpc}, ${service.subnet})`, // Include VPC and subnet in the label
-        color: "rgb(246,133,0)", // Example color
-        imageSrc: (service.icon.props as { src: string }).src, // Use the service icon
+            label: `${service.name} (${service.vpc}, ${service.subnet})`, // Include VPC and subnet in the label
+            color: "rgb(246,133,0)", // Example color
+            imageSrc: (service.icon.props as { src: string }).src, // Use the service icon
           },
         } as Node,
       ]);
     });
   }, [registerAddNodeFunction, setNodes]);
+
+  useEffect(() => {
+    const loadProjectData = async () => {
+      try {
+        const projectId = sessionStorage.getItem('selectedProjectId');
+        if (!projectId) return;
+
+        const projectData = await fetchProjectData();
+
+        const dynamicNodes: Node[] = projectData.map((node) => ({
+          id: node._id,
+          type: node.type,
+          // position:node.position 
+          position: {x: 0, y: 0},
+          data: {
+            label: node.name,
+            // icon: node.data.icon,
+            // color: node.data.color,
+            // width: node.data.width,
+            // height: node.data.height,
+          },
+          parentNode: node.parentId,
+          extent: 'parent',
+        }));
+
+        const dynamicEdges: Edge[] = [];
+
+        projectData
+          .filter((node) => node.connnectedTo)
+          .forEach((node) => (
+            node.connnectedTo.forEach((connectedNode) => {
+              dynamicEdges.push({
+                id: `${node._id}-${connectedNode}`,
+                source: node._id,
+                target: connectedNode,
+                animated: true,
+                type: 'smoothstep',
+                style: { stroke: '#555', strokeWidth: 2 },
+              })
+            })
+          ));
+
+        setNodes((nds) => [...defaultNodes, ...dynamicNodes]);
+        setEdges((eds) => [...initialEdges, ...dynamicEdges]);
+      } catch (error) {
+        console.error('Error loading project data:', error);
+      }
+    };
+
+    loadProjectData();
+  }, []);
 
   return (
     <div style={{ width: '100%', height: '100%' }} ref={reactFlowWrapper}>
