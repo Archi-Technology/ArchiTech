@@ -10,7 +10,7 @@ export enum ServiceType  {
 export enum CloudProvider {    
     GCP = 'GCP',
     AZURE = 'AZURE',
-    IWS = 'AWS',
+    AWS = 'AWS',
 }
 
 export interface IProjectArtchitecture {
@@ -22,8 +22,8 @@ interface IBaseService {
     _id: string;
     name: string;
     type: ServiceType;
-    parentId: string;
+    parentId: string | null;
     cloudProvider: CloudProvider;
     connnectedTo: string[];
-    extraData: JSON;
+    extraData: JSON | null;
 }
