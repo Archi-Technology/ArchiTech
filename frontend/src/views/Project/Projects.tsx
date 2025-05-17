@@ -19,7 +19,12 @@ import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { getAllProjects, createProject, updateProject, deleteProject } from '../../services/projectService';
+import {
+  getAllProjects,
+  createProject,
+  updateProject,
+  deleteProject,
+} from '../../services/projectService';
 
 interface Project {
   _id: string;
@@ -60,7 +65,11 @@ export default function Projects() {
 
   const handleEditProject = async (projectId: string, newName: string) => {
     try {
-      await updateProject(projectId, newName, projects.find(p => p._id === projectId)?.data || {});
+      await updateProject(
+        projectId,
+        newName,
+        projects.find((p) => p._id === projectId)?.data || {}
+      );
       setEditMode(null);
       await fetchProjects();
     } catch (err) {
@@ -91,39 +100,30 @@ export default function Projects() {
   return (
     <Box
       sx={{
-        bgcolor: '#0d0d0d',
-        color: '#fff',
+        bgcolor: '#fff',
+        color: '#000',
         minHeight: '100vh',
         py: 6,
-        backgroundImage:
-          'radial-gradient(#444 1px, transparent 1px), radial-gradient(#444 1px, transparent 1px)',
-        backgroundSize: '28px 28px',
-        backgroundPosition: '0 0, 14px 14px',
       }}
     >
       <Container>
         <Grid container spacing={4} mb={4}>
           <Grid item xs={12} md={6}>
-            <Paper elevation={3} sx={{ p: 4, bgcolor: '#1a1a1a' }}>
+            <Paper elevation={3} sx={{ p: 4 }}>
               <Box display="flex" alignItems="center" mb={1}>
-                <FolderOpenIcon sx={{ mr: 1, color: '#fff' }} />
-                <Typography variant="subtitle1" fontWeight="bold" color="white">
+                <FolderOpenIcon sx={{ mr: 1, color: '#000' }} />
+                <Typography variant="subtitle1" fontWeight="bold">
                   Continue Existing Project
                 </Typography>
               </Box>
-              <Typography variant="body2" color="gray" gutterBottom>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
                 Resume work on your cloud architecture designs.
               </Typography>
-              <Typography variant="caption" color="gray">
+              <Typography variant="caption" color="text.secondary">
                 Access your ongoing projects and pick up where you left off.
               </Typography>
               <Box mt={3}>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  sx={{ bgcolor: '#fff', color: '#000' }}
-                  onClick={() => setOpenDialog(true)}
-                >
+                <Button fullWidth variant="contained" onClick={() => setOpenDialog(true)}>
                   View Existing Projects
                 </Button>
               </Box>
@@ -131,26 +131,21 @@ export default function Projects() {
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <Paper elevation={3} sx={{ p: 4, bgcolor: '#1a1a1a' }}>
+            <Paper elevation={3} sx={{ p: 4 }}>
               <Box display="flex" alignItems="center" mb={1}>
-                <AddIcon sx={{ mr: 1, color: '#fff' }} />
-                <Typography variant="subtitle1" fontWeight="bold" color="white">
+                <AddIcon sx={{ mr: 1, color: '#000' }} />
+                <Typography variant="subtitle1" fontWeight="bold">
                   Create New Project
                 </Typography>
               </Box>
-              <Typography variant="body2" color="gray" gutterBottom>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
                 Start a fresh cloud architecture design.
               </Typography>
-              <Typography variant="caption" color="gray">
+              <Typography variant="caption" color="text.secondary">
                 Begin a new project from scratch or use a template.
               </Typography>
               <Box mt={3}>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  sx={{ bgcolor: '#fff', color: '#000' }}
-                  onClick={handleCreateProject}
-                >
+                <Button fullWidth variant="contained" onClick={handleCreateProject}>
                   Create New Project
                 </Button>
               </Box>
@@ -160,24 +155,22 @@ export default function Projects() {
 
         {projects.length > 0 && (
           <>
-            <Typography variant="subtitle1" mb={2} color="white">
+            <Typography variant="subtitle1" mb={2}>
               Recent Projects
             </Typography>
             <Grid container spacing={3}>
               {projects.map((project) => (
                 <Grid item xs={12} sm={6} md={4} key={project._id}>
-                  <Paper sx={{ bgcolor: '#1a1a1a', p: 3 }}>
+                  <Paper sx={{ p: 3 }}>
                     <Box display="flex" alignItems="center" mb={1}>
-                      <FolderOpenIcon sx={{ mr: 1, color: '#fff' }} />
-                      <Typography fontWeight="bold" color="white">
-                        {project.name}
-                      </Typography>
+                      <FolderOpenIcon sx={{ mr: 1, color: '#000' }} />
+                      <Typography fontWeight="bold">{project.name}</Typography>
                     </Box>
-                    <Typography variant="body2" color="gray">
+                    <Typography variant="body2" color="text.secondary">
                       Last edited: {formatDate(project.lastEdited)}
                     </Typography>
                     <Box mt={2}>
-                      <Button fullWidth variant="contained" sx={{ bgcolor: '#fff', color: '#000' }}>
+                      <Button fullWidth variant="contained">
                         Open Project
                       </Button>
                     </Box>
@@ -206,10 +199,10 @@ export default function Projects() {
             <Grid container spacing={2}>
               {projects.map((project) => (
                 <Grid item xs={12} key={project._id}>
-                  <Paper sx={{ p: 2, bgcolor: '#1a1a1a' }}>
+                  <Paper sx={{ p: 2 }}>
                     <Box display="flex" justifyContent="space-between" alignItems="center">
                       <Box display="flex" alignItems="center" flex={1}>
-                        <FolderOpenIcon sx={{ mr: 1, color: '#fff' }} />
+                        <FolderOpenIcon sx={{ mr: 1, color: '#000' }} />
                         {editMode === project._id ? (
                           <TextField
                             value={newProjectName}
@@ -228,10 +221,9 @@ export default function Projects() {
                                 handleEditProject(project._id, newProjectName);
                               }
                             }}
-                            sx={{ input: { color: '#fff' } }}
                           />
                         ) : (
-                          <Typography color="white">{project.name}</Typography>
+                          <Typography>{project.name}</Typography>
                         )}
                       </Box>
                       <Box>
@@ -241,14 +233,12 @@ export default function Projects() {
                             setNewProjectName(project.name);
                           }}
                           size="small"
-                          sx={{ color: '#fff' }}
                         >
                           <EditIcon />
                         </IconButton>
                         <IconButton
                           onClick={() => handleDeleteProject(project._id)}
                           size="small"
-                          sx={{ color: '#fff' }}
                         >
                           <DeleteIcon />
                         </IconButton>
@@ -265,7 +255,7 @@ export default function Projects() {
                         </Button>
                       </Box>
                     </Box>
-                    <Typography variant="caption" color="gray" display="block" mt={1}>
+                    <Typography variant="caption" color="text.secondary" display="block" mt={1}>
                       Last edited: {formatDate(project.lastEdited)}
                     </Typography>
                   </Paper>
