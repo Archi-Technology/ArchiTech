@@ -1,6 +1,11 @@
 import './index.scss';
 import { useState, useEffect } from 'react';
 import {
+  askOptimalChoices,
+  parseGeminiRecommendation,
+} from '../../utils/recommendation';
+
+import {
   getAllAvailableLocations,
   translateLocationToRegionCodes,
 } from '../../utils/Mappers/regionMapper';
@@ -71,7 +76,7 @@ export default function ServicePopup({
 
   useEffect(() => {
     setRecommendation(
-      `Based on your selection, we recommend using the "${service.name}" service for optimal cost and performance.`,
+      `Based on your app context, click here to get optimal cost and performance for "${service.name}".`,
     );
   }, [service]);
 
@@ -110,9 +115,46 @@ export default function ServicePopup({
       <div className="popup-content">
         <div className="popup-recommendation">
           <div className="chatbot-icon">🤖</div>
-          <p>{recommendation}</p>
+          <button
+            className="popup-button ai"
+            style={{ background: 'none' }}
+            onClick={async () => {
+              const answer = await askOptimalChoices(service.name);
+              const parsed = parseGeminiRecommendation(answer?.message ?? '');
+              if (parsed) {
+                try {
+                  if (service.name === 'Virtual Machine') {
+                    setSelectedInstanceType(parsed.type || '');
+                    setSelectedRegion(parsed.region || '');
+                    setSelectedOS(parsed.os || '');
+                  } else if (service.name === 'Object Storage') {
+                    setSelectedRegion(parsed.region || '');
+                    setSelectedStorageClass(parsed.storageClass || '');
+                  } else if (service.name === 'Load Balancer') {
+                    setSelectedRegion(parsed.region || '');
+                    setSelectedLBType(parsed.lbType || '');
+                  } else if (service.name === 'Database') {
+                    setSelectedRegion(parsed.region || '');
+                    setSelectedDBInstanceType(parsed.dbType || '');
+                    setSelectedDBEngine(parsed.dbEngine || '');
+                  }
+
+                  setRecommendation(
+                    `Optimal choices for "${service.name}" have been set.`,
+                  );
+                } catch (e) {
+                  if (e instanceof Error) {
+                    setRecommendation(e.message);
+                  } else {
+                    setRecommendation(String(e));
+                  }
+                }
+              }
+            }}
+          >
+            <p>{recommendation}</p>
+          </button>
         </div>
-        <h3>Confirm Add Service</h3>
         <div className="popup-service">
           <div className="popup-service-icon">{service.icon}</div>
           <div className="popup-service-name">{service.name}</div>
@@ -286,11 +328,11 @@ export default function ServicePopup({
               !selectedPricing ||
               (service.name === 'Virtual Machine' &&
                 (!selectedInstanceType || !selectedRegion || !selectedOS)) ||
-              (service.name === 'Bucket' &&
+              (service.name === 'Object Storage' &&
                 (!selectedRegion || !selectedStorageClass)) ||
               (service.name === 'Load Balancer' &&
                 (!selectedRegion || !selectedLBType)) ||
-              (service.name === 'DB' &&
+              (service.name === 'Database' &&
                 (!selectedRegion ||
                   !selectedDBInstanceType ||
                   !selectedDBEngine))

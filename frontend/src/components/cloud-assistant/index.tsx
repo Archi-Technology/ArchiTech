@@ -1,140 +1,152 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { X } from "lucide-react"
-import { Button } from '../ui/button/button'
-import { Input } from '../ui/input/input'
-import { Label } from '../ui/label/label'
-import { RadioGroup, RadioGroupItem } from '../ui/radio-group/radio-group'
-import { Textarea } from '../ui/textarea/textarea'
-import "./index.css"
-import { saveUserContext } from "../../services/userService"
+import { useState } from 'react';
+import { Button } from '../ui/button/button';
+import { Input } from '../ui/input/input';
+import { Label } from '../ui/label/label';
+import { RadioGroup, RadioGroupItem } from '../ui/radio-group/radio-group';
+import './index.css';
+import { saveUserContext } from '../../services/userService';
 
-
-export interface IUserContext{
-    descOfProject: string;
-    highAvailbility: boolean;
-    securityHighConcern: boolean;
-    connectDifferentCloudP: boolean;
-    amountOfUsers: string;
-    budget: string;
-    regulations: string;
+export interface IUserContext {
+  mainPurpose: string;
+  resourceDemands: string;
+  regions: string;
+  osDependencies: string;
+  softwareDependencies: string;
+  budgetConsiderations: string;
 }
 
 type Question = {
-    id: number
-    text: string
-    type: "input" | "textarea" | "radio"
-    options?: string[]
-    name: keyof IUserContext
-  }
+  id: number;
+  text: string;
+  type: 'input' | 'radio';
+  options?: string[];
+  name: keyof IUserContext;
+};
 
 const questions: Question[] = [
   {
     id: 1,
-    text: "Tell me a little bit about your company and what services are you planning on delivering through your environment",
-    type: "textarea",
-    name: "descOfProject",
+    text: 'What is the main purpose of your application?',
+    type: 'radio',
+    options: [
+      'Web Server/Application Hosting',
+      'Database Server',
+      'Data Processing/Analytics',
+      'Machine Learning/AI',
+      'Gaming Server',
+    ],
+    name: 'mainPurpose',
   },
   {
     id: 2,
-    text: "Does your environment require redundancy and high availability?",
-    type: "radio",
-    options: ["Yes", "No"],
-    name: 'highAvailbility',
+    text: 'What are the expected resource demands of your application??',
+    type: 'radio',
+    options: [
+      'CPU-intensive (high processing power needed)',
+      'Memory-intensive (needs a lot of RAM)',
+      'I/O-intensive (reads and writes a lot of data)',
+      'Graphics Processing (requires a GPU)',
+      'Balanced (moderate needs across resources)',
+    ],
+    name: 'resourceDemands',
   },
   {
     id: 3,
-    text: "Are you required to comply with local/regional regulations? If so, please provide their identifiers/specifications",
-    type: "textarea",
-    name: "regulations",
+    text: "Where are the majority of your application's users located or where do you anticipate the most traffic?",
+    type: 'radio',
+    options: [
+      'North America',
+      'Europe',
+      'Asia-Pacific',
+      'South America',
+      'India',
+    ],
+    name: 'regions',
   },
   {
     id: 4,
-    text: "Is security a high concern for your environment?",
-    type: "radio",
-    options: ["Yes", "No"],
-    name: "securityHighConcern",
+    text: 'Does your application have any specific software dependencies or licensing requirements that might influence the choice of operating system?',
+    type: 'radio',
+    options: [
+      'Requires Windows-specific features (.NET, etc.)',
+      'Works best with a specific Linux distribution',
+      'No specific OS requirements',
+      'Needs specific licensed software',
+    ],
+    name: 'softwareDependencies',
   },
   {
     id: 5,
-    text: "How many users are expected to interact with your environment?",
-    type: "input",
-    name: "amountOfUsers",
+    text: 'What is your approximate budget considerations for the virtual machine?',
+    type: 'radio',
+    options: [
+      'Cost-sensitive (looking for the most affordable option)',
+      'Balanced cost and performance',
+      'Performance is the priority, cost is less of a concern',
+    ],
+    name: 'budgetConsiderations',
   },
   {
     id: 6,
-    text: "Do you plan on connecting to other cloud service providers/on premise networks?",
-    type: "radio",
-    options: ["Yes", "No"],
-    name: "connectDifferentCloudP",
+    text: 'Do you have any specific preferences or familiarity with a particular operating system?',
+    type: 'radio',
+    options: [
+      'Familiar with Linux (Ubuntu, CentOS, etc.)',
+      'Familiar with Windows Server',
+      'No preference',
+    ],
+    name: 'osDependencies',
   },
-  {
-    id: 7,
-    text: "What is the budget allocated for the environment?",
-    type: "input",
-    name: "budget",
-  },
-]
+];
 
 export function CloudAssistantPopup({ onClose }: { onClose: () => void }) {
-  const [currentQuestion, setCurrentQuestion] = useState(0)
-  const [answers, setAnswers] = useState<Partial<IUserContext>>({})
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [answers, setAnswers] = useState<Partial<IUserContext>>({});
 
   const handleNext = async () => {
     if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1)
+      setCurrentQuestion(currentQuestion + 1);
     } else {
       // Submit answers or perform final action
-      console.log("All answers:", answers);
+      console.log('All answers:', answers);
       await saveUserContext(answers);
-      onClose()
+      onClose();
     }
-  }
+  };
 
   const handlePrevious = () => {
     if (currentQuestion > 0) {
-      setCurrentQuestion(currentQuestion - 1)
+      setCurrentQuestion(currentQuestion - 1);
     }
-  }
+  };
 
   const handleAnswerChange = (value: string) => {
-    const currentQuestionType = questions[currentQuestion].type
+    setAnswers({
+      ...answers,
+      [questions[currentQuestion].name]: value,
+    });
+  };
 
-    // Convert radio answers to boolean
-    if (currentQuestionType === "radio") {
-      setAnswers({
-        ...answers,
-        [questions[currentQuestion].name]: value === "Yes",
-      })
-    } else {
-      setAnswers({
-        ...answers,
-        [questions[currentQuestion].name]: value,
-      })
-    }
-  }
-
-  const currentQuestionData = questions[currentQuestion]
-  const isLastQuestion = currentQuestion === questions.length - 1
+  const currentQuestionData = questions[currentQuestion];
+  const isLastQuestion = currentQuestion === questions.length - 1;
 
   // For radio buttons, convert boolean back to string for display
   const getCurrentValue = () => {
-    const value = answers[currentQuestionData.name]
-    if (currentQuestionData.type === "radio") {
-      return value === true ? "Yes" : value === false ? "No" : ""
-    }
-    return (value as string) || ""
-  }
+    const value = answers[currentQuestionData.name];
+
+    return (value as string) || '';
+  };
 
   // Check if the "Next" button should be disabled
   const isNextDisabled = () => {
-    const value = answers[currentQuestionData.name]
-    if (currentQuestionData.type === "radio") {
-      return value === undefined // Disable if no radio option is selected
+    const value = answers[currentQuestionData.name];
+    if (currentQuestionData.type === 'radio') {
+      return value === undefined; // Disable if no radio option is selected
     }
-    return !value // Disable if input/textarea is empty
-  }
+    return !value; // Disable if input/textarea is empty
+  };
 
   return (
     <div className="popup-container">
@@ -165,7 +177,7 @@ export function CloudAssistantPopup({ onClose }: { onClose: () => void }) {
       <div className="popup-content">
         <h3 className="question-text">{currentQuestionData.text}</h3>
 
-        {currentQuestionData.type === "input" && (
+        {currentQuestionData.type === 'input' && (
           <Input
             value={getCurrentValue()}
             onChange={(e) => handleAnswerChange(e.target.value)}
@@ -174,22 +186,17 @@ export function CloudAssistantPopup({ onClose }: { onClose: () => void }) {
           />
         )}
 
-        {currentQuestionData.type === "textarea" && (
-          <Textarea
+        {currentQuestionData.type === 'radio' && (
+          <RadioGroup
             value={getCurrentValue()}
-            onChange={(e) => handleAnswerChange(e.target.value)}
-            placeholder="Type your answer here"
-            className="text-area"
-          />
-        )}
-
-        {currentQuestionData.type === "radio" && (
-          <RadioGroup value={getCurrentValue()} onValueChange={handleAnswerChange} className="radio-options">
+            onValueChange={handleAnswerChange}
+            className="radio-options"
+          >
             {currentQuestionData.options?.map((option) => (
               <div
                 key={option}
-                className={`radio-option-container ${getCurrentValue() === option ? "selected" : ""}`}
-                onClick={() => handleAnswerChange(option)} // Ensure clicking the container triggers the change
+                className={`radio-option-container ${getCurrentValue() === option ? 'selected' : ''}`}
+                onClick={() => handleAnswerChange(option)}
               >
                 <RadioGroupItem value={option} id={`option-${option}`} />
                 <Label htmlFor={`option-${option}`} className="radio-label">
@@ -202,14 +209,19 @@ export function CloudAssistantPopup({ onClose }: { onClose: () => void }) {
       </div>
 
       <div className="popup-footer">
-        <Button variant="outline" onClick={currentQuestion === 0 ? onClose : handlePrevious}>
-          {currentQuestion === 0 ? "Close" : "Back"}
+        <Button
+          variant="outline"
+          onClick={currentQuestion === 0 ? onClose : handlePrevious}
+        >
+          {currentQuestion === 0 ? 'Close' : 'Back'}
         </Button>
         <div className="question-counter">
           Question {currentQuestion + 1} of {questions.length}
         </div>
-        <Button onClick={handleNext} disabled={isNextDisabled()}>{isLastQuestion ? "Submit" : "Next"}</Button>
+        <Button onClick={handleNext} disabled={isNextDisabled()}>
+          {isLastQuestion ? 'Submit' : 'Next'}
+        </Button>
       </div>
     </div>
-  )
+  );
 }
