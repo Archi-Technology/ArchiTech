@@ -23,6 +23,10 @@ const regionMap: RegionMap = {
     aws: ['eu-west-3'],
     azure: ['francecentral', 'francesouth'],
   },
+  Ireland: {
+    aws: ['eu-west-1'],
+    azure: ['northeurope'],
+  },
   Brazil: {
     aws: ['sa-east-1'],
     azure: ['brazilsouth', 'brazilsoutheast'],

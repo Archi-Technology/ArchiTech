@@ -41,7 +41,7 @@ const questions: Question[] = [
   },
   {
     id: 2,
-    text: 'What are the expected resource demands of your application??',
+    text: 'What are the expected resource demands of your application?',
     type: 'radio',
     options: [
       'CPU-intensive (high processing power needed)',
