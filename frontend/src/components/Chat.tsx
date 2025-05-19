@@ -34,15 +34,19 @@ export default function Chat() {
     } catch (error) {
       setMessages([
         ...newMessages,
-        { role: 'assistant', content: '❌ שגיאה בשליחת השאלה' } as Message,
+        { role: 'assistant', content: '❌ Error' } as Message,
       ]);
     }
   };
 
   return (
     <>
-      <button className="toggle-chat-btn" onClick={() => setVisible(!visible)}>
-        {visible ? '✖ סגור' : '💬 שאל'}
+      <button
+        className="toggle-chat-btn"
+        style={{ color: 'whtie', backgroundColor: 'black' }}
+        onClick={() => setVisible(!visible)}
+      >
+        {visible ? '✖ Close' : '💬 Ask'}
       </button>
 
       {visible && (
@@ -58,10 +62,15 @@ export default function Chat() {
             <input
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
-              placeholder="שאל אותי משהו..."
+              placeholder="Ask me anything..."
               onKeyDown={(e) => e.key === 'Enter' && ask()}
             />
-            <button onClick={ask}>שלח</button>
+            <button
+              style={{ color: 'whtie', backgroundColor: 'black' }}
+              onClick={ask}
+            >
+              send
+            </button>
           </div>
         </div>
       )}

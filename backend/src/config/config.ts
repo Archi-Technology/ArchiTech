@@ -11,6 +11,7 @@ export const config: IConfig = {
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
     PORT: parseInt(process.env.PORT || '5000'),
+    GEMINI_API_KEY: process.env.GEMINI_API_KEY || '',
 }
 interface IConfig {
     JWT_SECRET: string;
@@ -21,4 +22,5 @@ interface IConfig {
     PORT: number;
     GOOGLE_CLIENT_ID: string;
     GOOGLE_CLIENT_SECRET: string; 
+    GEMINI_API_KEY: string;
 }

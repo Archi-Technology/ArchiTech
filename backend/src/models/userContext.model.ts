@@ -1,13 +1,12 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema } from "mongoose";
 
 export interface IBaseUserContext extends Document {
-  descOfProject: string;
-  highAvailbility: boolean;
-  securityHighConcern: boolean;
-  connectDifferentCloudP: boolean;
-  amountOfUsers: string;
-  budget: string;
-  regulations: string;
+  mainPurpose: string;
+  resourceDemands: string;
+  regions: string;
+  osDependencies: string;
+  softwareDependencies: string;
+  budgetConsiderations: string;
 }
 
 export interface IUserContext extends IBaseUserContext {
@@ -15,17 +14,24 @@ export interface IUserContext extends IBaseUserContext {
 }
 
 const UserContextSchema = new Schema<IUserContext>({
-  userId: { type: Schema.Types.ObjectId, required: true, ref: 'User', index: true, unique: true },
-  descOfProject: { type: String },
-  amountOfUsers: { type: String },
-  regulations: { type: String },
-  budget: { type: String },
-  connectDifferentCloudP: { type: Boolean },
-  securityHighConcern: { type: Boolean },
-  highAvailbility: { type: Boolean },
+  userId: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: "User",
+    index: true,
+    unique: true,
+  },
+  mainPurpose: { type: String },
+  resourceDemands: { type: String },
+  regions: { type: String },
+  osDependencies: { type: String },
+  softwareDependencies: { type: String },
+  budgetConsiderations: { type: String },
 });
 
-
-const UserContextModel = mongoose.model<IUserContext>('UserContext', UserContextSchema);
+const UserContextModel = mongoose.model<IUserContext>(
+  "UserContext",
+  UserContextSchema
+);
 
 export default UserContextModel;

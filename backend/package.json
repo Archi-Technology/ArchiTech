@@ -15,7 +15,7 @@
   "description": "",
   "dependencies": {
     "@aws-sdk/client-pricing": "^3.797.0",
-    "@google/generative-ai": "^0.21.0",
+    "@google/generative-ai": "^0.24.1",
     "@types/jest": "^29.5.14",
     "@types/supertest": "^6.0.2",
     "axios": "^1.9.0",
