@@ -17,7 +17,7 @@ export interface IProjectArtchitecture {
     data: IBaseService[]
 }
 
-interface IBaseService {    
+export interface IBaseService {    
     projectId: string;
     _id: string;
     name: string;
