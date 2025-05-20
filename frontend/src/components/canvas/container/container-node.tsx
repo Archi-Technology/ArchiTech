@@ -79,7 +79,7 @@ const ContainerNode = ({ data, title = "Azure", icon }: NodeProps & { title?: st
           fontWeight: 'bold',
         }}
       >
-        {data.label}
+      
       </div>
     </div>
   );
