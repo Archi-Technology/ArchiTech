@@ -15,7 +15,7 @@ export const createVPC = async (name: string, cloud: string, cidr: string) => {
 };
 
 export const createSubnet = async (name: string, vpc: string, cloud: string, cidr: string) => {
-   // Simulate a delay of 1 second
+  // Simulate a delay of 1 second
   const projectId = sessionStorage.getItem('selectedProjectId'); // Fetch project ID from session storage
   const response = await AxiosInstence.post('/canvas/subnet', {
     name,
@@ -65,6 +65,26 @@ export const fetchProjectData = async () => {
         name: 'subnet1',
         type: ServiceType.Subnet,
         parentId: '7',
+        cloudProvider: CloudProvider.AZURE,
+        connnectedTo: [],
+        extraData: null
+      },
+      {
+        projectId: '1',
+        _id: '10',
+        name: 'VM1',
+        type: ServiceType.VM,
+        parentId: '9',
+        cloudProvider: CloudProvider.AZURE,
+        connnectedTo: [],
+        extraData: null
+      },
+         {
+        projectId: '1',
+        _id: '11',
+        name: 'VM2',
+        type: ServiceType.VM,
+        parentId: '9',
         cloudProvider: CloudProvider.AZURE,
         connnectedTo: [],
         extraData: null

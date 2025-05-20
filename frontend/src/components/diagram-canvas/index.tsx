@@ -135,8 +135,9 @@ export default function BasicFlow() {
         return vpcIcon;
       case ServiceType.Subnet:
         return subnetIcon;
-        return earth;
-      // Add more cases as needed for other service types
+      case ServiceType.VM:
+        return subnetIcon;
+
       default:
         return undefined;
     }
@@ -189,257 +190,264 @@ export default function BasicFlow() {
     setExpandedNodeId(node.id);
 
     const canvasWidth = reactFlowWrapper.current?.clientWidth || 0; // Dynamically get canvas width
-    const containerWidth = canvasWidth * 1.2; // Use 80% of the canvas width for the box
+
 
     // Center the expansion box horizontally in the canvas
     const canvasCenterX = canvasWidth / 2;
-    const startOfBox = canvasCenterX - containerWidth / 2;
-
-   const projectId = sessionStorage.getItem('selectedProjectId');
-      if (!projectId) return;
-
-      const projectData = await fetchProjectData();
 
 
+    const projectId = sessionStorage.getItem('selectedProjectId');
+    if (!projectId) return;
 
-      const cloudBoxWidth = canvasWidth * 1.2; // Use 80% of the canvas width for the box
-      const cloudBoxHeight = 1000; // Height of the container node
+    const projectData = await fetchProjectData();
 
 
-      // Count VPCs per cloudProvider
-      const vpcCounts: Record<string, number> = {};
-      const bucketsCount: Record<string, number> = {};
-      const subnetCounts: Record<string, number> = {};
-      const childCounts: Record<string, number> = {};
 
-      projectData.forEach((node: any) => {
-        if (node.type === ServiceType.VPC) {
-          vpcCounts[node.cloudProvider] = (vpcCounts[node.cloudProvider] || 0) + 1;
+    const cloudBoxWidth = canvasWidth * 0.6; // Use 80% of the canvas width for the box
+    const cloudBoxHeight = 500; // Height of the container node
+    const startOfBox = canvasCenterX - cloudBoxWidth / 2;
+
+    // Count VPCs per cloudProvider
+    const vpcCounts: Record<string, number> = {};
+    const bucketsCount: Record<string, number> = {};
+    const subnetCounts: Record<string, number> = {};
+    const childCounts: Record<string, number> = {};
+
+    projectData.forEach((node: any) => {
+      if (node.type === ServiceType.VPC) {
+        vpcCounts[node.cloudProvider] = (vpcCounts[node.cloudProvider] || 0) + 1;
+      }
+      if (node.type === ServiceType.OBJECT_STORAGE) {
+        bucketsCount[node.cloudProvider] = (bucketsCount[node.cloudProvider] || 0) + 1;
+      }
+
+      if (node.type === ServiceType.Subnet && node.parentId) {
+        subnetCounts[node.parentId] = (subnetCounts[node.parentId] || 0) + 1;
+      }
+
+      if (node.parentId) {
+        childCounts[node.parentId] = (childCounts[node.parentId] || 0) + 1;
+      }
+    });
+
+
+    // Calculate positions for dynamic nodes
+    // 1. Group nodes by parentId (or cloudProvider for VPCs)
+    const vpcGroups: Record<string, any[]> = {};
+    const subnetGroups: Record<string, any[]> = {};
+    const childGroups: Record<string, any[]> = {};
+
+    projectData.forEach((node: any) => {
+      if (node.type === ServiceType.VPC) {
+        if (!vpcGroups[node.cloudProvider]) vpcGroups[node.cloudProvider] = [];
+        vpcGroups[node.cloudProvider].push(node);
+      } else if (node.type === ServiceType.Subnet) {
+        if (!subnetGroups[node.parentId]) subnetGroups[node.parentId] = [];
+        subnetGroups[node.parentId].push(node);
+      } else if (node.parentId) {
+        if (!childGroups[node.parentId]) childGroups[node.parentId] = [];
+        childGroups[node.parentId].push(node);
+      }
+    });
+
+
+
+    // Helper to get base position for cloud nodes
+    const cloudBasePositions: Record<string, { x: number, y: number }> = {
+      '1': { x: startOfBox, y: 250 }, // Azure
+      '2': { x: startOfBox, y: 250 }, // GCP
+      '3': { x: startOfBox, y: 250 }, // AWS
+    };
+
+    // Helper to get VPC node id for parent lookup
+    const vpcIdMap: Record<string, string> = {};
+    projectData.forEach((node: any) => {
+      if (node.type === ServiceType.VPC) {
+        vpcIdMap[node._id] = node.cloudProvider;
+      }
+    });
+
+    let dynamicNodes: Node[] = projectData.map((node: IBaseService) => {
+      let width = 0, height = 0;
+      let position = { x: 0, y: 0 };
+
+      if (node.type === ServiceType.VPC) {
+        const count = vpcCounts[node.cloudProvider] || 1;
+        width = cloudBoxWidth / count - 10;
+        height = cloudBoxHeight - 45;
+
+        // Position VPCs horizontally under their cloud node
+        const group = vpcGroups[node.cloudProvider] || [];
+        const idx = group.findIndex((n) => n._id === node._id);
+        const base = cloudBasePositions[
+          node.cloudProvider === 'AZURE' ? '1' :
+            node.cloudProvider === 'GCP' ? '2' :
+              node.cloudProvider === 'AWS' ? '3' : '1'
+        ];
+
+        position = {
+          x: idx * width + 10,
+          y: 35,
+        };
+
+        let parentNode = node.parentId;
+        if (node.type === ServiceType.VPC as unknown as string) {
+          if (node.cloudProvider === 'AZURE') parentNode = '1';
+          else if (node.cloudProvider === 'GCP') parentNode = '2';
+          else if (node.cloudProvider === 'AWS') parentNode = '3';
         }
-        if (node.type === ServiceType.OBJECT_STORAGE) {
-          bucketsCount[node.cloudProvider] = (bucketsCount[node.cloudProvider] || 0) + 1;
-        }
 
-        if (node.type === ServiceType.Subnet && node.parentId) {
-          subnetCounts[node.parentId] = (subnetCounts[node.parentId] || 0) + 1;
-        }
+        return {
+          id: node._id,
+          type: node.type === ServiceType.VPC || node.type === ServiceType.Subnet ? 'bigSquare' : 'circle',
+          position,
+          data: {
+            label: node.name,
+            icon: getIconForType(node.type),
+            imageSrc: getIconForType(node.type),
+            color: getColorForCloud(node.cloudProvider),
+            width,
+            height,
+          },
+          parentNode,
+          extent: 'parent',
+        } as Node;
 
-        if (node.parentId) {
-          childCounts[node.parentId] = (childCounts[node.parentId] || 0) + 1;
-        }
-      });
+      } else {
+
+        let parentNode = node.parentId;
+
+        return {
+          id: node._id,
+          type: node.type === ServiceType.Subnet ? 'bigSquare' : 'circle',
+          position,
+          data: {
+            label: node.name,
+            icon: getIconForType(node.type),
+            imageSrc: getIconForType(node.type),
+            color: getColorForCloud(node.cloudProvider),
+            width,
+            height,
+          },
+          parentNode,
+          extent: 'parent',
+        } as Node;
+      }
+
+    });
 
 
-      // Calculate positions for dynamic nodes
-      // 1. Group nodes by parentId (or cloudProvider for VPCs)
-      const vpcGroups: Record<string, any[]> = {};
-      const subnetGroups: Record<string, any[]> = {};
-      const childGroups: Record<string, any[]> = {};
+    dynamicNodes = dynamicNodes.map((node: Node) => {
 
-      projectData.forEach((node: any) => {
-        if (node.type === ServiceType.VPC) {
-          if (!vpcGroups[node.cloudProvider]) vpcGroups[node.cloudProvider] = [];
-          vpcGroups[node.cloudProvider].push(node);
-        } else if (node.type === ServiceType.Subnet) {
-          if (!subnetGroups[node.parentId]) subnetGroups[node.parentId] = [];
-          subnetGroups[node.parentId].push(node);
-        } else if (node.parentId) {
-          if (!childGroups[node.parentId]) childGroups[node.parentId] = [];
-          childGroups[node.parentId].push(node);
-        }
-      });
+      if (node.type === 'bigSquare' && node.position.x === 0) {
 
-
-
-      // Helper to get base position for cloud nodes
-      const cloudBasePositions: Record<string, { x: number, y: number }> = {
-        '1': { x: startOfBox, y: 250 }, // Azure
-        '2': { x: startOfBox, y: 250 }, // GCP
-        '3': { x: startOfBox, y: 250 }, // AWS
-      };
-
-      // Helper to get VPC node id for parent lookup
-      const vpcIdMap: Record<string, string> = {};
-      projectData.forEach((node: any) => {
-        if (node.type === ServiceType.VPC) {
-          vpcIdMap[node._id] = node.cloudProvider;
-        }
-      });
-
-      let dynamicNodes: Node[] = projectData.map((node: IBaseService) => {
         let width = 0, height = 0;
         let position = { x: 0, y: 0 };
 
-        if (node.type === ServiceType.VPC) {
-          const count = vpcCounts[node.cloudProvider] || 1;
-          width = cloudBoxWidth / count - 10;
-          height = cloudBoxHeight - 45;
+        // Find parent VPC node
+        const parentVPCNode = projectData.find((n: any) => n._id === node.parentNode);
+        const parentDynamicNode = parentVPCNode
+          ? dynamicNodes.find((n) => n.id === parentVPCNode._id)
+          : undefined;
+        const parentWidth = parentDynamicNode?.data?.width || cloudBoxWidth;
+        const parentHeight = parentDynamicNode?.data?.height || cloudBoxHeight;
+        const count = node.parentNode ? subnetCounts[node.parentNode] || 1 : 1;
+        width = parentWidth / count - 10;
+        height = parentHeight - 45;
+        // Position subnets horizontally under their VPC node
+        const group = node.parentNode ? subnetGroups[node.parentNode] || [] : [];
+        const idx = group.findIndex((n) => n._id === node.id);
+        const parentPos = parentDynamicNode?.position || { x: 0, y: 0 };
+        position = {
+          x: idx * width,
+          y: 35,
+        };
 
-          // Position VPCs horizontally under their cloud node
-          const group = vpcGroups[node.cloudProvider] || [];
-          const idx = group.findIndex((n) => n._id === node._id);
-          const base = cloudBasePositions[
-            node.cloudProvider === 'AZURE' ? '1' :
-              node.cloudProvider === 'GCP' ? '2' :
-                node.cloudProvider === 'AWS' ? '3' : '1'
-          ];
+        return {
+          ...node,
+          position,
+          data: {
+            label: node.data.label,
+            icon: node.data.icon,
+            color: node.data.color,
+            width,
+            height,
+          },
 
+        } as Node;
+      } else {
+        return node;
+      }
+    })
+
+
+    dynamicNodes = dynamicNodes.map((node: Node) => {
+      if (node.type !== 'bigSquare') {
+        let width = 0, height = 0;
+        let position = { x: 0, y: 0 };
+
+        // Find parent VPC node
+        const parentSubnetNode = projectData.find((n: any) => n._id === node.parentNode);
+        const parentDynamicNode = parentSubnetNode
+          ? dynamicNodes.find((n) => n.id === parentSubnetNode._id)
+          : undefined;
+        const parentWidth = parentDynamicNode?.data?.width || cloudBoxWidth;
+        const parentHeight = parentDynamicNode?.data?.height || cloudBoxHeight;
+        const count = node.parentNode ? subnetCounts[node.parentNode] || 1 : 1;
+        width = parentWidth / count / 4 - 10;
+        height = parentHeight / 4 - 10;
+        // Position subnets horizontally under their VPC node
+        const group = node.parentNode ? childGroups[node.parentNode] || [] : [];
+        const idx = group.findIndex((n) => n._id === node.id);
+
+        if (group.length >= 2) {
           position = {
-            x: idx * width + 10,
-            y: 35,
+            x: parentWidth / 2 - width / 2 - 10,
+            y: (parentHeight / 5) * ( 2 * idx + 2) - height ,
           };
-
-          let parentNode = node.parentId;
-          if (node.type === ServiceType.VPC as unknown as string) {
-            if (node.cloudProvider === 'AZURE') parentNode = '1';
-            else if (node.cloudProvider === 'GCP') parentNode = '2';
-            else if (node.cloudProvider === 'AWS') parentNode = '3';
-          }
-
-          return {
-            id: node._id,
-            type: node.type === ServiceType.VPC || node.type === ServiceType.Subnet ? 'bigSquare' : 'circle',
-            position,
-            data: {
-              label: node.name,
-              icon: getIconForType(node.type),
-              color: getColorForCloud(node.cloudProvider),
-              width,
-              height,
-            },
-            parentNode,
-            extent: 'parent',
-          } as Node;
-
         } else {
-
-          let parentNode = node.parentId;
-
-          return {
-            id: node._id,
-            type: node.type === ServiceType.Subnet ? 'bigSquare' : 'circle',
-            position,
-            data: {
-              label: node.name,
-              icon: getIconForType(node.type),
-              color: getColorForCloud(node.cloudProvider),
-              width,
-              height,
-            },
-            parentNode,
-            extent: 'parent',
-          } as Node;
-        }
-
-      });
-
-
-      dynamicNodes = dynamicNodes.map((node: Node) => {
-
-        if (node.type === 'bigSquare' && node.position.x === 0) {
-
-          let width = 0, height = 0;
-          let position = { x: 0, y: 0 };
-
-          // Find parent VPC node
-          const parentVPCNode = projectData.find((n: any) => n._id === node.parentNode);
-          const parentDynamicNode = parentVPCNode
-            ? dynamicNodes.find((n) => n.id === parentVPCNode._id)
-            : undefined;
-          const parentWidth = parentDynamicNode?.data?.width || cloudBoxWidth;
-          const parentHeight = parentDynamicNode?.data?.height || cloudBoxHeight;
-          const count = node.parentNode ? subnetCounts[node.parentNode] || 1 : 1;
-          width = parentWidth / count - 10;
-          height = parentHeight - 45;
-          // Position subnets horizontally under their VPC node
-          const group = node.parentNode ? subnetGroups[node.parentNode] || [] : [];
-          const idx = group.findIndex((n) => n._id === node.id);
-          const parentPos = parentDynamicNode?.position || { x: 0, y: 0 };
           position = {
-            x: idx * width,
-            y: 35,
+            x: parentWidth / 2 - width / 2 - 10,
+            y: parentHeight / 2 - height / 2 - 10,
           };
-
-          return {
-            ...node,
-            position,
-            data: {
-              label: node.data.label,
-              icon: node.data.icon,
-              color: node.data.color,
-              width,
-              height,
-            },
-
-          } as Node;
-        } else {
-          return node;
-        }
-      })
-
-
-      dynamicNodes = dynamicNodes.map((node: Node) => {
-        if (node.type !== 'bigSquare') {
-          let width = 0, height = 0;
-          let position = { x: 0, y: 0 };
-
-          // Find parent VPC node
-          const parentVPCNode = projectData.find((n: any) => n._id === node.parentId);
-          const parentDynamicNode = parentVPCNode
-            ? dynamicNodes.find((n) => n.id === parentVPCNode._id)
-            : undefined;
-          const parentWidth = parentDynamicNode?.data?.width || cloudBoxWidth;
-          const parentHeight = parentDynamicNode?.data?.height || cloudBoxHeight;
-          const count = node.parentNode ? subnetCounts[node.parentNode] || 1 : 1;
-          width = parentWidth / count - 10;
-          height = parentHeight - 20;
-          // Position subnets horizontally under their VPC node
-          const group = node.parentId ? subnetGroups[node.parentId] || [] : [];
-          const idx = group.findIndex((n) => n._id === node.id);
-          const parentPos = parentDynamicNode?.position || { x: 0, y: 0 };
-          position = {
-            x: idx * width,
-            y: 10,
-          };
-
-          return {
-            ...node,
-            position,
-            data: {
-              label: node.data.label,
-              icon: node.data.icon,
-              color: node.data.color,
-              width,
-              height,
-            },
-          }
-        }
-        else {
-          return node;
         }
 
+        return {
+          ...node,
+          position,
+          data: {
+            ...node.data,
+            width,
+            height,
+          },
+        }
+      }
+      else {
+        return node;
+      }
 
-      })
 
-      const dynamicEdges: Edge[] = [];
-      projectData
-        .filter((node: any) => node.connnectedTo)
-        .forEach((node: any) => (
-          node.connnectedTo.forEach((connectedNode: string) => {
-            dynamicEdges.push({
-              id: `${node._id}-${connectedNode}`,
-              source: node._id,
-              target: connectedNode,
-              animated: true,
-              type: 'smoothstep',
-              style: { stroke: '#555', strokeWidth: 2 },
-            })
+    })
+
+    const dynamicEdges: Edge[] = [];
+    projectData
+      .filter((node: any) => node.connnectedTo)
+      .forEach((node: any) => (
+        node.connnectedTo.forEach((connectedNode: string) => {
+          dynamicEdges.push({
+            id: `${node._id}-${connectedNode}`,
+            source: node._id,
+            target: connectedNode,
+            animated: true,
+            type: 'smoothstep',
+            style: { stroke: '#555', strokeWidth: 2 },
           })
-        ));
+        })
+      ));
 
-      console.log(dynamicNodes)
-      setNodes((nds) => [...defaultNodes, ...dynamicNodes]);
-      setEdges((eds) => [...initialEdges, ...dynamicEdges]);
+    console.log(dynamicNodes)
+    setNodes((nds) => [...defaultNodes, ...dynamicNodes]);
+    setEdges((eds) => [...initialEdges, ...dynamicEdges]);
 
 
     // Step 1: Replace node with container node
@@ -477,8 +485,8 @@ export default function BasicFlow() {
               ...n,
               data: {
                 ...n.data,
-                width: containerWidth,
-                height: 1000,
+                width: cloudBoxWidth,
+                height: cloudBoxHeight,
               },
             }
             : n
@@ -546,7 +554,7 @@ export default function BasicFlow() {
     // }, 600);
 
     // Step 4: Move other SCP nodes
-    handleOtherNodes(node.id, canvasCenterX, containerWidth);
+    handleOtherNodes(node.id, canvasCenterX, cloudBoxWidth);
   };
 
   const nColor = (id: string) => {
@@ -585,8 +593,8 @@ export default function BasicFlow() {
         maxZoom={1.5}
         onInit={(instance: ReactFlowInstance) => {
           reactFlowInstance.current = instance;
-          // instance.fitView({ padding: 0.1 });
-          // instance.zoomTo(0.55);
+          instance.fitView({ padding: 0.1 });
+          instance.zoomTo(0.55);
         }}
       >
         <MiniMap />
