@@ -426,8 +426,8 @@ export default function BasicFlow() {
             console.log('dynamic base:')
             console.log(base)
             position = {
-              x: base.x + idx * width,
-              y: base.y,
+              x: idx * width,
+              y: 10,
             };
 
             let parentNode = node.parentId;
@@ -497,8 +497,8 @@ export default function BasicFlow() {
             const idx = group.findIndex((n) => n._id === node.id);
             const parentPos = parentDynamicNode?.position || { x: 0, y: 0 };
             position = {
-              x: parentPos.x + idx * width + 20,
-              y: parentPos.y + 10,
+              x:  idx * width + 20,
+              y: 10,
             };
 
             return {
@@ -539,8 +539,8 @@ export default function BasicFlow() {
             const idx = group.findIndex((n) => n._id === node.id);
             const parentPos = parentDynamicNode?.position || { x: 0, y: 0 };
             position = {
-              x: parentPos.x + idx * width + 20,
-              y: parentPos.y + 10,
+              x: idx * width + 20,
+              y: 10,
             };
 
             return {
