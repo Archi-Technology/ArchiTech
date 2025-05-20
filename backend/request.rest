@@ -150,12 +150,57 @@ authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzUzNDUwY
 
 
 ###
-PUT http://localhost:5000/api/comment/update
+GET  http://localhost:5000/api/projects/
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODI3NTdiY2I3ZGY4MmU4OWQ2MjJiNjciLCJpYXQiOjE3NDc0MDg4MzQsImV4cCI6MTc0NzQxMjQzNH0.zo-EzAoS7JWNTh9960MkxbSbXBM-M_QmJ2EJDF5EPZo
+
+
+###
+POST   http://localhost:5000/api/resource/create
 content-type: application/json
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzUyZWJkN2ZjYjNlNDY4MWYyYjI1ZTkiLCJpYXQiOjE3MzM0ODc1NzUsImV4cCI6MTczMzQ5MTE3NX0.BqjZXmSa9fdiJoxOIOfzcdz1jI_gHRVG70eQcalSoow
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODI3NTdiY2I3ZGY4MmU4OWQ2MjJiNjciLCJpYXQiOjE3NDc0OTUyNzUsImV4cCI6MTc0NzQ5ODg3NX0.qylJbCIUdnRci0IJIFQnEw_x6fTbUGnvveH_i9pAyMs
 
 {
-    "text": "daniel123-the-king",
-    "postId": "6752d7a8c1306bd9c20bf39b",
-    "id": "6752eb93fcb3e4681f2b25e4"
+    "projectId": "68275a5c12fe52a1179804f3",
+    "name": "first vpc",
+    "type": "Vpc",
+    "parentId": null,
+    "cloudProvider": "AWS"
 }
+
+###
+POST   http://localhost:5000/api/resource/create
+content-type: application/json
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODI3NTdiY2I3ZGY4MmU4OWQ2MjJiNjciLCJpYXQiOjE3NDc0OTUyNzUsImV4cCI6MTc0NzQ5ODg3NX0.qylJbCIUdnRci0IJIFQnEw_x6fTbUGnvveH_i9pAyMs
+
+{
+    "projectId": "68275a5c12fe52a1179804f3",
+    "name": "subnet",
+    "type": "Subnet",
+    "parentId": "6828aa5b7842ea449b818caa",
+    "cloudProvider": "AWS"
+}
+
+###
+POST   http://localhost:5000/api/resource/create
+content-type: application/json
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODI3NTdiY2I3ZGY4MmU4OWQ2MjJiNjciLCJpYXQiOjE3NDc0OTUyNzUsImV4cCI6MTc0NzQ5ODg3NX0.qylJbCIUdnRci0IJIFQnEw_x6fTbUGnvveH_i9pAyMs
+
+{
+    "projectId": "68275a5c12fe52a1179804f3",
+    "name": "subnet",
+    "type": "VirtualMachine",
+    "parentId": "6828aa827842ea449b818cac",
+    "cloudProvider": "AWS"
+}
+
+
+###
+GET  http://localhost:5000/api/projects/artchitecture/68275a5c12fe52a1179804f3
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODI3NTdiY2I3ZGY4MmU4OWQ2MjJiNjciLCJpYXQiOjE3NDc0OTUyNzUsImV4cCI6MTc0NzQ5ODg3NX0.qylJbCIUdnRci0IJIFQnEw_x6fTbUGnvveH_i9pAyMs
+
+
+
+
+
+
+
