@@ -329,8 +329,8 @@ export default function BasicFlow() {
   useEffect(() => {
     const loadProjectData = async () => {
       try {
-        const projectId = sessionStorage.getItem('selectedProjectId');
-        if (!projectId) return;
+         const projectId = sessionStorage.getItem('selectedProjectId');
+         if (!projectId) return;
 
         const projectData = await fetchProjectData();
 
@@ -366,7 +366,6 @@ export default function BasicFlow() {
             childCounts[node.parentId] = (childCounts[node.parentId] || 0) + 1;
           }
         });
-
 
 
         // Calculate positions for dynamic nodes
@@ -426,9 +425,8 @@ export default function BasicFlow() {
             console.log('dynamic base:')
             console.log(base)
             position = {
-              x: base.x + idx * width,
-              y: base.y,
-            };
+              x: idx * width,
+              y: 0            };
 
             let parentNode = node.parentId;
             if (node.type === ServiceType.VPC as unknown as string) {
@@ -483,22 +481,22 @@ export default function BasicFlow() {
             let position = { x: 0, y: 0 };
 
             // Find parent VPC node
-            const parentVPCNode = projectData.find((n: any) => n._id === node.parentId);
+            const parentVPCNode = projectData.find((n: any) => n._id === node.parentNode);
             const parentDynamicNode = parentVPCNode
               ? dynamicNodes.find((n) => n.id === parentVPCNode._id)
               : undefined;
             const parentWidth = parentDynamicNode?.data?.width || cloudBoxWidth;
             const parentHeight = parentDynamicNode?.data?.height || cloudBoxHeight;
             const count = node.parentNode ? subnetCounts[node.parentNode] || 1 : 1;
-            width = parentWidth / count - 10;
-            height = parentHeight - 20;
+            width = parentWidth / count - 50;
+            height = parentHeight - 60;
             // Position subnets horizontally under their VPC node
-            const group = node.parentId ? subnetGroups[node.parentId] || [] : [];
+            const group = node.parentNode ? subnetGroups[node.parentNode] || [] : [];
             const idx = group.findIndex((n) => n._id === node.id);
             const parentPos = parentDynamicNode?.position || { x: 0, y: 0 };
             position = {
-              x: parentPos.x + idx * width + 20,
-              y: parentPos.y + 10,
+              x: idx * width + 20,
+              y:  10,
             };
 
             return {
@@ -539,8 +537,8 @@ export default function BasicFlow() {
             const idx = group.findIndex((n) => n._id === node.id);
             const parentPos = parentDynamicNode?.position || { x: 0, y: 0 };
             position = {
-              x: parentPos.x + idx * width + 20,
-              y: parentPos.y + 10,
+              x:  idx * width + 20,
+              y:  10,
             };
 
             return {
@@ -604,8 +602,8 @@ export default function BasicFlow() {
         maxZoom={1.5}
         onInit={(instance: ReactFlowInstance) => {
           reactFlowInstance.current = instance;
-          instance.fitView({ padding: 0.1 });
-          instance.zoomTo(0.55);
+          // instance.fitView({ padding: 0.1 });
+          // instance.zoomTo(0.55);
         }}
       >
         <MiniMap />

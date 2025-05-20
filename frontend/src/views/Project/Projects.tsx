@@ -52,7 +52,7 @@ export default function Projects() {
   const handleCreateProject = async () => {
     try {
 
-      await fetchProjects();
+      await createProject('New Project');
       navigate('/home');
     } catch (err) {
       console.error('Error creating project', err);

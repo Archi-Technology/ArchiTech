@@ -15,6 +15,7 @@ export const createVPC = async (name: string, cloud: string, cidr: string) => {
 };
 
 export const createSubnet = async (name: string, vpc: string, cloud: string, cidr: string) => {
+   // Simulate a delay of 1 second
   const projectId = sessionStorage.getItem('selectedProjectId'); // Fetch project ID from session storage
   const response = await AxiosInstence.post('/canvas/subnet', {
     name,
