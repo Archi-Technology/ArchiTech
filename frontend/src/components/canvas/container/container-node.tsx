@@ -1,5 +1,5 @@
 import React from 'react';
-import { NodeProps } from 'reactflow';
+import { NodeProps, Handle, Position } from 'reactflow';
 
 const ContainerNode = ({ data, title = "Azure", icon }: NodeProps & { title?: string; icon?: string }) => {
   const width = data?.width ?? 100;
@@ -16,9 +16,12 @@ const ContainerNode = ({ data, title = "Azure", icon }: NodeProps & { title?: st
         position: 'relative',
         transition: 'width 0.5s ease, height 0.5s ease',
         boxSizing: 'border-box',
-        overflow: 'visible', // Let labels/icons outside show without affecting layout
+        overflow: 'visible',
       }}
     >
+      {/* Top handle for incoming edges */}
+      <Handle type="target" position={Position.Top} style={{ left: '50%', transform: 'translateX(-50%)' }} />
+
       {/* Border mask (to hide top border segment) */}
       <div
         style={{
@@ -27,7 +30,7 @@ const ContainerNode = ({ data, title = "Azure", icon }: NodeProps & { title?: st
           left: 25,
           width: 100,
           height: 24,
-          backgroundColor: 'rgb(241,245,249)', // Match canvas background
+          backgroundColor: 'rgb(241,245,249)',
           zIndex: 1,
         }}
       />

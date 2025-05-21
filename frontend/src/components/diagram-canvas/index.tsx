@@ -156,45 +156,17 @@ export default function BasicFlow() {
     }
   };
 
-  const handleOtherNodes = (activeId: string, canvasCenterX: number, containerWidth: number) => {
-    const horizontalSpacing = 100; // Reduce spacing to bring nodes closer
-    const verticalOffset = 150; // Slight vertical adjustment for better positioning
-    let leftNodePlaced = false; // Track if the left node has been placed
-    console.log(`right ${canvasCenterX + (containerWidth / 2) + horizontalSpacing}`)
-    console.log(`left ${canvasCenterX - (containerWidth / 2) - horizontalSpacing}`)
 
-
-
-    setNodes((nds: Node[]) =>
-      nds.map((n: Node) => {
-        if (['1', '2', '3'].includes(n.id) && n.id !== activeId) {
-          const newX: number = leftNodePlaced
-            ? canvasCenterX + (containerWidth / 2) + horizontalSpacing // Place on the right
-            : canvasCenterX - (containerWidth / 2) - horizontalSpacing; // Place on the left
-          leftNodePlaced = true; // Mark the left node as placed
-          return {
-            ...n,
-            position: {
-              x: newX,
-              y: n.position.y + verticalOffset, // Adjust vertically to avoid overlap
-            },
-          };
-        }
-        return n;
-      })
-    );
-  };
 
   const onNodeClick = async (_: React.MouseEvent, node: Node) => {
     if (!['1', '2', '3'].includes(node.id) || expandedNodeId === node.id) return;
     setExpandedNodeId(node.id);
 
-    const canvasWidth = reactFlowWrapper.current?.clientWidth || 0; // Dynamically get canvas width
-
-
-    // Center the expansion box horizontally in the canvas
+    const canvasWidth = reactFlowWrapper.current?.clientWidth || 0;
     const canvasCenterX = canvasWidth / 2;
-
+    const cloudBoxWidth = canvasWidth * 0.8;
+    const cloudBoxHeight = 700;
+    const startOfBox = canvasCenterX - cloudBoxWidth / 2;
 
     const projectId = sessionStorage.getItem('selectedProjectId');
     if (!projectId) return;
@@ -203,9 +175,38 @@ export default function BasicFlow() {
 
 
 
-    const cloudBoxWidth = canvasWidth * 0.6; // Use 80% of the canvas width for the box
-    const cloudBoxHeight = 500; // Height of the container node
-    const startOfBox = canvasCenterX - cloudBoxWidth / 2;
+    // Expand all cloud nodes and position them one below the other
+    const cloudNodeIds = ['1', '2', '3'];
+
+
+    setNodes((nds: Node[]) =>
+      nds.map((n: Node) => {
+        if (cloudNodeIds.includes(n.id)) {
+
+          return {
+            ...n,
+            type: 'bigSquare',
+            position: { x: 0, y: 0 },
+            data: {
+              ...n.data,
+              label: containerLabelMap[n.id],
+              icon: n.id === '1' ? azureIcon : n.id === '3' ? awsIcon : n.id === '2' ? gcpIcon : n.data.icon,
+              color: n.id === '1' ? 'rgb(67,196,237)' : n.id === '2' ? 'rgb(103,155,253)' : n.data.color,
+              width: cloudBoxWidth,
+              height: cloudBoxHeight,
+            },
+          };
+        }
+        if (n.id === '4') {
+          // Move Earth node to the middle top
+          return {
+            ...n,
+            position: { x: canvasCenterX, y: 30 },
+          };
+        }
+        return n;
+      })
+    );
 
     // Count VPCs per cloudProvider
     const vpcCounts: Record<string, number> = {};
@@ -403,7 +404,7 @@ export default function BasicFlow() {
         if (group.length >= 2) {
           position = {
             x: parentWidth / 2 - width / 2 - 10,
-            y: (parentHeight / 5) * ( 2 * idx + 2) - height ,
+            y: (parentHeight / 5) * (2 * idx + 2) - height,
           };
         } else {
           position = {
@@ -430,57 +431,85 @@ export default function BasicFlow() {
     })
 
     const dynamicEdges: Edge[] = [];
-    projectData
-      .filter((node: any) => node.connnectedTo)
-      .forEach((node: any) => (
-        node.connnectedTo.forEach((connectedNode: string) => {
-          dynamicEdges.push({
-            id: `${node._id}-${connectedNode}`,
-            source: node._id,
-            target: connectedNode,
-            animated: true,
-            type: 'smoothstep',
-            style: { stroke: '#555', strokeWidth: 2 },
-          })
-        })
-      ));
+    // projectData
+    //   .filter((node: any) => node.connnectedTo)
+    //   .forEach((node: any) => (
+    //     node.connnectedTo.forEach((connectedNode: string) => {
+    //       dynamicEdges.push({
+    //         id: `${node._id}-${connectedNode}`,
+    //         source: node._id,
+    //         target: connectedNode,
+    //         animated: true,
+    //         type: 'smoothstep',
+    //         style: { stroke: '#555', strokeWidth: 2 },
+    //       })
+    //     })
+    //   ));
 
-    console.log(dynamicNodes)
+
     setNodes((nds) => [...defaultNodes, ...dynamicNodes]);
     setEdges((eds) => [...initialEdges, ...dynamicEdges]);
 
 
     // Step 1: Replace node with container node
     setNodes((nds: Node[]) =>
-      nds.map((n: Node) =>
-        n.id === node.id
-          ? {
+      nds.map((n: Node) => {
+        if (n.id === '1' || n.id === '2' || n.id === '3') {
+          // Use the correct icon, label, and color for each cloud node
+          let icon: string | undefined, label: string | undefined, color: string | undefined, position: { x: number; y: number };
+          if (n.id === '1') {
+            icon = azureIcon;
+            label = 'Azure';
+            color = 'rgb(67,196,237)';
+            // Azure left
+            position = { x: 0, y: 0 };
+          } else if (n.id === '2') {
+            icon = gcpIcon;
+            label = 'GCP';
+            color = 'rgb(103,155,253)';
+            // GCP above, centered
+            position = { x: cloudBoxWidth + 200, y: 0 };
+          } else {
+            // n.id === '3'
+            icon = awsIcon;
+            label = 'AWS';
+            color = 'rgb(246,133,0)';
+            // AWS right
+            position = { x: cloudBoxWidth / 2 + 100, y: cloudBoxHeight + 100 };
+          }
+          return {
             ...n,
             type: 'bigSquare',
-            position: { x: startOfBox, y: n.position.y }, // Only update x value
+            position,
             data: {
               ...n.data,
-              label: containerLabelMap[node.id],
-              icon: node.id === '1' ? azureIcon : node.id === '3' ? awsIcon : node.id === '2' ? gcpIcon : n.data.icon,
-              color: node.id === '1' ? 'rgb(67,196,237)' : node.id === '2' ? 'rgb(103,155,253)' : n.data.color,
+              label,
+              icon,
+              color,
               width: 0,
               height: 0,
             },
-          }
-          : n.id === '4'
-            ? {
-              ...n,
-              position: { x: canvasCenterX, y: n.position.y - 130 }, // Move Earth node to the middle of the screen in x-axis
-            }
-            : n
-      )
+          };
+        }
+        if (n.id === '4') {
+          return {
+            ...n,
+            position: { x: cloudBoxWidth + 50, y: -200 },
+          };
+        }
+        // Ensure position is always defined
+        return {
+          ...n,
+          position: n.position ?? { x: 0, y: 0 },
+        };
+      })
     );
 
     // Step 2: Expand size
     setTimeout(() => {
       setNodes((nds: Node[]) =>
         nds.map((n: Node) =>
-          n.id === node.id
+          n.id === '1' || n.id === '2' || n.id === '3'
             ? {
               ...n,
               data: {
@@ -494,67 +523,13 @@ export default function BasicFlow() {
       );
     }, 10);
 
-    // // Step 3: Add VPC and Subnet nodes
-    // setTimeout(() => {
-    //   setNodes((nds: Node[]) => [
-    //     ...nds,
-    //     {
-    //       id: `${node.id}-vpc`,
-    //       type: 'bigSquare',
-    //       position: { x: 100, y: 100 },
-    //       data: {
-    //         label: node.id === '1' ? 'VNet' : 'VPC', // Use "VNet" for Azure
-    //         icon: vpcIcon,
-    //         color: node.data.color,
-    //         width: 800,
-    //         height: 400,
-    //       },
-    //       parentNode: node.id, // VPC/VNet is a child of the clicked node
-    //       extent: 'parent',
-    //     } as Node,
-    //     {
-    //       id: `${node.id}-subnet`,
-    //       type: 'bigSquare',
-    //       position: { x: 50, y: 50 },
-    //       data: {
-    //         label: 'Subnet',
-    //         icon: subnetIcon,
-    //         color: node.data.color,
-    //         width: 600,
-    //         height: 300,
-    //       },
-    //       parentNode: `${node.id}-vpc`, // Subnet is a child of the VPC/VNet
-    //       extent: 'parent',
-    //     } as Node,
-    //     {
-    //       id: `${node.id}-service-a`,
-    //       type: 'circle',
-    //       position: { x: 50, y: 60 },
-    //       data: {
-    //         label: 'Service A',
-    //         color: nColor(node.id),
-    //         imageSrc: iconMap[node.id],
-    //       },
-    //       parentNode: `${node.id}-subnet`, // Service A is a child of the Subnet
-    //       extent: 'parent',
-    //     } as Node,
-    //     {
-    //       id: `${node.id}-service-b`,
-    //       type: 'circle',
-    //       position: { x: 160, y: 160 },
-    //       data: {
-    //         label: 'Service B',
-    //         color: nColor(node.id),
-    //         imageSrc: iconMap[node.id],
-    //       },
-    //       parentNode: `${node.id}-subnet`, // Service B is a child of the Subnet
-    //       extent: 'parent',
-    //     } as Node,
-    //   ]);
-    // }, 600);
+    // not working right now
+    if (reactFlowInstance.current) {
+      reactFlowInstance.current.fitView({ padding: 0.2 });
+      reactFlowInstance.current.zoomTo(0.45);
+    }
 
-    // Step 4: Move other SCP nodes
-    handleOtherNodes(node.id, canvasCenterX, cloudBoxWidth);
+
   };
 
   const nColor = (id: string) => {
