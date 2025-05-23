@@ -4,6 +4,14 @@ import type React from 'react';
 
 import { useState, useEffect } from 'react';
 import { FaRobot } from 'react-icons/fa';
+import { AxiosInstence } from '../../services/axios/AxiosInstance';
+import { translateOSTypeToCloudOptions } from '../../utils/Mappers/osMapper';
+import { translateDBEngineToCloudOptions } from '../../utils/Mappers/dbEngineMapper';
+import { translateDBInstanceTypeToCloudOptions } from '../../utils/Mappers/dbInstanceTypeMapper';
+import { translateLoadBalancerTypeToCloudOptions } from '../../utils/Mappers/loadBalancerMapper';
+import { translateStorageClassToCloudOptions } from '../../utils/Mappers/objectStorageMapper';
+import { translateLocationToRegionCodes } from '../../utils/Mappers/regionMapper';
+import { translateInstanceTypeCategory } from '../../utils/Mappers/typeMapper';
 import './index.scss';
 
 interface ResourceOption {
@@ -24,11 +32,18 @@ interface PricingOption {
 export default function ResourceModal({
   isOpen,
   onClose,
+  selectedResourceName,
+  onResourceChange,
+  resourceParams
 }: {
   isOpen: boolean;
   onClose: () => void;
+  selectedResourceName: string;
+  onResourceChange?: (name: string) => void
+  resourceParams?: Record<string, any>;
 }) {
-  const [selectedResource, setSelectedResource] = useState('t2.micro');
+  const [selectedResource, setSelectedResource] = useState<string>('');
+  const [resources, setResources] = useState<ResourceOption[]>([]);
   const [pricingOption, setPricingOption] = useState('on-demand');
   const [mounted, setMounted] = useState(false);
 
@@ -44,8 +59,63 @@ export default function ResourceModal({
 
     if (isOpen) {
       document.addEventListener('keydown', handleEsc);
-      // Prevent scrolling on body when modal is open
       document.body.style.overflow = 'hidden';
+
+      // Translate resourceParams for each cloud provider
+      let awsParams = resourceParams;
+      let azureParams = resourceParams;
+
+      if (resourceParams) {
+        awsParams = {
+          ...resourceParams,
+          ...(resourceParams.os != null && { os: translateOSTypeToCloudOptions(resourceParams.os, 'aws')[0] }),
+          ...(resourceParams.dbEngine != null && { databaseEngine: translateDBEngineToCloudOptions(resourceParams.dbEngine, 'aws')[0] }),
+          ...(resourceParams.dbInstanceType != null && { instanceType: translateDBInstanceTypeToCloudOptions(resourceParams.dbInstanceType, 'aws')[0] }),
+          ...(resourceParams.lbType != null && { lbType: translateLoadBalancerTypeToCloudOptions(resourceParams.lbType, 'aws')[0] }),
+          ...(resourceParams.storageClass != null && { storageClass: translateStorageClassToCloudOptions(resourceParams.storageClass, 'aws')[0] }),
+          ...(resourceParams.region != null && { region: translateLocationToRegionCodes(resourceParams.region, 'aws')[0] }),
+          ...(resourceParams.instanceType != null && { instanceType: translateInstanceTypeCategory(resourceParams.instanceType, 'aws')[0] }),
+        };
+        azureParams = {
+          ...resourceParams,
+          ...(resourceParams.os != null && { os: translateOSTypeToCloudOptions(resourceParams.os, 'azure')[0] }),
+          ...(resourceParams.dbEngine != null && { databaseEngine: translateDBEngineToCloudOptions(resourceParams.dbEngine, 'azure')[0] }),
+          ...(resourceParams.dbInstanceType != null && { instanceType: translateDBInstanceTypeToCloudOptions(resourceParams.dbInstanceType, 'azure')[0] }),
+          ...(resourceParams.lbType != null && { lbType: translateLoadBalancerTypeToCloudOptions(resourceParams.lbType, 'azure')[0] }),
+          ...(resourceParams.storageClass != null && { storageClass: translateStorageClassToCloudOptions(resourceParams.storageClass, 'azure')[0] }),
+          ...(resourceParams.region != null && { region: translateLocationToRegionCodes(resourceParams.region, 'azure')[0] }),
+          ...(resourceParams.instanceType != null && { instanceType: translateInstanceTypeCategory(resourceParams.instanceType, 'azure')[0] }),
+        };
+      }
+
+      // Fetch resources from backend
+      const fetchResources = async () => {
+        try {
+          const awsName = mapServiceNameToProvider(selectedResourceName, 'aws');
+          const azureName = mapServiceNameToProvider(selectedResourceName, 'azure');
+            const [awsRes, azureRes] = await Promise.all([
+            AxiosInstence.get(`/aws/cost/${awsName}`, { 
+              params: { 
+              ...awsParams 
+              } 
+            }),
+            AxiosInstence.get(`/azure/cost/${azureName}`, { 
+              params: { 
+              ...azureParams 
+              } 
+            }),
+            ])
+          const awsResources = awsRes.data || [];
+          const azureResources = azureRes.data || [];
+          const combined = [...awsResources, ...azureResources];
+          setResources(combined);
+          if (combined.length > 0) setSelectedResource(combined[0].id);
+        } catch (error) {
+          console.error('Failed to fetch resources:', error);
+        }
+      };
+
+      fetchResources();
     }
 
     return () => {
@@ -54,45 +124,27 @@ export default function ResourceModal({
     };
   }, [isOpen, onClose]);
 
+
+  function mapServiceNameToProvider(serviceName: string, provider: 'aws' | 'azure'): string {
+    const mapping: Record<string, { aws: string; azure: string }> = {
+      'Virtual Machine': { aws: 'ec2', azure: 'vm' },
+      'Load Balancer': { aws: 'elb', azure: 'loadbalancer' },
+      'Database': { aws: 'rds', azure: 'sql' },
+      'Object Storage': { aws: 's3', azure: 'blob' },
+    };
+
+    if (mapping[serviceName]) {
+      return mapping[serviceName][provider];
+    }
+    // fallback to the original name if not found
+    return serviceName;
+  }
+
+
   // Don't render on server
   if (!mounted) return null;
   if (!isOpen) return null;
 
-  const resources: ResourceOption[] = [
-    {
-      id: 't2.micro',
-      name: 't2.micro',
-      specs: '1 vCPU, 1 GiB Memory',
-      price: '$0.0116 per hour',
-      features: [
-        'Free tier eligible',
-        'EBS storage',
-        'Low to moderate network performance',
-      ],
-    },
-    {
-      id: 't2.small',
-      name: 't2.small',
-      specs: '1 vCPU, 2 GiB Memory',
-      price: '$0.023 per hour',
-      features: [
-        'Moderate network performance',
-        'EBS storage',
-        'Balanced resources',
-      ],
-    },
-    {
-      id: 't2.medium',
-      name: 't2.medium',
-      specs: '2 vCPU, 4 GiB Memory',
-      price: '$0.0464 per hour',
-      features: [
-        'Moderate network performance',
-        'EBS storage',
-        'Enhanced computing power',
-      ],
-    },
-  ];
 
   const pricingOptions: PricingOption[] = [
     {
