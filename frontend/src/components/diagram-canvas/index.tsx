@@ -392,10 +392,11 @@ export default function BasicFlow() {
         const parentDynamicNode = parentSubnetNode
           ? dynamicNodes.find((n) => n.id === parentSubnetNode._id)
           : undefined;
-        const parentWidth = parentDynamicNode?.data?.width || cloudBoxWidth;
+        console.log(parentDynamicNode)
+        const parentWidth = parentDynamicNode?.data?.width;
         const parentHeight = parentDynamicNode?.data?.height || cloudBoxHeight;
         const count = node.parentNode ? subnetCounts[node.parentNode] || 1 : 1;
-        width = parentWidth / count / 4 - 10;
+        width = 100;
         height = parentHeight / 4 - 10;
         // Position subnets horizontally under their VPC node
         const group = node.parentNode ? childGroups[node.parentNode] || [] : [];
@@ -403,12 +404,12 @@ export default function BasicFlow() {
 
         if (group.length >= 2) {
           position = {
-            x: parentWidth / 2 - width / 2 - 10,
+            x: parentWidth / 2 - width / 2,
             y: (parentHeight / 5) * (2 * idx + 2) - height,
           };
         } else {
           position = {
-            x: parentWidth / 2 - width / 2 - 10,
+            x: parentWidth / 2 - width / 2 ,
             y: parentHeight / 2 - height / 2 - 10,
           };
         }

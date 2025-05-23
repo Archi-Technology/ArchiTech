@@ -79,13 +79,43 @@ export const fetchProjectData = async () => {
         connnectedTo: [],
         extraData: null
       },
-         {
+      {
         projectId: '1',
         _id: '11',
         name: 'VM2',
         type: ServiceType.VM,
         parentId: '9',
         cloudProvider: CloudProvider.AZURE,
+        connnectedTo: [],
+        extraData: null
+      },
+      {
+        projectId: '1',
+        _id: '12',
+        name: 'VPC1',
+        type: ServiceType.VPC,
+        parentId: '2',
+        cloudProvider: CloudProvider.GCP,
+        connnectedTo: [],
+        extraData: null
+      },
+      {
+        projectId: '1',
+        _id: '13',
+        name: 'SUBNET1',
+        type: ServiceType.Subnet,
+        parentId: '12',
+        cloudProvider: CloudProvider.GCP,
+        connnectedTo: [],
+        extraData: null
+      },
+      {
+        projectId: '1',
+        _id: '14',
+        name: 'VM1',
+        type: ServiceType.VM,
+        parentId: '13',
+        cloudProvider: CloudProvider.GCP,
         connnectedTo: [],
         extraData: null
       }
