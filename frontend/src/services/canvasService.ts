@@ -118,6 +118,16 @@ export const fetchProjectData = async () => {
         cloudProvider: CloudProvider.GCP,
         connnectedTo: [],
         extraData: null
+      },
+        {
+        projectId: '1',
+        _id: '15',
+        name: 'VPC1',
+        type: ServiceType.VPC,
+        parentId: '3',
+        cloudProvider: CloudProvider.AWS,
+        connnectedTo: [],
+        extraData: null
       }
     ]
 

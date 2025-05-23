@@ -482,7 +482,7 @@ export default function BasicFlow() {
               position = { x: canvasCenterX + cloudBoxWidth / 2, y: 100 };
             } else {
               // Position the closed node below
-              position = { x: canvasCenterX - 50, y: 900 };
+              position = { x: canvasCenterX + cloudBoxWidth / 4 + 50, y: 900 };
 
             }
           } else if (newOpenNodes.length === 3) {
@@ -490,9 +490,9 @@ export default function BasicFlow() {
             if (n.id === newOpenNodes[0]) {
               position = { x: canvasCenterX / 2 - cloudBoxWidth / 2, y: 100 };
             } else if (n.id === newOpenNodes[1]) {
-              position = { x: canvasCenterX * 1.5 - cloudBoxWidth / 2, y: 100 };
+               position = { x: canvasCenterX + cloudBoxWidth / 2, y: 100 };
             } else if (n.id === newOpenNodes[2]) {
-              position = { x: canvasCenterX - cloudBoxWidth / 2, y: 400 };
+              position = { x: canvasCenterX - cloudBoxWidth / 8 - 24, y: 900 };
             }
           } else {
             position = { x: 150 + parseInt(n.id) * 100, y: 250 };
@@ -529,10 +529,18 @@ export default function BasicFlow() {
         }
 
         if (n.id === '4') {
-          return {
-            ...n,
-            position: { x: canvasCenterX - 50, y: -200 }, // 100 is the earh width
-          };
+
+          if (newOpenNodes.length === 1) {
+            return {
+              ...n,
+              position: { x: canvasCenterX - 50, y: -200 }, // 100 is the earh width
+            };
+          } else {
+            return {
+              ...n,
+              position: { x: canvasCenterX + cloudBoxWidth / 4 + 50, y: -200 }, // 100 is the earh width
+            };
+          }
         }
         // Ensure position is always defined
         return {
@@ -560,8 +568,8 @@ export default function BasicFlow() {
       );
 
       if (reactFlowInstance.current) {
-        // reactFlowInstance.current.fitView({ padding: 0.2 });
-        reactFlowInstance.current.zoomTo(0.35);
+        reactFlowInstance.current.fitView({ padding: 0.2 });
+        // reactFlowInstance.current.zoomTo(0.35);
       }
     }, 10);
 
