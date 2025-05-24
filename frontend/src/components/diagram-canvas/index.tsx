@@ -22,6 +22,8 @@ import gcpIcon from '../../assets/canvas/gcp-svgrepo-com.svg';
 import awsIcon from '../../assets/canvas/aws-svgrepo-com.svg';
 import earth from '../../assets/canvas/planet-earth.svg';
 import vpcIcon from '../../assets/canvas/cloud-svgrepo-com.svg';
+import vmIcon from '../../assets/canvas/vm-svgrepo-com.svg';
+import bucketIcon from '../../assets/canvas/bucket-svgrepo-com.svg';
 import subnetIcon from '../../assets/canvas/network-wired-svgrepo-com.svg';
 import { ContactlessOutlined } from '@mui/icons-material';
 import { useCanvas } from "../../contexts/canvasContext"; // Import canvas context
@@ -143,7 +145,9 @@ export default function BasicFlow() {
       case ServiceType.Subnet:
         return subnetIcon;
       case ServiceType.VM:
-        return subnetIcon;
+        return vmIcon;
+      case ServiceType.OBJECT_STORAGE:
+        return bucketIcon;
 
       default:
         return undefined;
@@ -228,6 +232,7 @@ export default function BasicFlow() {
     // Calculate positions for dynamic nodes
     // 1. Group nodes by parentId (or cloudProvider for VPCs)
     const vpcGroups: Record<string, any[]> = {};
+    const bucketsGroups: Record<string, any[]> = {};
     const subnetGroups: Record<string, any[]> = {};
     const childGroups: Record<string, any[]> = {};
 
@@ -238,6 +243,9 @@ export default function BasicFlow() {
       } else if (node.type === ServiceType.Subnet) {
         if (!subnetGroups[node.parentId]) subnetGroups[node.parentId] = [];
         subnetGroups[node.parentId].push(node);
+      } else if (node.type === ServiceType.OBJECT_STORAGE) {
+        if (!bucketsGroups[node.cloudProvider]) bucketsGroups[node.cloudProvider] = [];
+        bucketsGroups[node.cloudProvider].push(node);
       } else if (node.parentId) {
         if (!childGroups[node.parentId]) childGroups[node.parentId] = [];
         childGroups[node.parentId].push(node);
@@ -261,6 +269,7 @@ export default function BasicFlow() {
       }
     });
 
+    // first loop changes all IbaseService nodes to Node and places vpcs and buckets, second loop changes subnets, third changes children of subnets
     let dynamicNodes: Node[] = [];
     projectData.forEach((node: IBaseService) => {
 
@@ -270,7 +279,13 @@ export default function BasicFlow() {
 
         if (node.type === ServiceType.VPC) {
           const count = vpcCounts[node.cloudProvider] || 1;
-          width = cloudBoxWidth / count - 10;
+          if (bucketsCount[node.cloudProvider] >= 1) {
+            width = cloudBoxWidth / count - 10 - (150 / count);
+
+          } else {
+            width = cloudBoxWidth / count - 10;
+          }
+
           height = cloudBoxHeight - 45;
 
           // Position VPCs horizontally under their cloud node
@@ -311,7 +326,7 @@ export default function BasicFlow() {
               extent: 'parent',
             } as Node);
 
-        } else {
+        } else if (node.type !== ServiceType.OBJECT_STORAGE) {
 
           let parentNode = node.parentId;
 
@@ -330,6 +345,45 @@ export default function BasicFlow() {
             parentNode,
             extent: 'parent',
           } as Node);
+        } else {
+          // it is a bucket
+          let parentNode = node.parentId;
+          const group = bucketsGroups[node.cloudProvider] || [];
+          width = 100;
+          height = 100;
+          const idx = group.findIndex((n) => n._id === node._id);
+          if (vpcCounts[node.cloudProvider] >= 1) {
+            if (group.length >= 2) {
+              position = { x: cloudBoxWidth - 125, y: (cloudBoxHeight / 5) * (2 * idx + 2) - height };
+            } else {
+              position = { x: cloudBoxWidth - 125, y: (cloudBoxHeight / 2) - height / 2 };
+            }
+          } else {
+            if (group.length >= 2) {
+              position = { x: cloudBoxWidth / 2 - width / 2, y: (cloudBoxHeight / 5) * (2 * idx + 2) - height };
+            } else {
+              position = { x: cloudBoxWidth / 2 - width / 2, y: (cloudBoxHeight / 2) - height / 2 };
+            }
+          }
+
+          dynamicNodes.push({
+            id: node._id,
+            type: 'circle',
+            position,
+            data: {
+              label: node.name,
+              icon: getIconForType(node.type),
+              imageSrc: getIconForType(node.type),
+              color: getColorForCloud(node.cloudProvider),
+              width,
+              height,
+            },
+            parentNode,
+            extent: 'parent',
+          } as Node);
+
+
+
         }
       }
     });
@@ -381,7 +435,7 @@ export default function BasicFlow() {
 
 
     dynamicNodes = dynamicNodes.map((node: Node) => {
-      if (node.type !== 'bigSquare') {
+      if (node.type !== 'bigSquare' && node.data.icon !== getIconForType(ServiceType.OBJECT_STORAGE)) {
         let width = 0, height = 0;
         let position = { x: 0, y: 0 };
 
@@ -450,7 +504,7 @@ export default function BasicFlow() {
     setEdges((eds) => [...initialEdges, ...dynamicEdges]);
 
 
-    // Step 1: Replace node with container node
+    // cloud nodes placement and sizing
     setNodes((nds: Node[]) =>
       nds.map((n: Node) => {
         if (['1', '2', '3'].includes(n.id)) {
@@ -490,7 +544,7 @@ export default function BasicFlow() {
             if (n.id === newOpenNodes[0]) {
               position = { x: canvasCenterX / 2 - cloudBoxWidth / 2, y: 100 };
             } else if (n.id === newOpenNodes[1]) {
-               position = { x: canvasCenterX + cloudBoxWidth / 2, y: 100 };
+              position = { x: canvasCenterX + cloudBoxWidth / 2, y: 100 };
             } else if (n.id === newOpenNodes[2]) {
               position = { x: canvasCenterX - cloudBoxWidth / 8 - 24, y: 900 };
             }
