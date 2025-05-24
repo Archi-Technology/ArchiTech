@@ -61,6 +61,26 @@ export const fetchProjectData = async () => {
       },
       {
         projectId: '1',
+        _id: '20',
+        name: 'subnet1',
+        type: ServiceType.Subnet,
+        parentId: '8',
+        cloudProvider: CloudProvider.AZURE,
+        connnectedTo: [],
+        extraData: null
+      },
+      {
+        projectId: '1',
+        _id: '22',
+        name: 'VM1',
+        type: ServiceType.VM,
+        parentId: '20',
+        cloudProvider: CloudProvider.AZURE,
+        connnectedTo: [],
+        extraData: null
+      },
+      {
+        projectId: '1',
         _id: '9',
         name: 'subnet1',
         type: ServiceType.Subnet,
@@ -112,8 +132,8 @@ export const fetchProjectData = async () => {
       {
         projectId: '1',
         _id: '14',
-        name: 'VM1',
-        type: ServiceType.VM,
+        name: 'database1',
+        type: ServiceType.Databases,
         parentId: '13',
         cloudProvider: CloudProvider.GCP,
         connnectedTo: [],
@@ -139,7 +159,7 @@ export const fetchProjectData = async () => {
         connnectedTo: [],
         extraData: null
       },
-          {
+      {
         projectId: '1',
         _id: '17',
         name: 'bucket1',
@@ -149,7 +169,7 @@ export const fetchProjectData = async () => {
         connnectedTo: [],
         extraData: null
       },
-          {
+      {
         projectId: '1',
         _id: '18',
         name: 'bucket2',

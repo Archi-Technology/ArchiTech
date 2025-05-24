@@ -25,6 +25,7 @@ import vpcIcon from '../../assets/canvas/cloud-svgrepo-com.svg';
 import vmIcon from '../../assets/canvas/vm-svgrepo-com.svg';
 import bucketIcon from '../../assets/canvas/bucket-svgrepo-com.svg';
 import subnetIcon from '../../assets/canvas/network-wired-svgrepo-com.svg';
+import databaseIcon from '../../assets/canvas/database-svgrepo-com.svg';
 import { ContactlessOutlined } from '@mui/icons-material';
 import { useCanvas } from "../../contexts/canvasContext"; // Import canvas context
 import { fetchProjectData } from '../../services/canvasService'; // Import fetchProjectData
@@ -148,9 +149,11 @@ export default function BasicFlow() {
         return vmIcon;
       case ServiceType.OBJECT_STORAGE:
         return bucketIcon;
+      case ServiceType.Databases:
+        return databaseIcon;
 
       default:
-        return undefined;
+        return vpcIcon;
     }
   };
 
