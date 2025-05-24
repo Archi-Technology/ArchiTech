@@ -26,4 +26,5 @@ export interface IBaseService {
     cloudProvider: CloudProvider;
     connnectedTo: string[];
     extraData: JSON | null;
+    price?: number | null;
 }

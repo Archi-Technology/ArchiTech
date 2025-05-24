@@ -76,8 +76,9 @@ export const fetchProjectData = async () => {
         type: ServiceType.VM,
         parentId: '20',
         cloudProvider: CloudProvider.AZURE,
-        connnectedTo: [],
-        extraData: null
+        connnectedTo: ['14'],
+        extraData: null,
+        price: 200
       },
       {
         projectId: '1',
@@ -87,7 +88,8 @@ export const fetchProjectData = async () => {
         parentId: '7',
         cloudProvider: CloudProvider.AZURE,
         connnectedTo: [],
-        extraData: null
+        extraData: null,
+        price: 50
       },
       {
         projectId: '1',
@@ -96,8 +98,9 @@ export const fetchProjectData = async () => {
         type: ServiceType.VM,
         parentId: '9',
         cloudProvider: CloudProvider.AZURE,
-        connnectedTo: [],
-        extraData: null
+        connnectedTo: ['18'],
+        extraData: null,
+        price: 200
       },
       {
         projectId: '1',
@@ -107,7 +110,8 @@ export const fetchProjectData = async () => {
         parentId: '9',
         cloudProvider: CloudProvider.AZURE,
         connnectedTo: [],
-        extraData: null
+        extraData: null,
+        price: 210
       },
       {
         projectId: '1',
@@ -117,7 +121,8 @@ export const fetchProjectData = async () => {
         parentId: '2',
         cloudProvider: CloudProvider.GCP,
         connnectedTo: [],
-        extraData: null
+        extraData: null,
+        price: 160
       },
       {
         projectId: '1',
@@ -127,7 +132,8 @@ export const fetchProjectData = async () => {
         parentId: '12',
         cloudProvider: CloudProvider.GCP,
         connnectedTo: [],
-        extraData: null
+        extraData: null,
+        price: 60
       },
       {
         projectId: '1',
@@ -137,7 +143,8 @@ export const fetchProjectData = async () => {
         parentId: '13',
         cloudProvider: CloudProvider.GCP,
         connnectedTo: [],
-        extraData: null
+        extraData: null,
+        price: 220
       },
       {
         projectId: '1',
@@ -147,7 +154,8 @@ export const fetchProjectData = async () => {
         parentId: '2',
         cloudProvider: CloudProvider.GCP,
         connnectedTo: [],
-        extraData: null
+        extraData: null,
+        price: 70
       },
       {
         projectId: '1',
@@ -157,7 +165,8 @@ export const fetchProjectData = async () => {
         parentId: '1',
         cloudProvider: CloudProvider.AZURE,
         connnectedTo: [],
-        extraData: null
+        extraData: null,
+        price: 80
       },
       {
         projectId: '1',
@@ -167,7 +176,8 @@ export const fetchProjectData = async () => {
         parentId: '3',
         cloudProvider: CloudProvider.AWS,
         connnectedTo: [],
-        extraData: null
+        extraData: null,
+        price: 90
       },
       {
         projectId: '1',
@@ -177,7 +187,8 @@ export const fetchProjectData = async () => {
         parentId: '3',
         cloudProvider: CloudProvider.AWS,
         connnectedTo: [],
-        extraData: null
+        extraData: null,
+        price: 100
       },
     ]
 

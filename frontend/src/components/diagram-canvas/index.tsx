@@ -344,6 +344,7 @@ export default function BasicFlow() {
               color: getColorForCloud(node.cloudProvider),
               width,
               height,
+              price: node.price || 0,
             },
             parentNode,
             extent: 'parent',
@@ -380,6 +381,7 @@ export default function BasicFlow() {
               color: getColorForCloud(node.cloudProvider),
               width,
               height,
+              price: node.price || 0,
             },
             parentNode,
             extent: 'parent',
@@ -487,20 +489,20 @@ export default function BasicFlow() {
     })
 
     const dynamicEdges: Edge[] = [];
-    // projectData
-    //   .filter((node: any) => node.connnectedTo)
-    //   .forEach((node: any) => (
-    //     node.connnectedTo.forEach((connectedNode: string) => {
-    //       dynamicEdges.push({
-    //         id: `${node._id}-${connectedNode}`,
-    //         source: node._id,
-    //         target: connectedNode,
-    //         animated: true,
-    //         type: 'smoothstep',
-    //         style: { stroke: '#555', strokeWidth: 2 },
-    //       })
-    //     })
-    //   ));
+    projectData
+      .filter((node: any) => node.connnectedTo)
+      .forEach((node: any) => (
+        node.connnectedTo.forEach((connectedNode: string) => {
+          dynamicEdges.push({
+            id: `${node._id}-${connectedNode}`,
+            source: node._id,
+            target: connectedNode,
+            animated: true,
+            type: 'smoothstep',
+            style: { stroke: 'purple', strokeWidth: 2 },
+          })
+        })
+      ));
 
 
     setNodes((nds) => [...defaultNodes, ...dynamicNodes]);
