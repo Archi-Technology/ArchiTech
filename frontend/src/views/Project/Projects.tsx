@@ -101,6 +101,34 @@ export default function Projects() {
     });
   };
 
+  const paperStyle = {
+    p: 4,
+    textAlign: 'center',
+    cursor: 'pointer',
+    border: '2px solid transparent',
+    transition: '0.3s',
+    backgroundColor: '#ffffff',
+    '&:hover': {
+      borderColor: '#6751f0',
+      backgroundColor: 'rgba(103, 81, 240, 0.08)',
+      boxShadow: '0 0 0 4px rgba(103, 81, 240, 0.15)',
+      '& .hoverTitle': {
+        color: '#6751f0',
+      },
+    },
+  };
+
+  const titleStyle = {
+    color: 'black',
+    fontWeight: 'bold',
+    transition: '0.3s',
+  };
+
+  const descriptionStyle = {
+    color: 'text.secondary',
+    transition: '0.3s',
+  };
+
   return (
     <Box sx={{ bgcolor: '#fff', minHeight: '100vh', py: 6 }}>
       <Container>
@@ -109,7 +137,7 @@ export default function Projects() {
           fontWeight="bold"
           align="center"
           gutterBottom
-          style={{ color: '#6751f0' }}
+          sx={{ color: 'black' }}
         >
           Manage Your Architecture Projects
         </Typography>
@@ -118,7 +146,7 @@ export default function Projects() {
           <Grid item xs={12} md={6}>
             <Paper
               elevation={3}
-              sx={{ p: 4, textAlign: 'center', cursor: 'pointer' }}
+              sx={paperStyle}
               onClick={() => setOpenDialog(true)}
               onMouseEnter={() => openRef.current?.goToAndPlay(0)}
             >
@@ -129,10 +157,15 @@ export default function Projects() {
                 play={false}
                 style={{ width: 80, height: 80, margin: '0 auto' }}
               />
-              <Typography variant="subtitle1" fontWeight="bold" mt={1} style={{ color: '#6751f0' }}>
+              <Typography
+                variant="subtitle1"
+                mt={1}
+                className="hoverTitle"
+                sx={titleStyle}
+              >
                 Continue Existing Project
               </Typography>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
+              <Typography variant="body2" sx={descriptionStyle}>
                 Resume work on your cloud architecture designs.
               </Typography>
             </Paper>
@@ -141,7 +174,7 @@ export default function Projects() {
           <Grid item xs={12} md={6}>
             <Paper
               elevation={3}
-              sx={{ p: 4, textAlign: 'center', cursor: 'pointer' }}
+              sx={paperStyle}
               onClick={handleCreateProject}
               onMouseEnter={() => createRef.current?.goToAndPlay(0)}
             >
@@ -152,10 +185,15 @@ export default function Projects() {
                 play={false}
                 style={{ width: 80, height: 80, margin: '0 auto' }}
               />
-              <Typography variant="subtitle1" fontWeight="bold" mt={1} style={{ color: '#6751f0' }}>
+              <Typography
+                variant="subtitle1"
+                mt={1}
+                className="hoverTitle"
+                sx={titleStyle}
+              >
                 Create New Project
               </Typography>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
+              <Typography variant="body2" sx={descriptionStyle}>
                 Start a fresh cloud architecture design.
               </Typography>
             </Paper>
@@ -164,28 +202,30 @@ export default function Projects() {
 
         {projects.length > 0 && (
           <>
-            <Typography variant="h5" fontWeight="bold" style={{ color: '#6751f0' }} mb={3}>
+            <Typography variant="h5" fontWeight="bold" sx={{ color: 'black', mb: 3 }}>
               Recent Projects
             </Typography>
             <Grid container spacing={4}>
               {projects.slice(0, 3).map((project) => (
                 <Grid item xs={12} sm={6} md={4} key={project._id}>
-                  <Paper sx={{ p: 3 }}>
-                    <Typography fontWeight="bold" style={{ color: '#6751f0' }}>
+                  <Paper
+                    sx={{
+                      ...paperStyle,
+                      p: 3,
+                      textAlign: 'left',
+                    }}
+                    onClick={() => navigate(`/home?projectId=${project._id}`)}
+                  >
+                    <Typography
+                      variant="subtitle1"
+                      className="hoverTitle"
+                      sx={titleStyle}
+                    >
                       {project.name}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={descriptionStyle}>
                       Last edited: {formatDate(project.lastEdited)}
                     </Typography>
-                    <Box mt={2}>
-                      <Button
-                        fullWidth
-                        variant="contained"
-                        onClick={() => navigate(`/home?projectId=${project._id}`)}
-                      >
-                        Open Project
-                      </Button>
-                    </Box>
                   </Paper>
                 </Grid>
               ))}
