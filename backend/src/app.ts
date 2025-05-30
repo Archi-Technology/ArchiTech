@@ -48,8 +48,8 @@ const appPromise: Promise<Application> = new Promise(async (resolve, reject) => 
     app.use('/api/chat', chatRouter);
     app.use('/api/projects', projectRouter);
 
-    app.use('/aws', awsRouter);
-    app.use("/azure", azureRouter);
+    app.use('/api/aws', awsRouter);
+    app.use("/api/azure", azureRouter);
 
   app.use('/api', authMiddleware);
   app.use('/api/auth', authRouter);

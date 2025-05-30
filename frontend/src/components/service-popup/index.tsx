@@ -503,6 +503,8 @@ export default function ServicePopup({
             <ResourceModal
               isOpen={currentPage === 'price-comparison'}
               onClose={() => setCurrentPage('form')}
+              selectedResourceName={service.name}
+              resourceParams={formData}
             />
           </motion.div>
         )}
