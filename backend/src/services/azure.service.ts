@@ -65,14 +65,21 @@ export class AzureService {
     return null;
   }
 
-  async getVmPricing(params: VmPricingParams): Promise<any | null> {
+  async getVmPricing(params: VmPricingParams): Promise<any[] | null> {
     try {
-      const baseFilter = `serviceName eq 'Virtual Machines' and armRegionName eq '${params.region}' and armSkuName eq '${params.instanceType}' and contains(productName, '${params.os}')`;
-      const fullFilter = encodeURIComponent(baseFilter);
+      let filter = `serviceName eq 'Virtual Machines' and armRegionName eq '${params.region}' and armSkuName eq '${params.instanceType}'`;
+      if (params.os.toLowerCase() === 'linux') {
+        filter += " and indexof(productName, 'Windows') eq -1";
+      } else if (params.os.toLowerCase() === 'windows') {
+        filter += " and contains(productName, 'Windows')";
+      }
+      const fullFilter = encodeURIComponent(filter);
 
+      // console.log(`${this.pricingApiUrl}?$filter=${fullFilter}`)
       const response = await axios.get(
         `${this.pricingApiUrl}?$filter=${fullFilter}`
       );
+
       const priceItems = response.data.Items;
 
       if (!priceItems || priceItems.length === 0) {
@@ -80,17 +87,27 @@ export class AzureService {
         return null;
       }
 
-      const vmItem = priceItems[0];
-      const unitPrice = parseFloat(vmItem.retailPrice);
-      const unitOfMeasure = vmItem.unitOfMeasure;
+      const results = priceItems.map((item: any, index: number) => {
+        let pricePerHour = parseFloat(item.retailPrice);
 
-      return {
-        region: params.region,
-        instanceType: params.instanceType,
-        os: params.os,
-        unitPrice,
-        unitOfMeasure,
-      };
+        if (item.reservationTerm === "1 Year") {
+          pricePerHour = pricePerHour / (365 * 24);
+        } else if (item.reservationTerm === "3 Years") {
+          pricePerHour = pricePerHour / (3 * 365 * 24);
+        }
+
+        return {
+          id: index,
+          region: params.region,
+          instanceType: params.instanceType,
+          productName: item.productName,
+          reservationTerm: item.reservationTerm || null,
+          pricePerHour: parseFloat(pricePerHour.toFixed(6)),
+          os: params.os,
+        };
+      });
+
+      return results;
     } catch (error) {
       console.error("Error fetching VM pricing:", error);
       return null;
