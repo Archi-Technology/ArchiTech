@@ -73,6 +73,22 @@ export class awsController {
     }
   }
 
+  async getAWSRegions(req: Request, res: Response): Promise<void> {
+    try {
+      const regions = await this.service.getAWSRegions();
+
+      if (!regions || regions.length === 0) {
+        res.status(404).json({ error: "No AWS region data found" });
+        return;
+      }
+
+      res.status(200).json({ regions });
+    } catch (error) {
+      console.error("Error fetching AWS regions:", error);
+      res.status(500).json({ error: "Failed to retrieve AWS region data" });
+    }
+  }
+
   async getELBPricing(req: Request, res: Response): Promise<void> {
     try {
       const { region, lbType } = req.query;

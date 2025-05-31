@@ -48,6 +48,52 @@ export class AzureService {
     }
   }
 
+  async getAllRegions(): Promise<
+    { regionCode: string; regionName: string }[] | null
+  > {
+    try {
+      let allRegionsSet = new Set<string>();
+      let regionsDetailsMap = new Map<string, string>();
+
+      // We'll page through the pricing API to collect all unique regions
+      let url = this.pricingApiUrl + "?$top=100";
+      let done = false;
+
+      while (!done) {
+        const response = await axios.get(url);
+        const items = response.data.Items;
+
+        if (!items || items.length === 0) break;
+
+        for (const item of items) {
+          if (item.armRegionName) {
+            allRegionsSet.add(item.armRegionName);
+            if (!regionsDetailsMap.has(item.armRegionName) && item.region) {
+              regionsDetailsMap.set(item.armRegionName, item.region);
+            }
+          }
+        }
+
+        if (response.data.NextPageLink) {
+          url = response.data.NextPageLink;
+        } else {
+          done = true;
+        }
+      }
+
+      const regions = Array.from(allRegionsSet).map((regionCode) => ({
+        regionCode,
+        // Use the friendly region name from pricing API if available, otherwise fallback to regionCode
+        regionName: regionsDetailsMap.get(regionCode) ?? regionCode,
+      }));
+
+      return regions;
+    } catch (err) {
+      console.error("Error fetching Azure regions:", err);
+      return null;
+    }
+  }
+
   private async getStoragePricePerGB(
     region: string,
     storageTier: string,

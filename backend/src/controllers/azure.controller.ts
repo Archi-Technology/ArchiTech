@@ -8,6 +8,26 @@ export class AzureController {
     this.service = new AzureService();
   }
 
+  async getAllRegions(req: Request, res: Response) {
+    try {
+      const regions = await this.service.getAllRegions();
+
+      if (!regions) {
+        return res
+          .status(500)
+          .json({ error: "Failed to retrieve Azure regions" });
+      }
+
+      return res.status(200).json({
+        count: regions.length,
+        regions,
+      });
+    } catch (error) {
+      console.error("Error fetching Azure regions:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  }
+
   async getBlobPricing(req: Request, res: Response) {
     try {
       const { region, storageTier, redundancy, dataStoredGB } = req.query;

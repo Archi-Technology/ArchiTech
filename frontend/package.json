@@ -10,7 +10,9 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@aws-sdk/client-ec2": "^3.810.0",
+    "@aws-sdk/client-ec2": "^3.813.0",
+    "@azure/arm-subscriptions": "^5.1.0",
+    "@azure/identity": "^4.10.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@fontsource/heebo": "^5.1.0",
@@ -26,6 +28,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "alertifyjs": "^1.14.0",
+    "aws-sdk": "^2.1692.0",
     "axios": "^1.9.0",
     "cheerio": "^1.0.0",
     "class-variance-authority": "^0.7.1",

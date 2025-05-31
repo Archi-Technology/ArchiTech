@@ -116,6 +116,41 @@ azureRouter.get("/cost/loadbalancer", async (req, res) => {
 
 /**
  * @swagger
+ * /azure/regions:
+ *   get:
+ *     description: Get all Azure regions with codes and names
+ *     tags:
+ *       - Azure
+ *     responses:
+ *       200:
+ *         description: List of Azure regions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: integer
+ *                 regions:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       regionCode:
+ *                         type: string
+ *                       regionName:
+ *                         type: string
+ */
+azureRouter.get("/regions", async (req, res) => {
+  try {
+    await azureControllerInstance.getAllRegions(req, res);
+  } catch (error) {
+    res.status(500).send({ error: "Internal Server Error" });
+  }
+});
+
+/**
+ * @swagger
  * /azure/cost/sql:
  *   get:
  *     description: Get Azure SQL Database vCore-based pricing

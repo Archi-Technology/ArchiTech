@@ -108,6 +108,40 @@ awsRouter.get(
 
 /**
  * @swagger
+ * /aws/regions:
+ *   get:
+ *     description: Get all available AWS regions with their codes and geographies
+ *     tags:
+ *       - AWS
+ *     responses:
+ *       200:
+ *         description: List of AWS regions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 regions:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       regionCode:
+ *                         type: string
+ *                         example: "us-east-1"
+ *                       geography:
+ *                         type: string
+ *                         example: "us"
+ *       500:
+ *         description: Server error
+ */
+awsRouter.get(
+  "/regions",
+  awsControllerInstance.getAWSRegions.bind(awsControllerInstance)
+);
+
+/**
+ * @swagger
  * /aws/cost/elb:
  *   get:
  *     description: Get pricing for ELB

@@ -5,7 +5,11 @@ import {
 } from "@aws-sdk/client-pricing";
 import dotenv from "dotenv";
 dotenv.config();
-
+import {
+  EC2Client,
+  DescribeRegionsCommand,
+  DescribeRegionsCommandInput,
+} from "@aws-sdk/client-ec2";
 // Define the LoadBalancerType type
 export type LoadBalancerType = "application" | "network" | "classic";
 
@@ -334,6 +338,37 @@ export class awsService {
       return null;
     } catch (err) {
       console.error("Error fetching RDS pricing:", err);
+      return null;
+    }
+  }
+
+
+  async getAWSRegions(): Promise<{ regionCode: string; geography: string }[] | null> {
+    const ec2Client = new EC2Client({ region: "us-east-1" });
+
+    const input: DescribeRegionsCommandInput = {
+      AllRegions: true,
+    };
+
+    try {
+      const command = new DescribeRegionsCommand(input);
+      const response = await ec2Client.send(command);
+
+      if (!response.Regions || response.Regions.length === 0) {
+        console.warn("No AWS region data found.");
+        return null;
+      }
+
+      const regions = response.Regions.map((region) => ({
+        regionCode: region.RegionName ?? "unknown",
+        geography:
+          region.Endpoint?.split(".")[1] ??
+          "unknown",
+      }));
+
+      return regions;
+    } catch (err) {
+      console.error("Error fetching AWS regions:", err);
       return null;
     }
   }

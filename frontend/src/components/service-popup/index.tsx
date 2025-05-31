@@ -39,6 +39,7 @@ import {
   translateDBEngineToCloudOptions,
   getAllAvailableDBEngineNames,
 } from '../../utils/Mappers/dbEngineMapper';
+import { get } from 'react-hook-form';
 
 interface ServicePopupProps {
   service: { name: string; icon: JSX.Element };
@@ -73,11 +74,18 @@ export default function ServicePopup({
     useState<string>('');
   const [selectedDBEngine, setSelectedDBEngine] = useState<string>('');
   const [recommendation, setRecommendation] = useState<string>('');
+  let regionCodes: string[] = [];
 
   useEffect(() => {
     setRecommendation(
       `Based on your app context, click here to get optimal cost and performance for "${service.name}".`,
     );
+
+    const fetchRegionCodes = async () => {
+      regionCodes = await getAllAvailableLocations();
+      // You can use regionCodes here if needed
+    };
+    fetchRegionCodes();
   }, [service]);
 
   const handleConfirm = () => {
@@ -183,7 +191,7 @@ export default function ServicePopup({
                 onChange={(e) => setSelectedRegion(e.target.value)}
               >
                 <option value="">-- Select Region --</option>
-                {getAllAvailableLocations().map((loc) => (
+                {regionCodes.map((loc) => (
                   <option key={loc} value={loc}>
                     {loc}
                   </option>
@@ -197,7 +205,7 @@ export default function ServicePopup({
                 onChange={(e) => setSelectedOS(e.target.value)}
               >
                 <option value="">-- Select OS --</option>
-                {getAllAvailableOSNames().map((os) => (
+                {regionCodes.map((os) => (
                   <option key={os} value={os}>
                     {os}
                   </option>
@@ -216,7 +224,7 @@ export default function ServicePopup({
                 onChange={(e) => setSelectedRegion(e.target.value)}
               >
                 <option value="">-- Select Region --</option>
-                {getAllAvailableLocations().map((loc) => (
+                {regionCodes.map((loc) => (
                   <option key={loc} value={loc}>
                     {loc}
                   </option>
@@ -249,7 +257,7 @@ export default function ServicePopup({
                 onChange={(e) => setSelectedRegion(e.target.value)}
               >
                 <option value="">-- Select Region --</option>
-                {getAllAvailableLocations().map((loc) => (
+                {regionCodes.map((loc) => (
                   <option key={loc} value={loc}>
                     {loc}
                   </option>
@@ -282,7 +290,7 @@ export default function ServicePopup({
                 onChange={(e) => setSelectedRegion(e.target.value)}
               >
                 <option value="">-- Select Region --</option>
-                {getAllAvailableLocations().map((loc) => (
+                {regionCodes.map((loc) => (
                   <option key={loc} value={loc}>
                     {loc}
                   </option>

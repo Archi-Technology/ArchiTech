@@ -61,6 +61,53 @@ const regionMap: RegionMap = {
   },
 };
 
+const { SubscriptionClient } = require('@azure/arm-subscriptions');
+  const { DefaultAzureCredential } = require('@azure/identity');
+  const AWS = require('aws-sdk');
+
+  async function getAzureRegions() {
+    const credential = new DefaultAzureCredential();
+    const client = new SubscriptionClient(credential);
+    const subscriptionId = process.env.AZURE_SUBSCRIPTION_ID;
+
+    const result = await client.subscriptions.listLocations(subscriptionId);
+    const azureRegions = result.map(
+      (location: any) => location.displayName || location.name,
+    );
+    return azureRegions;
+  }
+
+  async function getAWSRegions() {
+    const ec2 = new AWS.EC2({ region: 'us-east-1' });
+    const result = await ec2.describeRegions().promise();
+    const awsRegions = result.Regions.map((region: { RegionName: string }) => region.RegionName);
+    return awsRegions;
+  }
+
+  function normalizeRegionName(name: string) {
+    return name.toLowerCase().replace(/\s+/g, '');
+  }
+
+  async function getCombinedRegions() {
+    const [azureRegions, awsRegions] = await Promise.all([
+      getAzureRegions(),
+      getAWSRegions(),
+    ]);
+
+    const seen = new Set();
+    const allRegions = [...azureRegions, ...awsRegions].filter((region) => {
+      const norm = normalizeRegionName(region);
+      if (seen.has(norm)) return false;
+      seen.add(norm);
+      return true;
+    });
+
+    console.log('Combined Unique Regions:');
+    allRegions.forEach((region) => console.log(region));
+  }
+
+  getCombinedRegions().catch((err) => console.error(err));
+
 export function translateLocationToRegionCodes(
   location: string,
   cloud: Cloud,
@@ -71,6 +118,15 @@ export function translateLocationToRegionCodes(
   return entry?.[1]?.[cloud] ?? [];
 }
 
-export function getAllAvailableLocations(): string[] {
-  return Object.keys(regionMap).sort((a, b) => a.localeCompare(b));
+export async function getAllAvailableLocations(): Promise<string[]> {
+  // return Object.keys(regionMap).sort((a, b) => a.localeCompare(b));
+  const awsRegions = await getAWSRegions();
+  // Convert array to a record with region name as key and true as value
+  return awsRegions.reduce(
+    (acc: Record<string, boolean>, region: string): Record<string, boolean> => {
+      acc[region] = true;
+      return acc;
+    },
+    {} as Record<string, boolean>
+  );
 }
