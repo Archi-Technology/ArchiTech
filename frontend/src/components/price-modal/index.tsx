@@ -5,7 +5,6 @@ import type React from 'react';
 import { useState, useEffect } from 'react';
 import { FaRobot } from 'react-icons/fa';
 import { AxiosInstence } from '../../services/axios/AxiosInstance';
-import { translateOSTypeToCloudOptions } from '../../utils/Mappers/osMapper';
 import { translateDBEngineToCloudOptions } from '../../utils/Mappers/dbEngineMapper';
 import { translateDBInstanceTypeToCloudOptions } from '../../utils/Mappers/dbInstanceTypeMapper';
 import { translateLoadBalancerTypeToCloudOptions } from '../../utils/Mappers/loadBalancerMapper';
@@ -13,13 +12,15 @@ import { translateStorageClassToCloudOptions } from '../../utils/Mappers/objectS
 import { translateLocationToRegionCodes } from '../../utils/Mappers/regionMapper';
 import { translateInstanceTypeCategory } from '../../utils/Mappers/typeMapper';
 import './index.scss';
+import ResourceCard from '../resourceCard';
 
 interface ResourceOption {
   id: string;
-  name: string;
-  specs: string;
-  price: string;
-  features: string[];
+  productName?: string;
+  instanceType?: string;
+  os?: string;
+  region?: string;
+  pricePerHour?: number;
 }
 
 interface PricingOption {
@@ -34,12 +35,12 @@ export default function ResourceModal({
   onClose,
   selectedResourceName,
   onResourceChange,
-  resourceParams
+  resourceParams,
 }: {
   isOpen: boolean;
   onClose: () => void;
   selectedResourceName: string;
-  onResourceChange?: (name: string) => void
+  onResourceChange?: (name: string) => void;
   resourceParams?: Record<string, any>;
 }) {
   const [selectedResource, setSelectedResource] = useState<string>('');
@@ -50,7 +51,6 @@ export default function ResourceModal({
   useEffect(() => {
     setMounted(true);
 
-    // Add event listener to handle ESC key
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         onClose();
@@ -61,53 +61,112 @@ export default function ResourceModal({
       document.addEventListener('keydown', handleEsc);
       document.body.style.overflow = 'hidden';
 
-      // Translate resourceParams for each cloud provider
       let awsParams = resourceParams;
       let azureParams = resourceParams;
 
       if (resourceParams) {
         awsParams = {
           ...resourceParams,
-          ...(resourceParams.os != null && { os: translateOSTypeToCloudOptions(resourceParams.os, 'aws')[0] }),
-          ...(resourceParams.dbEngine != null && { databaseEngine: translateDBEngineToCloudOptions(resourceParams.dbEngine, 'aws')[0] }),
-          ...(resourceParams.dbInstanceType != null && { instanceType: translateDBInstanceTypeToCloudOptions(resourceParams.dbInstanceType, 'aws')[0] }),
-          ...(resourceParams.lbType != null && { lbType: translateLoadBalancerTypeToCloudOptions(resourceParams.lbType, 'aws')[0] }),
-          ...(resourceParams.storageClass != null && { storageClass: translateStorageClassToCloudOptions(resourceParams.storageClass, 'aws')[0] }),
-          ...(resourceParams.region != null && { region: translateLocationToRegionCodes(resourceParams.region, 'aws')[0] }),
-          ...(resourceParams.instanceType != null && { instanceType: translateInstanceTypeCategory(resourceParams.instanceType, 'aws')[0] }),
+          ...(resourceParams.os && { os: resourceParams.os }),
+          ...(resourceParams.dbEngine && {
+            databaseEngine: translateDBEngineToCloudOptions(
+              resourceParams.dbEngine,
+              'aws',
+            )[0],
+          }),
+          ...(resourceParams.dbInstanceType && {
+            instanceType: translateDBInstanceTypeToCloudOptions(
+              resourceParams.dbInstanceType,
+              'aws',
+            )[0],
+          }),
+          ...(resourceParams.lbType && {
+            lbType: translateLoadBalancerTypeToCloudOptions(
+              resourceParams.lbType,
+              'aws',
+            )[0],
+          }),
+          ...(resourceParams.storageClass && {
+            storageClass: translateStorageClassToCloudOptions(
+              resourceParams.storageClass,
+              'aws',
+            )[0],
+          }),
+          ...(resourceParams.region && {
+            region: translateLocationToRegionCodes(
+              resourceParams.region,
+              'aws',
+            )[0],
+          }),
+          ...(resourceParams.instanceType && {
+            instanceType: translateInstanceTypeCategory(
+              resourceParams.instanceType,
+              'aws',
+            )[0],
+          }),
         };
+
         azureParams = {
           ...resourceParams,
-          ...(resourceParams.os != null && { os: translateOSTypeToCloudOptions(resourceParams.os, 'azure')[0] }),
-          ...(resourceParams.dbEngine != null && { databaseEngine: translateDBEngineToCloudOptions(resourceParams.dbEngine, 'azure')[0] }),
-          ...(resourceParams.dbInstanceType != null && { instanceType: translateDBInstanceTypeToCloudOptions(resourceParams.dbInstanceType, 'azure')[0] }),
-          ...(resourceParams.lbType != null && { lbType: translateLoadBalancerTypeToCloudOptions(resourceParams.lbType, 'azure')[0] }),
-          ...(resourceParams.storageClass != null && { storageClass: translateStorageClassToCloudOptions(resourceParams.storageClass, 'azure')[0] }),
-          ...(resourceParams.region != null && { region: translateLocationToRegionCodes(resourceParams.region, 'azure')[0] }),
-          ...(resourceParams.instanceType != null && { instanceType: translateInstanceTypeCategory(resourceParams.instanceType, 'azure')[0] }),
+          ...(resourceParams.os && { os: resourceParams.os }),
+          ...(resourceParams.dbEngine && {
+            databaseEngine: translateDBEngineToCloudOptions(
+              resourceParams.dbEngine,
+              'azure',
+            )[0],
+          }),
+          ...(resourceParams.dbInstanceType && {
+            instanceType: translateDBInstanceTypeToCloudOptions(
+              resourceParams.dbInstanceType,
+              'azure',
+            )[0],
+          }),
+          ...(resourceParams.lbType && {
+            lbType: translateLoadBalancerTypeToCloudOptions(
+              resourceParams.lbType,
+              'azure',
+            )[0],
+          }),
+          ...(resourceParams.storageClass && {
+            storageClass: translateStorageClassToCloudOptions(
+              resourceParams.storageClass,
+              'azure',
+            )[0],
+          }),
+          ...(resourceParams.region && {
+            region: translateLocationToRegionCodes(
+              resourceParams.region,
+              'azure',
+            )[0],
+          }),
+          ...(resourceParams.instanceType && {
+            instanceType: translateInstanceTypeCategory(
+              resourceParams.instanceType,
+              'azure',
+            )[0],
+          }),
         };
       }
 
-      // Fetch resources from backend
       const fetchResources = async () => {
         try {
           const awsName = mapServiceNameToProvider(selectedResourceName, 'aws');
-          const azureName = mapServiceNameToProvider(selectedResourceName, 'azure');
-            const [awsRes, azureRes] = await Promise.all([
-            AxiosInstence.get(`/aws/cost/${awsName}`, { 
-              params: { 
-              ...awsParams 
-              } 
+          const azureName = mapServiceNameToProvider(
+            selectedResourceName,
+            'azure',
+          );
+
+          const [awsRes, azureRes] = await Promise.all([
+            AxiosInstence.get(`/aws/cost/${awsName}`, { params: awsParams }),
+            AxiosInstence.get(`/azure/cost/${azureName}`, {
+              params: azureParams,
             }),
-            AxiosInstence.get(`/azure/cost/${azureName}`, { 
-              params: { 
-              ...azureParams 
-              } 
-            }),
-            ])
-          const awsResources = awsRes.data || [];
-          const azureResources = azureRes.data || [];
-          const combined = [...awsResources, ...azureResources];
+          ]);
+
+          console.log('AWS Resources:', awsRes.data);
+          console.log('Azure Resources:', azureRes.data);
+
+          const combined = [...awsRes.data, ...azureRes.data];
           setResources(combined);
           if (combined.length > 0) setSelectedResource(combined[0].id);
         } catch (error) {
@@ -124,27 +183,20 @@ export default function ResourceModal({
     };
   }, [isOpen, onClose]);
 
-
-  function mapServiceNameToProvider(serviceName: string, provider: 'aws' | 'azure'): string {
+  function mapServiceNameToProvider(
+    serviceName: string,
+    provider: 'aws' | 'azure',
+  ): string {
     const mapping: Record<string, { aws: string; azure: string }> = {
       'Virtual Machine': { aws: 'ec2', azure: 'vm' },
       'Load Balancer': { aws: 'elb', azure: 'loadbalancer' },
-      'Database': { aws: 'rds', azure: 'sql' },
+      Database: { aws: 'rds', azure: 'sql' },
       'Object Storage': { aws: 's3', azure: 'blob' },
     };
-
-    if (mapping[serviceName]) {
-      return mapping[serviceName][provider];
-    }
-    // fallback to the original name if not found
-    return serviceName;
+    return mapping[serviceName]?.[provider] ?? serviceName;
   }
 
-
-  // Don't render on server
-  if (!mounted) return null;
-  if (!isOpen) return null;
-
+  if (!mounted || !isOpen) return null;
 
   const pricingOptions: PricingOption[] = [
     {
@@ -175,32 +227,29 @@ export default function ResourceModal({
 
   const getResourceSuggestion = () => {
     if (selectedResource === 't2.small') {
-      return 'For your current workload, the t2.small instance might be the most cost-effective option. It provides a good balance of compute power and memory.';
+      return 'For your current workload, the t2.small instance might be the most cost-effective option.';
     } else if (selectedResource === 't2.micro') {
-      return 'The t2.micro is perfect for low-traffic applications and development environments. Consider upgrading if you expect higher workloads.';
+      return 'The t2.micro is perfect for low-traffic applications and development environments.';
     } else {
-      return 'The t2.medium offers more computing power, ideal for applications with moderate traffic or computational needs.';
+      return 'The t2.medium offers more computing power, ideal for moderate applications.';
     }
   };
 
   const getPricingAdvice = () => {
     switch (pricingOption) {
       case 'spot':
-        return 'Spot instances can save you up to 90%, but they may be interrupted. Best for fault-tolerant workloads.';
+        return 'Spot instances can save up to 90%, but may be interrupted.';
       case 'savings':
-        return 'Savings Plans offer significant discounts with a 1 or 3 year commitment. Ideal for predictable workloads.';
+        return 'Savings Plans offer discounts with a 1 or 3 year commitment.';
       case 'auto-scaling':
-        return 'Auto Scaling optimizes costs by adjusting capacity to match demand. Great for variable workloads.';
+        return 'Auto Scaling adjusts capacity to match demand.';
       default:
-        return 'On-Demand provides maximum flexibility but at standard pricing. Consider other options for cost savings.';
+        return 'On-Demand provides flexibility but at standard pricing.';
     }
   };
 
-  // Handle click outside to close
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
+    if (e.target === e.currentTarget) onClose();
   };
 
   return (
@@ -210,31 +259,12 @@ export default function ResourceModal({
 
         <div className="resource-options">
           {resources.map((resource) => (
-            <div
+            <ResourceCard
               key={resource.id}
-              className={`resource-option ${selectedResource === resource.id ? 'selected' : ''}`}
-              onClick={() => setSelectedResource(resource.id)}
-            >
-              <div className="resource-option-content">
-                <div className="radio-container">
-                  <div className="radio-outer">
-                    <div className="radio-inner"></div>
-                  </div>
-                </div>
-                <div className="resource-details">
-                  <div className="resource-name">{resource.name}</div>
-                  <div className="resource-specs">{resource.specs}</div>
-                  <div className="resource-price">{resource.price}</div>
-                  <ul className="resource-features">
-                    {resource.features.map((feature, index) => (
-                      <li key={index} className="feature-item">
-                        • {feature}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
+              resource={resource}
+              isSelected={selectedResource === resource.id}
+              onSelect={setSelectedResource}
+            />
           ))}
         </div>
 

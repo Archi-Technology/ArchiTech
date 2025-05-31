@@ -4,55 +4,60 @@ type RegionMap = Record<string, { aws?: string[]; azure?: string[] }>;
 
 const regionMap: RegionMap = {
   'United States of America': {
-    aws: ['us-east-1', 'us-east-2', 'us-west-1', 'us-west-2'],
+    aws: [
+      'US East (N. Virginia)',
+      'US East (Ohio)',
+      'US West (N. California)',
+      'US West (Oregon)',
+    ],
     azure: ['eastus', 'eastus2', 'westus', 'westus2'],
   },
   Canada: {
-    aws: ['ca-central-1'],
+    aws: ['Canada (Central)'],
     azure: ['canadacentral', 'canadaeast'],
   },
   Germany: {
-    aws: ['eu-central-1'],
+    aws: ['EU (Frankfurt)'],
     azure: ['germanywestcentral', 'germanynorth'],
   },
   'United Kingdom': {
-    aws: ['eu-west-2'],
+    aws: ['EU (London)'],
     azure: ['uksouth', 'ukwest'],
   },
   France: {
-    aws: ['eu-west-3'],
+    aws: ['EU (Paris)'],
     azure: ['francecentral', 'francesouth'],
   },
   Ireland: {
-    aws: ['eu-west-1'],
+    aws: ['EU (Ireland)'],
     azure: ['northeurope'],
   },
   Brazil: {
-    aws: ['sa-east-1'],
+    aws: ['South America (São Paulo)'],
     azure: ['brazilsouth', 'brazilsoutheast'],
   },
   India: {
-    aws: ['ap-south-1'],
+    aws: ['Asia Pacific (Mumbai)'],
     azure: ['centralindia', 'southindia', 'westindia'],
   },
   Japan: {
-    aws: ['ap-northeast-1', 'ap-northeast-3'],
+    aws: ['Asia Pacific (Tokyo)', 'Asia Pacific (Osaka)'],
     azure: ['japaneast', 'japanwest'],
   },
   Australia: {
-    aws: ['ap-southeast-2'],
+    aws: ['Asia Pacific (Sydney)'],
     azure: ['australiaeast', 'australiasoutheast'],
   },
   Singapore: {
-    aws: ['ap-southeast-1'],
+    aws: ['Asia Pacific (Singapore)'],
     azure: ['southeastasia'],
   },
   'South Korea': {
-    aws: ['ap-northeast-2'],
+    aws: ['Asia Pacific (Seoul)'],
     azure: ['koreacentral', 'koreasouth'],
   },
   'South Africa': {
-    aws: ['af-south-1'],
+    aws: ['Africa (Cape Town)'],
     azure: ['southafricanorth', 'southafricawest'],
   },
   'United Arab Emirates': {
