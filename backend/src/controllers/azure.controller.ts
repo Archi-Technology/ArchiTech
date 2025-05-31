@@ -39,18 +39,18 @@ export class AzureController {
 
   async getVmPricing(req: Request, res: Response) {
     try {
-      const { region, instanceType, os } = req.query;
+      const { region, vmSize, osType } = req.query;
 
-      if (!region || !instanceType || !os) {
+      if (!region || !vmSize || !osType) {
         return res.status(400).json({
-          error: "Missing required parameters: region, instanceType, os",
+          error: "Missing required parameters: region, vmSize, osType",
         });
       }
 
       const price = await this.service.getVmPricing({
         region: region as string,
-        instanceType: instanceType as string,
-        os: os as string,
+        vmSize: vmSize as string,
+        osType: osType as string,
       });
 
       if (price) {

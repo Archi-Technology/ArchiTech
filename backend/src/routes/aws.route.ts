@@ -10,7 +10,7 @@ export const awsRouter = Router();
  *     tags:
  *       - AWS
  *     parameters:
- *       - name: region
+ *       - name: location
  *         in: query
  *         description: The region of the s3 bucket
  *         required: false
@@ -71,7 +71,7 @@ awsRouter.get(
  *         schema:
  *           type: string
  *           example: Canada (Central)
- *       - name: os
+ *       - name: operatingSystem
  *         in: query
  *         description: The operating system (e.g., Linux, Windows)
  *         required: true
@@ -92,7 +92,7 @@ awsRouter.get(
  *                 region:
  *                   type: string
  *                   example: us-east-1
- *                 os:
+ *                 operatingSystem:
  *                   type: string
  *                   example: Linux
  *                 pricePerHour:

@@ -9,23 +9,23 @@ export class awsController {
   }
   async getS3Pricing(req: Request, res: Response) {
     try {
-      const { region, storageClass } = req.query;
+      const { location, storageClass } = req.query;
 
-      if (!region || !storageClass) {
+      if (!location || !storageClass) {
         res.status(400).json({
-          error: "Missing required parameters: region, storageClass",
+          error: "Missing required parameters: location, storageClass",
         });
         return;
       }
 
       const price = await this.service.getS3StoragePrice(
-        region as string,
+        location as string,
         storageClass as string
       );
 
       if (price !== null) {
         res.status(200).json({
-          region: region,
+          location: location,
           storageClass: storageClass,
           pricePerGbPerMonth: price,
         });
@@ -40,12 +40,12 @@ export class awsController {
 
   async getEC2Pricing(req: Request, res: Response): Promise<void> {
     try {
-      const { instanceType, region, os } = req.query;
+      const { instanceType, region, operatingSystem } = req.query;
 
-      if (!instanceType || !region || !os) {
+      if (!instanceType || !region || !operatingSystem) {
         res.status(400).json({
           error:
-            "Missing required parameters: instanceType or region or os",
+            "Missing required parameters: instanceType or region or operatingSystem",
         });
         return;
       }
@@ -53,7 +53,7 @@ export class awsController {
       const price = await this.service.getEC2Pricing(
         instanceType as string,
         region as string,
-        os as string
+        operatingSystem as string
       );
 
       if (price === null) {
@@ -64,7 +64,7 @@ export class awsController {
       res.status(200).json({
         instanceType,
         region,
-        os,
+        operatingSystem,
         pricePerHour: price,
       });
     } catch (error) {

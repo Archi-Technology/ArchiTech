@@ -9,8 +9,8 @@ export interface BlobPricingParams {
 
 export interface VmPricingParams {
   region: string;
-  instanceType: string;
-  os: string;
+  vmSize: string;
+  osType: string;
 }
 
 export interface SqlDbPricingParams {
@@ -67,7 +67,7 @@ export class AzureService {
 
   async getVmPricing(params: VmPricingParams): Promise<any | null> {
     try {
-      const baseFilter = `serviceName eq 'Virtual Machines' and armRegionName eq '${params.region}' and armSkuName eq '${params.instanceType}' and contains(productName, '${params.os}')`;
+      const baseFilter = `serviceName eq 'Virtual Machines' and armRegionName eq '${params.region}' and armSkuName eq '${params.vmSize}' and contains(productName, '${params.osType}')`;
       const fullFilter = encodeURIComponent(baseFilter);
 
       const response = await axios.get(
@@ -86,8 +86,8 @@ export class AzureService {
 
       return {
         region: params.region,
-        instanceType: params.instanceType,
-        os: params.os,
+        vmSize: params.vmSize,
+        osType: params.osType,
         unitPrice,
         unitOfMeasure,
       };

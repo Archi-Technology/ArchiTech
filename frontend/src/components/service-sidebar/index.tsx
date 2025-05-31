@@ -17,13 +17,7 @@ export default function ServiceSidebar() {
     setSelectedService(service); // Open the popup with the selected service
   };
 
-  const handlePopupConfirm = ({
-    vpc,
-    subnet,
-  }: {
-    vpc: string;
-    subnet: string;
-  }) => {
+  const handlePopupConfirm = ({ vpc, subnet }: { vpc: string; subnet: string }) => {
     if (selectedService) {
       addNodeToCanvas({ ...selectedService, vpc, subnet }); // Pass VPC and subnet to the canvas
       setSelectedService(null); // Close the popup
@@ -48,7 +42,12 @@ export default function ServiceSidebar() {
       </div>
 
       <div className="tabs">
-        <h3 style={{ textAlign: 'center' }}>Catalog</h3>
+          <button
+            className={`tab-button ${activeTab === 'catalog' ? 'active-tab' : ''}`}
+            onClick={() => setActiveTab('catalog')}
+          >
+            Catalog
+          </button>
 
         <div className="tab-content">
           {activeTab === 'catalog' ? (
@@ -106,37 +105,19 @@ const services: Service[] = [
   {
     name: 'Virtual Machine',
     icon: (
-      <img
-        src={virtualMachineIcon}
-        alt="Virtual Machine"
-        className="service-icon-img"
-      />
+      <img src={virtualMachineIcon} alt="Virtual Machine" className="service-icon-img" />
     ),
   },
   {
     name: 'Object Storage',
-    icon: (
-      <img
-        src={objectStorageIcon}
-        alt="Object Storage"
-        className="service-icon-img"
-      />
-    ),
+    icon: <img src={objectStorageIcon} alt="Object Storage" className="service-icon-img" />,
   },
   {
     name: 'Load Balancer',
-    icon: (
-      <img
-        src={loadBalancerIcon}
-        alt="Load Balancer"
-        className="service-icon-img"
-      />
-    ),
+    icon: <img src={loadBalancerIcon} alt="Load Balancer" className="service-icon-img" />,
   },
   {
     name: 'Database',
-    icon: (
-      <img src={databaseIcon} alt="Database" className="service-icon-img" />
-    ),
-  },
+    icon: <img src={databaseIcon} alt="Database" className="service-icon-img" />,
+  }
 ];
