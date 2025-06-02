@@ -2,7 +2,7 @@
 
 import type React from 'react';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { FaRobot } from 'react-icons/fa';
 import { AxiosInstence } from '../../services/axios/AxiosInstance';
 import { translateDBEngineToCloudOptions } from '../../utils/Mappers/dbEngineMapper';
@@ -13,6 +13,7 @@ import { translateLocationToRegionCodes } from '../../utils/Mappers/regionMapper
 import { translateInstanceTypeCategory } from '../../utils/Mappers/typeMapper';
 import './index.scss';
 import ResourceCard from '../resourceCard';
+import ResourceLoader from '../resource-loader';
 
 interface ResourceOption {
   id: string;
@@ -47,6 +48,8 @@ export default function ResourceModal({
   const [resources, setResources] = useState<ResourceOption[]>([]);
   const [pricingOption, setPricingOption] = useState('on-demand');
   const [mounted, setMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showModalContent, setShowModalContent] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -61,127 +64,146 @@ export default function ResourceModal({
       document.addEventListener('keydown', handleEsc);
       document.body.style.overflow = 'hidden';
 
-      let awsParams = resourceParams;
-      let azureParams = resourceParams;
+      // Only start loading if not already loading
+      if (!isLoading && !showModalContent) {
+        setIsLoading(true);
+        setShowModalContent(false);
+        setResources([]);
 
-      if (resourceParams) {
-        awsParams = {
-          ...resourceParams,
-          ...(resourceParams.os && { os: resourceParams.os }),
-          ...(resourceParams.dbEngine && {
-            databaseEngine: translateDBEngineToCloudOptions(
-              resourceParams.dbEngine,
-              'aws',
-            )[0],
-          }),
-          ...(resourceParams.dbInstanceType && {
-            instanceType: translateDBInstanceTypeToCloudOptions(
-              resourceParams.dbInstanceType,
-              'aws',
-            )[0],
-          }),
-          ...(resourceParams.lbType && {
-            lbType: translateLoadBalancerTypeToCloudOptions(
-              resourceParams.lbType,
-              'aws',
-            )[0],
-          }),
-          ...(resourceParams.storageClass && {
-            storageClass: translateStorageClassToCloudOptions(
-              resourceParams.storageClass,
-              'aws',
-            )[0],
-          }),
-          ...(resourceParams.region && {
-            region: translateLocationToRegionCodes(
-              resourceParams.region,
-              'aws',
-            )[0],
-          }),
-          ...(resourceParams.instanceType && {
-            instanceType: translateInstanceTypeCategory(
-              resourceParams.instanceType,
-              'aws',
-            )[0],
-          }),
-        };
+        let awsParams = resourceParams;
+        let azureParams = resourceParams;
 
-        azureParams = {
-          ...resourceParams,
-          ...(resourceParams.os && { os: resourceParams.os }),
-          ...(resourceParams.dbEngine && {
-            databaseEngine: translateDBEngineToCloudOptions(
-              resourceParams.dbEngine,
-              'azure',
-            )[0],
-          }),
-          ...(resourceParams.dbInstanceType && {
-            instanceType: translateDBInstanceTypeToCloudOptions(
-              resourceParams.dbInstanceType,
-              'azure',
-            )[0],
-          }),
-          ...(resourceParams.lbType && {
-            lbType: translateLoadBalancerTypeToCloudOptions(
-              resourceParams.lbType,
-              'azure',
-            )[0],
-          }),
-          ...(resourceParams.storageClass && {
-            storageClass: translateStorageClassToCloudOptions(
-              resourceParams.storageClass,
-              'azure',
-            )[0],
-          }),
-          ...(resourceParams.region && {
-            region: translateLocationToRegionCodes(
-              resourceParams.region,
-              'azure',
-            )[0],
-          }),
-          ...(resourceParams.instanceType && {
-            instanceType: translateInstanceTypeCategory(
-              resourceParams.instanceType,
-              'azure',
-            )[0],
-          }),
-        };
-      }
-
-      const fetchResources = async () => {
-        try {
-          const awsName = mapServiceNameToProvider(selectedResourceName, 'aws');
-          const azureName = mapServiceNameToProvider(
-            selectedResourceName,
-            'azure',
-          );
-
-          const [awsRes, azureRes] = await Promise.all([
-            AxiosInstence.get(`/aws/cost/${awsName}`, { params: awsParams }),
-            AxiosInstence.get(`/azure/cost/${azureName}`, {
-              params: azureParams,
+        if (resourceParams) {
+          // ... your existing parameter mapping logic
+          awsParams = {
+            ...resourceParams,
+            ...(resourceParams.os && { os: resourceParams.os }),
+            ...(resourceParams.dbEngine && {
+              databaseEngine: translateDBEngineToCloudOptions(
+                resourceParams.dbEngine,
+                'aws',
+              )[0],
             }),
-          ]);
+            ...(resourceParams.dbInstanceType && {
+              instanceType: translateDBInstanceTypeToCloudOptions(
+                resourceParams.dbInstanceType,
+                'aws',
+              )[0],
+            }),
+            ...(resourceParams.lbType && {
+              lbType: translateLoadBalancerTypeToCloudOptions(
+                resourceParams.lbType,
+                'aws',
+              )[0],
+            }),
+            ...(resourceParams.storageClass && {
+              storageClass: translateStorageClassToCloudOptions(
+                resourceParams.storageClass,
+                'aws',
+              )[0],
+            }),
+            ...(resourceParams.region && {
+              region: translateLocationToRegionCodes(
+                resourceParams.region,
+                'aws',
+              )[0],
+            }),
+            ...(resourceParams.instanceType && {
+              instanceType: translateInstanceTypeCategory(
+                resourceParams.instanceType,
+                'aws',
+              )[0],
+            }),
+          };
 
-          console.log('AWS Resources:', awsRes.data);
-          console.log('Azure Resources:', azureRes.data);
-
-          const combined = [...awsRes.data, ...azureRes.data];
-          setResources(combined);
-          if (combined.length > 0) setSelectedResource(combined[0].id);
-        } catch (error) {
-          console.error('Failed to fetch resources:', error);
+          azureParams = {
+            ...resourceParams,
+            ...(resourceParams.os && { os: resourceParams.os }),
+            ...(resourceParams.dbEngine && {
+              databaseEngine: translateDBEngineToCloudOptions(
+                resourceParams.dbEngine,
+                'azure',
+              )[0],
+            }),
+            ...(resourceParams.dbInstanceType && {
+              instanceType: translateDBInstanceTypeToCloudOptions(
+                resourceParams.dbInstanceType,
+                'azure',
+              )[0],
+            }),
+            ...(resourceParams.lbType && {
+              lbType: translateLoadBalancerTypeToCloudOptions(
+                resourceParams.lbType,
+                'azure',
+              )[0],
+            }),
+            ...(resourceParams.storageClass && {
+              storageClass: translateStorageClassToCloudOptions(
+                resourceParams.storageClass,
+                'azure',
+              )[0],
+            }),
+            ...(resourceParams.region && {
+              region: translateLocationToRegionCodes(
+                resourceParams.region,
+                'azure',
+              )[0],
+            }),
+            ...(resourceParams.instanceType && {
+              instanceType: translateInstanceTypeCategory(
+                resourceParams.instanceType,
+                'azure',
+              )[0],
+            }),
+          };
         }
-      };
 
-      fetchResources();
+        const fetchResources = async () => {
+          try {
+            const awsName = mapServiceNameToProvider(
+              selectedResourceName,
+              'aws',
+            );
+            const azureName = mapServiceNameToProvider(
+              selectedResourceName,
+              'azure',
+            );
+
+            const [awsRes, azureRes] = await Promise.all([
+              AxiosInstence.get(`/aws/cost/${awsName}`, { params: awsParams }),
+              AxiosInstence.get(`/azure/cost/${azureName}`, {
+                params: azureParams,
+              }),
+            ]);
+
+            const combined = [...awsRes.data, ...azureRes.data];
+            setResources(combined);
+            if (combined.length > 0) setSelectedResource(combined[0].id);
+          } catch (error) {
+            console.error('Failed to fetch resources:', error);
+            // Handle error - you might want to show an error state
+            setIsLoading(false);
+          }
+        };
+
+        fetchResources();
+      }
+    } else {
+      // Reset states when modal closes
+      setIsLoading(false);
+      setShowModalContent(false);
     }
 
     return () => {
       document.removeEventListener('keydown', handleEsc);
       document.body.style.overflow = '';
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose]); // Removed other dependencies to prevent multiple triggers
+
+  const handleLoaderComplete = useCallback(() => {
+    setIsLoading(false);
+    setShowModalContent(true);
+  }, []);
 
   function mapServiceNameToProvider(
     serviceName: string,
@@ -253,76 +275,92 @@ export default function ResourceModal({
   };
 
   return (
-    <div className="modal-overlay" onClick={handleOverlayClick}>
-      <div className="modal-container" role="dialog" aria-modal="true">
-        <h2 className="modal-title">Select Resource</h2>
+    <>
+    <div className="resource-loader-container">
+        <ResourceLoader
+          isVisible={isLoading}
+          onComplete={handleLoaderComplete}
+          duration={3000}
+        />
+      </div>
 
-        <div className="resource-options">
-          {resources.map((resource) => (
-            <ResourceCard
-              key={resource.id}
-              resource={resource}
-              isSelected={selectedResource === resource.id}
-              onSelect={setSelectedResource}
-            />
-          ))}
-        </div>
+      {showModalContent && (
+        <div className="modal-overlay" onClick={handleOverlayClick}>
+          <div className="modal-container" role="dialog" aria-modal="true">
+            <h2 className="modal-title">Select Resource</h2>
 
-        <div className="pricing-section">
-          <h3 className="pricing-title">Pricing Options</h3>
-          <div className="tabs-container">
-            <div className="tabs-list">
-              {pricingOptions.map((option) => (
-                <button
-                  key={option.id}
-                  className={`tab-button ${pricingOption === option.id ? 'active' : ''}`}
-                  onClick={() => setPricingOption(option.id)}
-                >
-                  {option.name}
-                </button>
+            <div className="resource-options">
+              {resources.map((resource) => (
+                <ResourceCard
+                  key={resource.id}
+                  resource={resource}
+                  isSelected={selectedResource === resource.id}
+                  onSelect={setSelectedResource}
+                />
               ))}
             </div>
 
-            {pricingOptions.map((option) => (
-              <div
-                key={option.id}
-                className={`tab-panel ${pricingOption === option.id ? 'active' : ''}`}
-              >
-                <div className="pricing-option-name">{option.name}</div>
-                <div className="pricing-option-description">
-                  {option.description}
+            <div className="pricing-section">
+              <h3 className="pricing-title">Pricing Options</h3>
+              <div className="tabs-container">
+                <div className="tabs-list">
+                  {pricingOptions.map((option) => (
+                    <button
+                      key={option.id}
+                      className={`tab-button ${pricingOption === option.id ? 'active' : ''}`}
+                      onClick={() => setPricingOption(option.id)}
+                    >
+                      {option.name}
+                    </button>
+                  ))}
                 </div>
-                <div className="pricing-option-discount">
-                  Discount: {option.discount}
+
+                {pricingOptions.map((option) => (
+                  <div
+                    key={option.id}
+                    className={`tab-panel ${pricingOption === option.id ? 'active' : ''}`}
+                  >
+                    <div className="pricing-option-name">{option.name}</div>
+                    <div className="pricing-option-description">
+                      {option.description}
+                    </div>
+                    <div className="pricing-option-discount">
+                      Discount: {option.discount}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="suggestion-section">
+              <div className="suggestion-container">
+                <div className="bot-icon-container">
+                  <FaRobot className="bot-icon" />
+                </div>
+                <div className="suggestion-content">
+                  <div className="suggestion-title">Adam's Suggestion:</div>
+                  <div className="suggestion-text">
+                    {getResourceSuggestion()}
+                  </div>
+                  <div className="pricing-advice">
+                    <span className="pricing-advice-label">
+                      Pricing advice:
+                    </span>{' '}
+                    {getPricingAdvice()}
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="suggestion-section">
-          <div className="suggestion-container">
-            <div className="bot-icon-container">
-              <FaRobot className="bot-icon" />
             </div>
-            <div className="suggestion-content">
-              <div className="suggestion-title">Adam's Suggestion:</div>
-              <div className="suggestion-text">{getResourceSuggestion()}</div>
-              <div className="pricing-advice">
-                <span className="pricing-advice-label">Pricing advice:</span>{' '}
-                {getPricingAdvice()}
-              </div>
+
+            <div className="actions">
+              <button className="button secondary" onClick={onClose}>
+                Cancel
+              </button>
+              <button className="button primary">Confirm Selection</button>
             </div>
           </div>
         </div>
-
-        <div className="actions">
-          <button className="button secondary" onClick={onClose}>
-            Cancel
-          </button>
-          <button className="button primary">Confirm Selection</button>
-        </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 }

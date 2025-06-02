@@ -323,4 +323,16 @@
   opacity: 0;
   transform: scale(0.95);
   transition: opacity 200ms, transform 200ms;
+
+
+}
+
+.resource-loader-container {
+  width: 80%;
+  max-width: 30rem;
+  padding: 1rem;
+  margin: 0 auto;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }

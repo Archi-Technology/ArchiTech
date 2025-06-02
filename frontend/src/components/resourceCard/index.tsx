@@ -9,7 +9,7 @@ interface ResourceOption {
   os?: string;
   region?: string;
   pricePerHour?: number;
-  provider?: 'aws' | 'azure'; // Add a provider field to identify the resource type
+  provider?: 'AWS' | 'azure'; // Add a provider field to identify the resource type
 }
 
 export default function ResourceCard({
@@ -53,12 +53,12 @@ export default function ResourceCard({
           </div>
         </div>
         <div className="provider-icon-container">
-            {resource.provider === 'aws' && (
+            {resource.provider === 'AWS' && (
             <img
               src={awsIcon}
               alt="AWS Icon"
               className="provider-icon aws"
-              style={{ width: '24px', height: '24px' }}
+              style={{ width: '36px', height: '24px' }}
             />
             )}
             {resource.provider === 'azure' && (
