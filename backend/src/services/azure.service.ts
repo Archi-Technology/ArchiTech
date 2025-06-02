@@ -67,15 +67,16 @@ export class AzureService {
 
   async getVmPricing(params: VmPricingParams): Promise<any[] | null> {
     try {
-      let filter = `serviceName eq 'Virtual Machines' and armRegionName eq '${params.region}' and armSkuName eq '${params.instanceType}'`;
+      let filter = `serviceName eq 'Virtual Machines' and armRegionName eq '${params.region}' and armSkuName eq '${params.instanceType}' and indexof(skuName, 'Low Priority') eq -1 and type ne 'DevTestConsumption'`;
+
       if (params.os.toLowerCase() === 'linux') {
         filter += " and indexof(productName, 'Windows') eq -1";
       } else if (params.os.toLowerCase() === 'windows') {
         filter += " and contains(productName, 'Windows')";
       }
+
       const fullFilter = encodeURIComponent(filter);
 
-      // console.log(`${this.pricingApiUrl}?$filter=${fullFilter}`)
       const response = await axios.get(
         `${this.pricingApiUrl}?$filter=${fullFilter}`
       );
@@ -87,7 +88,9 @@ export class AzureService {
         return null;
       }
 
-      const results = priceItems.map((item: any, index: number) => {
+      let filteredItems = priceItems.filter((item: any) => !item.effectiveEndDate); //we only want active items
+
+      let results = filteredItems.map((item: any, index: number) => {
         let pricePerHour = parseFloat(item.retailPrice);
 
         if (item.reservationTerm === "1 Year") {
@@ -101,9 +104,12 @@ export class AzureService {
           region: params.region,
           instanceType: params.instanceType,
           productName: item.productName,
-          reservationTerm: item.reservationTerm || null,
           pricePerHour: parseFloat(pricePerHour.toFixed(6)),
           os: params.os,
+          reservationTerm: item.reservationTerm || null,
+          spotInstance: item.meterName.includes("Spot") ? true : false,
+          provider: "azure",
+          item: { item }
         };
       });
 
@@ -112,6 +118,7 @@ export class AzureService {
       console.error("Error fetching VM pricing:", error);
       return null;
     }
+
   }
 
   async getLoadBalancerPrice(
