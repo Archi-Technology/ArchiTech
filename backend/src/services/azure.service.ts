@@ -108,8 +108,7 @@ export class AzureService {
           os: params.os,
           reservationTerm: item.reservationTerm || null,
           spotInstance: item.meterName.includes("Spot") ? true : false,
-          provider: "azure",
-          item: { item }
+          provider: "azure"
         };
       });
 
