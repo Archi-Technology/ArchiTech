@@ -1,4 +1,6 @@
 import React from 'react';
+import awsIcon from '../../assets/awsIcon.png';
+import azureIcon from '../../assets/azureIcon.png';
 
 interface ResourceOption {
   id: string;
@@ -7,6 +9,7 @@ interface ResourceOption {
   os?: string;
   region?: string;
   pricePerHour?: number;
+  provider?: 'aws' | 'azure'; // Add a provider field to identify the resource type
 }
 
 export default function ResourceCard({
@@ -49,7 +52,25 @@ export default function ResourceCard({
             </div>
           </div>
         </div>
+        <div className="provider-icon-container">
+            {resource.provider === 'aws' && (
+            <img
+              src={awsIcon}
+              alt="AWS Icon"
+              className="provider-icon aws"
+              style={{ width: '24px', height: '24px' }}
+            />
+            )}
+            {resource.provider === 'azure' && (
+            <img
+              src={azureIcon}
+              alt="Azure Icon"
+              className="provider-icon azure"
+              style={{ width: '24px', height: '24px' }}
+            />
+            )}
+        </div>
+        </div>
       </div>
-    </div>
   );
 }

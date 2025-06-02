@@ -50,23 +50,19 @@ export class awsController {
         return;
       }
 
-      const price = await this.service.getEC2Pricing(
-        instanceType as string,
+
+      const pricing = await this.service.getFormattedEC2Pricing(
         region as string,
+        instanceType as string,
         os as string
       );
 
-      if (price === null) {
+      if (pricing === null) {
         res.status(404).json({ error: "Pricing data not found" });
         return;
       }
 
-      res.status(200).json({
-        instanceType,
-        region,
-        os,
-        pricePerHour: price,
-      });
+      res.status(200).json(pricing);
     } catch (error) {
       console.error("Error fetching EC2 pricing:", error);
       res.status(500).json({ error: "Failed to retrieve EC2 pricing" });
