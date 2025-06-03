@@ -54,13 +54,12 @@ export default function ResourceLoader({
     }
   }, [duration, isVisible, handleComplete]);
 
-  // Handle comment cycling with fade in/out
   const cycleComments = useCallback(() => {
     if (!isVisible) return;
 
-    const commentDuration = duration / comments.length;
-    const fadeOutDuration = 300;
-    const fadeInDuration = 300;
+    const commentDuration = duration / (comments.length * 0.25); // Much much slower cycling
+    const fadeOutDuration = 1500; // Even longer fade out
+    const fadeInDuration = 1500; // Even longer fade in
     const displayDuration = commentDuration - fadeOutDuration - fadeInDuration;
 
     // Fade out current comment
@@ -73,7 +72,7 @@ export default function ResourceLoader({
       // Fade in new comment
       setTimeout(() => {
         setCommentVisible(true);
-      }, 50);
+      }, 100); // Slight delay before fade in
 
       // Schedule next cycle
       setTimeout(() => {
@@ -140,9 +139,9 @@ export default function ResourceLoader({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] backdrop-blur-sm">
       <div className="bg-white rounded-xl shadow-2xl p-6 max-w-xs w-full mx-4 text-center">
         {/* Circular Progress - Made smaller */}
-        <div className="relative w-20 h-20 mx-auto mb-4">
+        <div className="relative w-20 h-20 mx-auto mb-4 flex items-center justify-center">
           <svg
-            className="w-20 h-20 transform -rotate-90"
+            className="absolute w-20 h-20 transform -rotate-90"
             viewBox="0 0 80 80"
             style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
           >
@@ -183,10 +182,8 @@ export default function ResourceLoader({
               </linearGradient>
             </defs>
           </svg>
-        </div>
-        {/* Percentage text */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-lg font-bold text-gray-800 tabular-nums">
+          {/* Percentage text - positioned absolutely within the flex container */}
+          <span className="absolute text-lg font-bold text-gray-800 tabular-nums z-10">
             {Math.round(progress)}%
           </span>
         </div>
@@ -203,7 +200,7 @@ export default function ResourceLoader({
         {/* Single comment with fade animation */}
         <div className="h-10 flex items-center justify-center">
           <p
-            className={`text-sm text-gray-600 text-center leading-relaxed px-2 transition-opacity duration-5000 ${
+            className={`text-sm text-gray-600 text-center leading-relaxed px-2 transition-opacity duration-1000 ${
               commentVisible ? 'opacity-100' : 'opacity-0'
             }`}
           >

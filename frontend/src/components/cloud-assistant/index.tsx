@@ -7,6 +7,8 @@ import { Label } from '../ui/label/label';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group/radio-group';
 import './index.css';
 import { saveUserContext } from '../../services/userService';
+import { Textarea } from '../ui/textarea/textarea';
+
 
 export interface IUserContext {
   mainPurpose: string;
@@ -15,12 +17,13 @@ export interface IUserContext {
   osDependencies: string;
   softwareDependencies: string;
   budgetConsiderations: string;
+  generalDescription: string;
 }
 
 type Question = {
   id: number;
   text: string;
-  type: 'input' | 'radio';
+  type: 'input' | 'radio' | 'textarea';
   options?: string[];
   name: keyof IUserContext;
 };
@@ -98,6 +101,12 @@ const questions: Question[] = [
       'No preference',
     ],
     name: 'osDependencies',
+  },
+  {
+    id: 7,
+    text: 'Tell us more about your application, its architecture, and any specific requirements or constraints you have in mind.',
+    type: 'textarea',
+    name: 'generalDescription',
   },
 ];
 
@@ -185,7 +194,14 @@ export function CloudAssistantPopup({ onClose }: { onClose: () => void }) {
             className="text-input"
           />
         )}
-
+        {currentQuestionData.type === 'textarea' && (
+          <Textarea
+            value={getCurrentValue()}
+            onChange={(e) => handleAnswerChange(e.target.value)}
+            placeholder="Type your answer here"
+            className="text-input textarea"
+          />
+        )}
         {currentQuestionData.type === 'radio' && (
           <RadioGroup
             value={getCurrentValue()}

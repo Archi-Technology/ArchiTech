@@ -276,13 +276,20 @@ export default function ResourceModal({
 
   return (
     <>
-    <div className="resource-loader-container">
-        <ResourceLoader
-          isVisible={isLoading}
-          onComplete={handleLoaderComplete}
-          duration={3000}
-        />
-      </div>
+      <ResourceLoader
+        isVisible={isLoading}
+        onComplete={handleLoaderComplete}
+        duration={4000}
+        comments={[
+          'Finding the best price for you...',
+          'Comparing cloud providers...',
+          'Analyzing cost optimization...',
+          'Searching for deals and discounts...',
+          'Calculating savings opportunities...',
+          'Reviewing performance metrics...',
+          'Finalizing recommendations...',
+        ]}
+      />
 
       {showModalContent && (
         <div className="modal-overlay" onClick={handleOverlayClick}>

@@ -7,6 +7,7 @@ export interface IBaseUserContext extends Document {
   osDependencies: string;
   softwareDependencies: string;
   budgetConsiderations: string;
+  generalDescription?: string;
 }
 
 export interface IUserContext extends IBaseUserContext {
@@ -27,6 +28,7 @@ const UserContextSchema = new Schema<IUserContext>({
   osDependencies: { type: String },
   softwareDependencies: { type: String },
   budgetConsiderations: { type: String },
+  generalDescription: { type: String, default: "" },
 });
 
 const UserContextModel = mongoose.model<IUserContext>(
