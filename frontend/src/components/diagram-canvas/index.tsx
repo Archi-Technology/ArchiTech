@@ -29,9 +29,10 @@ import databaseIcon from '../../assets/canvas/database-svgrepo-com.svg';
 import { ContactlessOutlined } from '@mui/icons-material';
 import { useCanvas } from "../../contexts/canvasContext"; // Import canvas context
 import { fetchProjectData } from '../../services/canvasService'; // Import fetchProjectData
-import { ServiceType, IBaseService } from '../../interfaces/canvas'; // Import ServiceType
+import { IBaseService } from '../../interfaces/canvas'; // Import ServiceType
 import { useTerraform } from '../../contexts/terraformContext';
 import { generateTerraform } from '../../services/resourceService';
+import { ServiceType } from '../service-popup';
 
 const nodeTypes = {
   circle: CircleNode,
@@ -146,7 +147,7 @@ export default function BasicFlow() {
     switch (type) {
       case ServiceType.VPC:
         return vpcIcon;
-      case ServiceType.Subnet:
+      case ServiceType.SUBNET:
         return subnetIcon;
       case ServiceType.VM:
         return vmIcon;
@@ -232,7 +233,7 @@ export default function BasicFlow() {
         bucketsCount[node.cloudProvider] = (bucketsCount[node.cloudProvider] || 0) + 1;
       }
 
-      if (node.type === ServiceType.Subnet && node.parentId) {
+      if (node.type === ServiceType.SUBNET && node.parentId) {
         subnetCounts[node.parentId] = (subnetCounts[node.parentId] || 0) + 1;
       }
 
@@ -253,7 +254,7 @@ export default function BasicFlow() {
       if (node.type === ServiceType.VPC) {
         if (!vpcGroups[node.cloudProvider]) vpcGroups[node.cloudProvider] = [];
         vpcGroups[node.cloudProvider].push(node);
-      } else if (node.type === ServiceType.Subnet) {
+      } else if (node.type === ServiceType.SUBNET) {
         if (!subnetGroups[node.parentId]) subnetGroups[node.parentId] = [];
         subnetGroups[node.parentId].push(node);
       } else if (node.type === ServiceType.OBJECT_STORAGE) {
@@ -325,7 +326,7 @@ export default function BasicFlow() {
           dynamicNodes.push(
             {
               id: node._id,
-              type: node.type === ServiceType.VPC || node.type === ServiceType.Subnet ? 'bigSquare' : 'circle',
+              type: node.type === ServiceType.VPC || node.type === ServiceType.SUBNET ? 'bigSquare' : 'circle',
               position,
               data: {
                 label: node.name,
@@ -345,7 +346,7 @@ export default function BasicFlow() {
 
           dynamicNodes.push({
             id: node._id,
-            type: node.type === ServiceType.Subnet ? 'bigSquare' : 'circle',
+            type: node.type === ServiceType.SUBNET ? 'bigSquare' : 'circle',
             position,
             data: {
               label: node.name,

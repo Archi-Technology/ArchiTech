@@ -1,12 +1,14 @@
+
+
 export enum ServiceType  {
     VPC = "Vpc",
     SUBNET = 'Subnet',
     LB = 'LoadBalancer',
     VM = 'VirtualMachine',
-    DATABASE = 'database',
+    DATABASE = 'Database',
     OBJECT_STORAGE = 'ObjectStorage'
-}
-
+  }
+  
 export enum CloudProvider {    
     GCP = 'GCP',
     AZURE = 'AZURE',

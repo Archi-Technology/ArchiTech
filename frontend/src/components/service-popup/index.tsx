@@ -24,7 +24,7 @@ export enum ServiceType  {
   SUBNET = 'Subnet',
   LB = 'LoadBalancer',
   VM = 'VirtualMachine',
-  DATABASE = 'database',
+  DATABASE = 'Database',
   OBJECT_STORAGE = 'ObjectStorage'
 }
 

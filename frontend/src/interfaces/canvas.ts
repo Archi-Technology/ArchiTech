@@ -1,11 +1,4 @@
-export enum ServiceType  {
-    VPC = "VPC",
-    Subnet = 'Subnet',
-    LB = 'LoadBalancer',
-    VM = 'VirtualMachine',
-    DATABASE='database',
-    OBJECT_STORAGE = 'ObjectStorage'
-}
+import { ServiceType } from "../components/service-popup";
 
 export enum CloudProvider {    
     GCP = 'GCP',

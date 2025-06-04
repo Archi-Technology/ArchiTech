@@ -1,6 +1,7 @@
 import { AxiosInstence } from './axios/AxiosInstance';
 import { IProjectArtchitecture } from '../interfaces/canvas';
-import { ServiceType, CloudProvider } from '../interfaces/canvas';
+import {  CloudProvider } from '../interfaces/canvas';
+import { ServiceType } from '../components/service-popup';
 export const createVPC = async (name: string, cloud: string, cidr: string) => {
   const projectId = sessionStorage.getItem('selectedProjectId'); // Fetch project ID from session storage
   const response = await AxiosInstence.post('/canvas/vpc', {
