@@ -1,10 +1,10 @@
-import { Download } from "lucide-react"
-import { Button } from "../ui/button"
-import terraformIcon from '../../assets/terraformIcon.png';
 
-import './index.scss'
+import { CircularProgress } from "@mui/material";
+import { useTerraform } from "../../contexts/terraformContext";
+import './index.scss';
 
 export default function CodePanel() {
+  const { terraformCode, isLoading} = useTerraform();
     return (
         <>
             <div className="header">
@@ -18,38 +18,10 @@ export default function CodePanel() {
             </div>
 
             <div className="codeContent">
+            {isLoading ? <div className="loading"> <CircularProgress color="inherit" size="6rem" /></div>:
                 <pre className="codeBlock">
-                    {`resource "aws_vpc" "main" {
-      cidr_block = "10.0.0.0/16"
-      
-      tags = {
-        Name = "main"
-      }
-    }`}
-                </pre>
-
-                <pre className="codeBlock">
-                    {`resource "aws_subnet" "public" {
-      vpc_id = \${aws_vpc.main.id}
-      cidr_block = "10.0.1.0/24"
-      
-      tags = {
-        Name = "Public"
-      }
-    }`}
-                </pre>
-
-                <pre className="codeBlock">
-                    {`resource "aws_instance" "web" {
-      ami = "ami-0c55b159cbfafe1f0"
-      instance_type = "t2.micro"
-      subnet_id = \${aws_subnet.public.id}
-      
-      tags = {
-        Name = "WebServer"
-      }
-    }`}
-                </pre>
+                {`${terraformCode}`}
+                </pre>}
             </div>
         </>
     )

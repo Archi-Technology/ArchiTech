@@ -137,3 +137,7 @@ projectRouter.delete('/:id', projectController.delete.bind(projectController));
 
 
 projectRouter.get('/artchitecture/:id', projectController.getProjectArtchitecture.bind(projectController));
+
+
+projectRouter.get('/:id/subnets', projectController.getProjectSubnets.bind(projectController));
+projectRouter.get('/:id/vpcs', projectController.getProjectVpcs.bind(projectController));

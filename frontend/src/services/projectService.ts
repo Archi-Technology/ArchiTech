@@ -1,7 +1,19 @@
 import {AxiosInstence} from './axios/AxiosInstance';
 
+
+const projectId = sessionStorage.getItem('selectedProjectId'); // Fetch project ID from session storage
 export const getAllProjects = async () => {
   const response = await AxiosInstence.get('/projects');
+  return response.data;
+};
+
+export const getProjectSubnets = async () => {
+  const response = await AxiosInstence.get(`/projects/${projectId}/subnets`);
+  return response.data;
+};
+
+export const getProjectVpcs = async () => {
+  const response = await AxiosInstence.get(`/projects/${projectId}/vpcs/`);
   return response.data;
 };
 

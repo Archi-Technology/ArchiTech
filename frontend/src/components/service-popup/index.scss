@@ -76,7 +76,7 @@
   color: #374151;
 }
 
-.popup-selection select {
+.popup-selection select, input[type="text"] {
   width: 100%;
   padding: 0.5rem;
   border: 1px solid #e2e8f0;
@@ -87,6 +87,12 @@
 
 .popup-selection select:focus {
   outline: none;
+  border-color: #3b82f6;
+}
+
+.popup-selection input[type="text"]:focus {
+  outline: none;
+  box-shadow: none;
   border-color: #3b82f6;
 }
 

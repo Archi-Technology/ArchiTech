@@ -14,17 +14,19 @@ class ResourceController {
   async create(req: Request, res: Response) {
     try {
       const userId = exractUserIdFromToken(req);
-      const { name, projectId, cloudProvider,  type,  parentId, } = req.body;
+      const { name, projectId, cloudProvider,  type,  parentId, extraData} = req.body;
+      console.log('Creating resource with data:', req.body);
 
       if (!name) throw new Error('Missing project name');
 
-      const created = await this.service.createResource(projectId, name, type, parentId, cloudProvider,);
-      if (!created) throw new Error('failed to create resource');
-      res.status(201).json(created);
+      const data = await this.service.createResource(projectId, name, type, parentId || null, cloudProvider,extraData);
+      if (!data) throw new Error('failed to create resource');
+      res.status(201).json(data);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
     }
   }
+
 }
  
 

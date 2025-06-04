@@ -59,12 +59,12 @@ azureRouter.get("/cost/blob", async (req, res) => {
  *         required: true
  *         example: eastus
  *       - in: query
- *         name: vmSize
+ *         name: instanceType
  *         schema: { type: string }
  *         required: true
  *         example: Standard_D2s_v3
  *       - in: query
- *         name: osType
+ *         name: os
  *         schema: { type: string }
  *         required: true
  *         example: Windows

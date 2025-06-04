@@ -8,7 +8,7 @@ export interface IResource extends Document {
   parentId: Types.ObjectId | null;
   connnectedTo: string[];
   cloudProvider: CloudProvider;
-  extraData: JSON;
+  extraData: any;
 }
 
 

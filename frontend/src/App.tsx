@@ -8,11 +8,11 @@ import Navbar from './components/navbar';
 import './index.scss';
 import { LoginScreen } from './views/Login';
 import Projects from './views/Project/Projects';
-import { ServiceProvider } from './contexts/serviceContext'; // Import ServiceProvider
+import { TerraformProvider } from './contexts/terraformContext';
 
 const App: React.FC = () => {
   return (
-    <ServiceProvider>
+    <TerraformProvider>
       <div className="whole-app">
         <Routes>
           {/* Landing page route */}
@@ -34,7 +34,7 @@ const App: React.FC = () => {
         </Routes>
         <ToastContainer position="bottom-left" />
       </div>
-    </ServiceProvider>
+      </TerraformProvider>
   );
 };
 

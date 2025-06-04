@@ -30,6 +30,8 @@ import { ContactlessOutlined } from '@mui/icons-material';
 import { useCanvas } from "../../contexts/canvasContext"; // Import canvas context
 import { fetchProjectData } from '../../services/canvasService'; // Import fetchProjectData
 import { ServiceType, IBaseService } from '../../interfaces/canvas'; // Import ServiceType
+import { useTerraform } from '../../contexts/terraformContext';
+import { generateTerraform } from '../../services/resourceService';
 
 const nodeTypes = {
   circle: CircleNode,
@@ -94,6 +96,7 @@ export default function BasicFlow() {
   const [expandedNodeId, setExpandedNodeId] = useState<string | null>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(defaultNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const {updateTerraformCode, setLoading} = useTerraform(); // Access the Terraform context to update code
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
   const reactFlowInstance = useRef<ReactFlowInstance | null>(null);
   const { registerAddNodeFunction } = useCanvas(); // Access the function to register node addition
@@ -149,7 +152,7 @@ export default function BasicFlow() {
         return vmIcon;
       case ServiceType.OBJECT_STORAGE:
         return bucketIcon;
-      case ServiceType.Databases:
+      case ServiceType.DATABASE:
         return databaseIcon;
 
       default:
@@ -174,13 +177,20 @@ export default function BasicFlow() {
 
   const onNodeClick = async (_: React.MouseEvent, node: Node) => {
     const nodeId = node.id;
+    console.log('Node clicked:', nodeId);
     const canvasWidth = reactFlowWrapper.current?.clientWidth || 0;
     const canvasCenterX = canvasWidth / 2;
     const cloudBoxWidth = canvasWidth * 0.8;
     const cloudBoxHeight = 700;
     const startOfBox = canvasCenterX - cloudBoxWidth / 2;
 
-    if (!['1', '2', '3'].includes(nodeId)) return;
+    if (!['1', '2', '3'].includes(nodeId)) {
+      if(node.id === '4') return
+      setLoading(true);
+      const terraformCode = await generateTerraform(nodeId);
+      updateTerraformCode(terraformCode);
+      setLoading(false);
+    } else {
 
     const projectId = sessionStorage.getItem('selectedProjectId');
     if (!projectId) return;
@@ -632,7 +642,7 @@ export default function BasicFlow() {
       }
     }, 10);
 
-
+  }
 
   };
 

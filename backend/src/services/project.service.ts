@@ -14,6 +14,16 @@ export class ProjectService {
     return await this.ResourceService.getAllByProject(projectId);
   }
 
+  async getSubnetsBYProject(projectId: string): Promise<IResource[]> {
+    console.log('Fetching subnets for project:', projectId);
+    return await this.ResourceService.getSubentsByProject(projectId);
+  }
+
+  
+  async getVpcsByProject(projectId: string): Promise<IResource[]> {
+    return await this.ResourceService.getVpcsByProject(projectId);
+  }
+
   async getAllByUser(userId: string): Promise<IProject[]> {
     return this.model.find({ userId }).sort({ lastEdited: -1 });
   }
