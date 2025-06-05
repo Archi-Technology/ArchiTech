@@ -12,7 +12,7 @@ const TerraformContext = createContext<TerraformContextProps | undefined>(undefi
 
 export const TerraformProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [terraformCode, setTerraformCode] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const updateTerraformCode = (newCode: string) => {
     setTerraformCode(newCode);
