@@ -98,6 +98,52 @@ export async function askOptimalChoices(serviceName: string) {
     return null;
   }
 }
+export async function getResourceSuggestion(serviceName: string): Promise<IGenericResponse | null> {
+  let question = '';
+
+  if (serviceName === 'Virtual Machine') {
+    question = `Given my user context, what is the best Virtual Machine instance according to the context: Spot, Reserved, or On-Demand? Explain why.
+    Please return text only wihout any formatting, and your answer should start with "The best option is: " followed by the type. For example: "The best option is: Spot".
+    Please no more than 3 sentences.`;
+  } else if (serviceName === 'Object Storage') {
+    const locations = getAllAvailableLocations();
+    const storageClasses = getAllAvailableObjectStorageClasses();
+    question = `Given my user context, what are the optimal region and storage class for a Object storage?
+    I want to pick one as you see best from the following:
+    regions: ${locations}
+    storage classes: ${storageClasses}
+    Please return the answer only as JSON, for example: {"region": "...", "storageClass": "..."}`;
+  } else if (serviceName === 'Load Balancer') {
+    const loadBalancerTypes = getAllAvailableLoadBalancerTypes();
+    const locations = getAllAvailableLocations();
+    question = `Given my user context, what are the optimal region and storage class for a load balancer?
+    I want to pick one as you see best from the following:
+    regions: ${locations}
+    storage classes: ${loadBalancerTypes}
+    Please return the answer only as JSON, for example: {"region": "...", "lbType": "..."}`;
+  } else if (serviceName === 'Database') {
+    const locations = getAllAvailableLocations();
+    const dbInstanceTypes = getAllAvailableDBInstanceTypes();
+    const dbEngines = getAllAvailableDBEngineNames();
+    question = `Given my user context, what are the optimal region and storage class for a Database?
+    I want to pick one as you see best from the following:
+    regions: ${locations}
+    DB instance type: ${dbInstanceTypes}
+    DB engines: ${dbEngines}
+    Please return the answer only in JSON, for example: {"region": "...", "dbType": "...", "dbEngine": "..."}`;
+  }
+
+  try {
+    const response = await AxiosInstence.post<IGenericResponse>('/chat', {
+      question,
+    });
+
+    return response.data
+  } catch (error) {
+    console.error('Error asking chat:', error);
+    return null;
+  }
+}
 
 export function parseGeminiRecommendation(
   rawOutput: string,

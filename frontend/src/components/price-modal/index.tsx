@@ -1,19 +1,16 @@
 'use client';
 
 import type React from 'react';
-
 import { useState, useEffect, useCallback } from 'react';
 import { FaRobot } from 'react-icons/fa';
 import { AxiosInstence } from '../../services/axios/AxiosInstance';
-import { translateDBEngineToCloudOptions } from '../../utils/Mappers/dbEngineMapper';
-import { translateDBInstanceTypeToCloudOptions } from '../../utils/Mappers/dbInstanceTypeMapper';
-import { translateLoadBalancerTypeToCloudOptions } from '../../utils/Mappers/loadBalancerMapper';
-import { translateStorageClassToCloudOptions } from '../../utils/Mappers/objectStorageMapper';
-import { translateLocationToRegionCodes } from '../../utils/Mappers/regionMapper';
-import { translateInstanceTypeCategory } from '../../utils/Mappers/typeMapper';
-import './index.scss';
-import ResourceCard from '../resourceCard';
+import { getTranslationParams } from '../../utils/translate';
+import PricePropositionCard from '../price-proposition-card/index';
 import ResourceLoader from '../resource-loader';
+import awsIcon from '../../assets/awsIcon.png';
+import azureIcon from '../../assets/azureIcon.png';
+import './index.scss';
+import { getResourceSuggestion } from '../../utils/recommendation';
 
 interface ResourceOption {
   id: string;
@@ -22,6 +19,10 @@ interface ResourceOption {
   os?: string;
   region?: string;
   pricePerHour?: number;
+  provider: 'AWS' | 'azure';
+  spotInstance?: boolean;
+  reservationTerm?: string | null;
+  savingsPlan?: boolean;
 }
 
 interface PricingOption {
@@ -50,6 +51,28 @@ export default function ResourceModal({
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showModalContent, setShowModalContent] = useState(false);
+  const [spotInstances, setSpotInstances] = useState<ResourceOption[]>([]);
+  const [savingsPlans, setSavingsPlans] = useState<ResourceOption[]>([]);
+  const [useSpotInstances, setUseSpotInstances] = useState(false);
+  const [useSavingsPlans, setUseSavingsPlans] = useState(false);
+  const [suggestion, setSuggestion] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (selectedResourceName) {
+      const fetchSuggestion = async () => {
+        try {
+          const recommendation = await getResourceSuggestion(selectedResourceName);
+          
+          setSuggestion(recommendation?.message || null);
+        } catch (error) {
+          console.error('Failed to fetch suggestion:', error);
+          setSuggestion(null);
+        }
+      };
+
+      fetchSuggestion();
+    }
+  }, [selectedResourceName]);
 
   useEffect(() => {
     setMounted(true);
@@ -64,99 +87,16 @@ export default function ResourceModal({
       document.addEventListener('keydown', handleEsc);
       document.body.style.overflow = 'hidden';
 
-      // Only start loading if not already loading
       if (!isLoading && !showModalContent) {
         setIsLoading(true);
         setShowModalContent(false);
         setResources([]);
+        setSpotInstances([]);
+        setSavingsPlans([]);
 
-        let awsParams = resourceParams;
-        let azureParams = resourceParams;
-
-        if (resourceParams) {
-          // ... your existing parameter mapping logic
-          awsParams = {
-            ...resourceParams,
-            ...(resourceParams.os && { os: resourceParams.os }),
-            ...(resourceParams.dbEngine && {
-              databaseEngine: translateDBEngineToCloudOptions(
-                resourceParams.dbEngine,
-                'aws',
-              )[0],
-            }),
-            ...(resourceParams.dbInstanceType && {
-              instanceType: translateDBInstanceTypeToCloudOptions(
-                resourceParams.dbInstanceType,
-                'aws',
-              )[0],
-            }),
-            ...(resourceParams.lbType && {
-              lbType: translateLoadBalancerTypeToCloudOptions(
-                resourceParams.lbType,
-                'aws',
-              )[0],
-            }),
-            ...(resourceParams.storageClass && {
-              storageClass: translateStorageClassToCloudOptions(
-                resourceParams.storageClass,
-                'aws',
-              )[0],
-            }),
-            ...(resourceParams.region && {
-              region: translateLocationToRegionCodes(
-                resourceParams.region,
-                'aws',
-              )[0],
-            }),
-            ...(resourceParams.instanceType && {
-              instanceType: translateInstanceTypeCategory(
-                resourceParams.instanceType,
-                'aws',
-              )[0],
-            }),
-          };
-
-          azureParams = {
-            ...resourceParams,
-            ...(resourceParams.os && { os: resourceParams.os }),
-            ...(resourceParams.dbEngine && {
-              databaseEngine: translateDBEngineToCloudOptions(
-                resourceParams.dbEngine,
-                'azure',
-              )[0],
-            }),
-            ...(resourceParams.dbInstanceType && {
-              instanceType: translateDBInstanceTypeToCloudOptions(
-                resourceParams.dbInstanceType,
-                'azure',
-              )[0],
-            }),
-            ...(resourceParams.lbType && {
-              lbType: translateLoadBalancerTypeToCloudOptions(
-                resourceParams.lbType,
-                'azure',
-              )[0],
-            }),
-            ...(resourceParams.storageClass && {
-              storageClass: translateStorageClassToCloudOptions(
-                resourceParams.storageClass,
-                'azure',
-              )[0],
-            }),
-            ...(resourceParams.region && {
-              region: translateLocationToRegionCodes(
-                resourceParams.region,
-                'azure',
-              )[0],
-            }),
-            ...(resourceParams.instanceType && {
-              instanceType: translateInstanceTypeCategory(
-                resourceParams.instanceType,
-                'azure',
-              )[0],
-            }),
-          };
-        }
+        let { awsParams, azureParams } = getTranslationParams(
+          resourceParams || {},
+        );
 
         const fetchResources = async () => {
           try {
@@ -176,12 +116,29 @@ export default function ResourceModal({
               }),
             ]);
 
-            const combined = [...awsRes.data, ...azureRes.data];
-            setResources(combined);
-            if (combined.length > 0) setSelectedResource(combined[0].id);
+            const combinedData = [...awsRes.data, ...azureRes.data];
+
+            const onDemandResources = combinedData.filter(
+              (resource) => !resource.spotInstance && !resource.reservationTerm,
+            );
+
+            const spotInstances = combinedData.filter(
+              (resource) => resource.spotInstance === true,
+            );
+
+            const savingsPlans = combinedData.filter(
+              (resource) => resource.reservationTerm !== null,
+            );
+
+            setResources(onDemandResources);
+            setSpotInstances(spotInstances);
+            setSavingsPlans(savingsPlans);
+
+            if (combinedData.length > 0) {
+              setSelectedResource(combinedData[0].id);
+            }
           } catch (error) {
             console.error('Failed to fetch resources:', error);
-            // Handle error - you might want to show an error state
             setIsLoading(false);
           }
         };
@@ -189,7 +146,6 @@ export default function ResourceModal({
         fetchResources();
       }
     } else {
-      // Reset states when modal closes
       setIsLoading(false);
       setShowModalContent(false);
     }
@@ -198,7 +154,7 @@ export default function ResourceModal({
       document.removeEventListener('keydown', handleEsc);
       document.body.style.overflow = '';
     };
-  }, [isOpen, onClose]); // Removed other dependencies to prevent multiple triggers
+  }, [isOpen, onClose, selectedResourceName, resourceParams]);
 
   const handleLoaderComplete = useCallback(() => {
     setIsLoading(false);
@@ -239,40 +195,17 @@ export default function ResourceModal({
       description: 'Commit to 1 or 3 years for significant discounts',
       discount: 'Up to 72%',
     },
-    {
-      id: 'auto-scaling',
-      name: 'Auto Scaling',
-      description: 'Automatically adjust capacity based on demand',
-      discount: 'Optimized usage',
-    },
   ];
-
-  const getResourceSuggestion = () => {
-    if (selectedResource === 't2.small') {
-      return 'For your current workload, the t2.small instance might be the most cost-effective option.';
-    } else if (selectedResource === 't2.micro') {
-      return 'The t2.micro is perfect for low-traffic applications and development environments.';
-    } else {
-      return 'The t2.medium offers more computing power, ideal for moderate applications.';
-    }
-  };
-
-  const getPricingAdvice = () => {
-    switch (pricingOption) {
-      case 'spot':
-        return 'Spot instances can save up to 90%, but may be interrupted.';
-      case 'savings':
-        return 'Savings Plans offer discounts with a 1 or 3 year commitment.';
-      case 'auto-scaling':
-        return 'Auto Scaling adjusts capacity to match demand.';
-      default:
-        return 'On-Demand provides flexibility but at standard pricing.';
-    }
-  };
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) onClose();
   };
+
+  const getAwsResources = (resourceList: ResourceOption[]) =>
+    resourceList.filter((r) => r.provider === 'AWS');
+
+  const getAzureResources = (resourceList: ResourceOption[]) =>
+    resourceList.filter((r) => r.provider === 'azure');
 
   return (
     <>
@@ -280,15 +213,6 @@ export default function ResourceModal({
         isVisible={isLoading}
         onComplete={handleLoaderComplete}
         duration={4000}
-        comments={[
-          'Finding the best price for you...',
-          'Comparing cloud providers...',
-          'Analyzing cost optimization...',
-          'Searching for deals and discounts...',
-          'Calculating savings opportunities...',
-          'Reviewing performance metrics...',
-          'Finalizing recommendations...',
-        ]}
       />
 
       {showModalContent && (
@@ -296,19 +220,7 @@ export default function ResourceModal({
           <div className="modal-container" role="dialog" aria-modal="true">
             <h2 className="modal-title">Select Resource</h2>
 
-            <div className="resource-options">
-              {resources.map((resource) => (
-                <ResourceCard
-                  key={resource.id}
-                  resource={resource}
-                  isSelected={selectedResource === resource.id}
-                  onSelect={setSelectedResource}
-                />
-              ))}
-            </div>
-
             <div className="pricing-section">
-              <h3 className="pricing-title">Pricing Options</h3>
               <div className="tabs-container">
                 <div className="tabs-list">
                   {pricingOptions.map((option) => (
@@ -322,20 +234,442 @@ export default function ResourceModal({
                   ))}
                 </div>
 
-                {pricingOptions.map((option) => (
-                  <div
-                    key={option.id}
-                    className={`tab-panel ${pricingOption === option.id ? 'active' : ''}`}
-                  >
-                    <div className="pricing-option-name">{option.name}</div>
-                    <div className="pricing-option-description">
-                      {option.description}
+                {/* On-Demand Panel */}
+                <div
+                  className={`tab-panel ${pricingOption === 'on-demand' ? 'active' : ''}`}
+                >
+                  <div className="pricing-header">
+                    <h3 className="pricing-option-name">On-Demand Pricing</h3>
+                    <p className="pricing-option-description">
+                      Pay as you go with no commitment. Standard pricing with
+                      maximum flexibility.
+                    </p>
+                  </div>
+
+                  <div className="provider-section">
+                    <div className="provider-header">
+                      <img
+                        src={awsIcon || '/placeholder.svg'}
+                        alt="AWS"
+                        className="provider-icon"
+                      />
+                      <h4 className="provider-title">AWS Options</h4>
                     </div>
-                    <div className="pricing-option-discount">
-                      Discount: {option.discount}
+                    {getAwsResources(resources).length === 0 ? (
+                      <div className="no-resources">
+                        No AWS resources available for this configuration
+                      </div>
+                    ) : (
+                      <div className="resource-grid">
+                        {getAwsResources(resources).map((resource) => (
+                          <PricePropositionCard
+                            key={resource.id}
+                            resource={resource}
+                            isSelected={selectedResource === resource.id}
+                            onSelect={setSelectedResource}
+                            pricingType="on-demand"
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="provider-section">
+                    <div className="provider-header">
+                      <img
+                        src={azureIcon || '/placeholder.svg'}
+                        alt="Azure"
+                        className="provider-icon"
+                      />
+                      <h4 className="provider-title">Azure Options</h4>
+                    </div>
+                    {getAzureResources(resources).length === 0 ? (
+                      <div className="no-resources">
+                        No Azure resources available for this configuration
+                      </div>
+                    ) : (
+                      <div className="resource-grid">
+                        {getAzureResources(resources).map((resource) => (
+                          <PricePropositionCard
+                            key={resource.id}
+                            resource={resource}
+                            isSelected={selectedResource === resource.id}
+                            onSelect={setSelectedResource}
+                            pricingType="on-demand"
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Spot Instances Panel */}
+                <div
+                  className={`tab-panel ${pricingOption === 'spot' ? 'active' : ''}`}
+                >
+                  <div className="pricing-header">
+                    <h3 className="pricing-option-name">Spot Instances</h3>
+                    <p className="pricing-option-description">
+                      Up to 90% off on-demand pricing with variable
+                      availability. Best for fault-tolerant workloads.
+                    </p>
+                  </div>
+
+                  <div className="toggle-container">
+                    {pricingOption === 'spot' && (
+                      <>
+                        <div className="provider-section">
+                          <div className="provider-header">
+                            <img
+                              src={awsIcon || '/placeholder.svg'}
+                              alt="AWS"
+                              className="provider-icon"
+                            />
+                            <h4 className="provider-title">
+                              AWS Spot Instances
+                            </h4>
+                          </div>
+                          {getAwsResources(spotInstances).length === 0 ? (
+                            <div className="no-resources">
+                              No AWS spot instances available for this
+                              configuration
+                            </div>
+                          ) : (
+                            <div className="resource-grid">
+                              {getAwsResources(spotInstances).map(
+                                (resource) => (
+                                  <PricePropositionCard
+                                    key={resource.id}
+                                    resource={resource}
+                                    isSelected={
+                                      selectedResource === resource.id
+                                    }
+                                    onSelect={setSelectedResource}
+                                    pricingType="spot"
+                                  />
+                                ),
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="provider-section">
+                          <div className="provider-header">
+                            <img
+                              src={azureIcon || '/placeholder.svg'}
+                              alt="Azure"
+                              className="provider-icon"
+                            />
+                            <h4 className="provider-title">
+                              Azure Spot Instances
+                            </h4>
+                          </div>
+                          {getAzureResources(spotInstances).length === 0 ? (
+                            <div className="no-resources">
+                              No Azure spot instances available for this
+                              configuration
+                            </div>
+                          ) : (
+                            <div className="resource-grid">
+                              {getAzureResources(spotInstances).map(
+                                (resource) => (
+                                  <PricePropositionCard
+                                    key={resource.id}
+                                    resource={resource}
+                                    isSelected={
+                                      selectedResource === resource.id
+                                    }
+                                    onSelect={setSelectedResource}
+                                    pricingType="spot"
+                                  />
+                                ),
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  {useSpotInstances && (
+                    <>
+                      <div className="provider-section">
+                        <div className="provider-header">
+                          <img
+                            src={awsIcon || '/placeholder.svg'}
+                            alt="AWS"
+                            className="provider-icon"
+                          />
+                          <h4 className="provider-title">AWS Spot Instances</h4>
+                        </div>
+                        {getAwsResources(spotInstances).length === 0 ? (
+                          <div className="no-resources">
+                            No AWS spot instances available for this
+                            configuration
+                          </div>
+                        ) : (
+                          <div className="resource-grid">
+                            {getAwsResources(spotInstances).map((resource) => (
+                              <PricePropositionCard
+                                key={resource.id}
+                                resource={resource}
+                                isSelected={selectedResource === resource.id}
+                                onSelect={setSelectedResource}
+                                pricingType="spot"
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="provider-section">
+                        <div className="provider-header">
+                          <img
+                            src={azureIcon || '/placeholder.svg'}
+                            alt="Azure"
+                            className="provider-icon"
+                          />
+                          <h4 className="provider-title">
+                            Azure Spot Instances
+                          </h4>
+                        </div>
+                        {getAzureResources(spotInstances).length === 0 ? (
+                          <div className="no-resources">
+                            No Azure spot instances available for this
+                            configuration
+                          </div>
+                        ) : (
+                          <div className="resource-grid">
+                            {getAzureResources(spotInstances).map(
+                              (resource) => (
+                                <PricePropositionCard
+                                  key={resource.id}
+                                  resource={resource}
+                                  isSelected={selectedResource === resource.id}
+                                  onSelect={setSelectedResource}
+                                  pricingType="spot"
+                                />
+                              ),
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Savings Plans Panel */}
+                <div
+                  className={`tab-panel ${pricingOption === 'savings' ? 'active' : ''}`}
+                >
+                  <div className="pricing-header">
+                    <h3 className="pricing-option-name">
+                      Savings Plans & Reserved Instances
+                    </h3>
+                    <p className="pricing-option-description">
+                      Commit to 1 or 3 years for significant discounts. Best for
+                      stable, predictable workloads.
+                    </p>
+                  </div>
+
+                  <div className="toggle-container">
+                    <div className="provider-section">
+                      {savingsPlans.length === 0 ? (
+                        <div className="no-resources">
+                          No savings plans available for this configuration
+                        </div>
+                      ) : (
+                        <table className="savings-table">
+                          <thead>
+                            <tr>
+                              <th>Term</th>
+                              <th>Provider</th>
+                              <th>Price Per Hour</th>
+                              <th>Select</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {/* 1-Year Term Rows */}
+                            {savingsPlans
+                              .filter(
+                                (resource) =>
+                                  resource.reservationTerm === '1 Year',
+                              )
+                              .map((resource) => (
+                                <tr key={resource.id}>
+                                  <td>1 Year</td>
+                                  <td>
+                                    <img
+                                      src={
+                                        resource.provider === 'AWS'
+                                          ? awsIcon
+                                          : azureIcon
+                                      }
+                                      alt={resource.provider}
+                                      className="provider-icon"
+                                    />
+                                  </td>
+                                  <td>
+                                    $
+                                    {resource.pricePerHour?.toFixed(4) || 'N/A'}
+                                  </td>
+                                  <td>
+                                    <input
+                                      type="radio"
+                                      name="savings-plan"
+                                      checked={selectedResource === resource.id}
+                                      onChange={() =>
+                                        setSelectedResource(resource.id)
+                                      }
+                                    />
+                                  </td>
+                                </tr>
+                              ))}
+
+                            {/* 3-Year Term Rows */}
+                            {savingsPlans
+                              .filter(
+                                (resource) =>
+                                  resource.reservationTerm === '3 Years',
+                              )
+                              .map((resource) => (
+                                <tr key={resource.id}>
+                                  <td>3 Years</td>
+                                  <td>
+                                    <img
+                                      src={
+                                        resource.provider === 'AWS'
+                                          ? awsIcon
+                                          : azureIcon
+                                      }
+                                      alt={resource.provider}
+                                      className="provider-icon"
+                                    />
+                                  </td>
+                                  <td>
+                                    $
+                                    {resource.pricePerHour?.toFixed(4) || 'N/A'}
+                                  </td>
+                                  <td>
+                                    <input
+                                      type="radio"
+                                      name="savings-plan"
+                                      checked={selectedResource === resource.id}
+                                      onChange={() =>
+                                        setSelectedResource(resource.id)
+                                      }
+                                    />
+                                  </td>
+                                </tr>
+                              ))}
+                          </tbody>
+                        </table>
+                      )}
                     </div>
                   </div>
-                ))}
+
+                  {useSavingsPlans && (
+                    <>
+                      <div className="provider-section">
+                        <div className="provider-header">
+                          <img
+                            src={awsIcon || '/placeholder.svg'}
+                            alt="AWS"
+                            className="provider-icon"
+                          />
+                          <h4 className="provider-title">AWS Savings Plans</h4>
+                        </div>
+                        {getAwsResources(savingsPlans).length === 0 ? (
+                          <div className="no-resources">
+                            No AWS savings plans available for this
+                            configuration
+                          </div>
+                        ) : (
+                          <table className="savings-table">
+                            <thead>
+                              <tr>
+                                <th>Term</th>
+                                <th>Price Per Hour</th>
+                                <th>Select</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {getAwsResources(savingsPlans).map((resource) => (
+                                <tr key={resource.id}>
+                                  <td>{resource.reservationTerm}</td>
+                                  <td>${resource.pricePerHour?.toFixed(4)}</td>
+                                  <td>
+                                    <input
+                                      type="radio"
+                                      name="aws-savings-plan"
+                                      checked={selectedResource === resource.id}
+                                      onChange={() =>
+                                        setSelectedResource(resource.id)
+                                      }
+                                    />
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        )}
+                      </div>
+
+                      <div className="provider-section">
+                        <div className="provider-header">
+                          <img
+                            src={azureIcon || '/placeholder.svg'}
+                            alt="Azure"
+                            className="provider-icon"
+                          />
+                          <h4 className="provider-title">
+                            Azure Reserved Instances
+                          </h4>
+                        </div>
+                        {getAzureResources(savingsPlans).length === 0 ? (
+                          <div className="no-resources">
+                            No Azure reserved instances available for this
+                            configuration
+                          </div>
+                        ) : (
+                          <table className="savings-table">
+                            <thead>
+                              <tr>
+                                <th>Term</th>
+                                <th>Price Per Hour</th>
+                                <th>Select</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {getAzureResources(savingsPlans).map(
+                                (resource) => (
+                                  <tr key={resource.id}>
+                                    <td>{resource.reservationTerm}</td>
+                                    <td>
+                                      ${resource.pricePerHour?.toFixed(4)}
+                                    </td>
+                                    <td>
+                                      <input
+                                        type="radio"
+                                        name="azure-savings-plan"
+                                        checked={
+                                          selectedResource === resource.id
+                                        }
+                                        onChange={() =>
+                                          setSelectedResource(resource.id)
+                                        }
+                                      />
+                                    </td>
+                                  </tr>
+                                ),
+                              )}
+                            </tbody>
+                          </table>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -345,15 +679,9 @@ export default function ResourceModal({
                   <FaRobot className="bot-icon" />
                 </div>
                 <div className="suggestion-content">
-                  <div className="suggestion-title">Adam's Suggestion:</div>
+                  <div className="suggestion-title">{"Adam's Suggestion:"}</div>
                   <div className="suggestion-text">
-                    {getResourceSuggestion()}
-                  </div>
-                  <div className="pricing-advice">
-                    <span className="pricing-advice-label">
-                      Pricing advice:
-                    </span>{' '}
-                    {getPricingAdvice()}
+                    {suggestion || 'No recommendation available at the moment.'}
                   </div>
                 </div>
               </div>

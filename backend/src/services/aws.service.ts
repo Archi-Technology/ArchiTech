@@ -3,6 +3,12 @@ import {
   GetProductsCommand,
   GetProductsCommandInput,
 } from "@aws-sdk/client-pricing";
+
+import {
+  EC2Client,
+  DescribeSpotPriceHistoryCommand,
+} from "@aws-sdk/client-ec2";
+
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -49,9 +55,18 @@ interface EC2PricingResult {
 
 export class awsService {
   client: PricingClient;
+  ec2Client: EC2Client;
 
   constructor() {
     this.client = new PricingClient({
+      region: "us-east-1",
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
+      },
+    });
+
+    this.ec2Client = new EC2Client({
       region: "us-east-1",
       credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
@@ -165,9 +180,6 @@ export class awsService {
         { Type: "TERM_MATCH", Field: "preInstalledSw", Value: "NA" },
         { Type: "TERM_MATCH", Field: "tenancy", Value: "Shared" },
         { Type: "TERM_MATCH", Field: "capacitystatus", Value: "Used" },
-        { Type: "TERM_MATCH", Field: "PurchaseOption", Value: "No Upfront" },
-        // { Type: "TERM_MATCH", Field: "termType", Value: "Reserved" },
-        // { Type: "TERM_MATCH", Field: "reservedInstanceType", Value: "Standard" },
       ],
       MaxResults: 100,
     };
@@ -175,229 +187,102 @@ export class awsService {
     const command = new GetProductsCommand(params);
     const response = await this.client.send(command);
 
-    const formattedResults = (response.PriceList ?? []).map((priceItemJson, index) => {
-      const priceItem = JSON.parse(priceItemJson);
+    const results: any[] = [];
 
+    (response.PriceList ?? []).forEach((priceItemJson, index) => {
+      const priceItem = JSON.parse(priceItemJson);
       const product = priceItem.product;
       const terms = priceItem.terms;
+      const region = product.attributes.location || location;
+      const os = product.attributes.operatingSystem || operatingSystem;
+      const type = product.attributes.instanceType || instanceType;
 
-      const productName = product.attributes?.servicecode || "Unknown";
-
-      let pricePerHour: string | null = null;
-      let reservationTerm: string | null = null;
-      let spotInstance: string | null = null;
-
+      // On-Demand
       if (terms.OnDemand) {
         for (const termKey in terms.OnDemand) {
           const term = terms.OnDemand[termKey];
-          if (term.priceDimensions) {
-            for (const dimKey in term.priceDimensions) {
-              const dim = term.priceDimensions[dimKey];
-              if (dim.unit === "Hrs" && dim.pricePerUnit && dim.pricePerUnit.USD) {
-                pricePerHour = dim.pricePerUnit.USD;
-              }
+          for (const dimKey in term.priceDimensions) {
+            const dim = term.priceDimensions[dimKey];
+            if (dim.unit === "Hrs" && dim.pricePerUnit?.USD && !dim.description?.toLowerCase().includes("byol")) {
+              results.push({
+                id: results.length + 1,
+                region,
+                instanceType: type,
+                productName: product.attributes.servicecode || "EC2",
+                pricePerHour: parseFloat(dim.pricePerUnit.USD),
+                os,
+                reservationTerm: null,
+                spotInstance: null,
+                provider: "AWS",
+              });
             }
           }
         }
       }
 
+      // Reserved
       if (terms.Reserved) {
         for (const termKey in terms.Reserved) {
-          const termAttributes = terms.Reserved[termKey].termAttributes;
-          if (termAttributes && termAttributes.LeaseContractLength) {
-            reservationTerm = termAttributes.LeaseContractLength;
-            break;
+          const term = terms.Reserved[termKey];
+          const length = term.termAttributes?.LeaseContractLength;
+          const noUpfront = term.termAttributes?.PurchaseOption === "No Upfront";
+          const standardOferringClass = term.termAttributes?.OfferingClass === "standard";
+
+          let reservationTerm = null;
+          if (length === "1yr") reservationTerm = "1 Year";
+          if (length === "3yr") reservationTerm = "3 Years";
+
+          for (const dimKey in term.priceDimensions) {
+            const dim = term.priceDimensions[dimKey];
+            if (dim.unit === "Hrs" && dim.pricePerUnit?.USD && noUpfront && standardOferringClass) {
+              results.push({
+                id: results.length + 1,
+                region,
+                instanceType: type,
+                productName: product.attributes.servicecode || "EC2",
+                pricePerHour: parseFloat(dim.pricePerUnit.USD),
+                os,
+                reservationTerm,
+                spotInstance: null,
+                provider: "AWS",
+              });
+            }
           }
         }
       }
-
-      if (terms.Spot) {
-        spotInstance = "Yes";
-      } else {
-        spotInstance = null;
-      }
-
-      return {
-        id: index + 1,
-        region: product.attributes.location || location,
-        instanceType: product.attributes.instanceType || instanceType,
-        pricePerHour: pricePerHour ? parseFloat(parseFloat(pricePerHour).toFixed(6)) : null,
-        os: product.attributes.operatingSystem || operatingSystem,
-        reservationTerm,
-        spotInstance,
-        provider: "AWS",
-      };
     });
 
-    return formattedResults;
-  }
-
-
-  async getEC2Pricing(
-    instanceType: string,
-    location: string,
-    operatingSystem: string
-  ): Promise<
-    Array<{
-      id: number;
-      region: string;
-      instanceType: string;
-      productName: string;
-      pricePerHour: number;
-      os: string;
-      reservationTerm: string | null;
-      spotInstance: boolean;
-      provider: string;
-      usageType: string;
-    }> | null
-  > {
-    let nextToken: string | undefined = undefined;
-    const results: any[] = [];
-
-    instanceType = instanceType.trim();
-    location = location.trim();
-    operatingSystem = operatingSystem.trim();
-
+    // Spot (separate API)
     try {
-      let idCounter = 0;
+      const spotCommand = new DescribeSpotPriceHistoryCommand({
+        InstanceTypes: [instanceType as any], // Cast to match expected type
+        ProductDescriptions: [operatingSystem],
+        MaxResults: 1,
+        StartTime: new Date(),
+      });
 
-      do {
-        console.log(
-          `Fetching EC2 pricing for: Location='${location}', InstanceType='${instanceType}', OS='${operatingSystem}'`
-        );
+      const spotResult = await this.ec2Client.send(spotCommand);
+      const spotPriceEntry = spotResult.SpotPriceHistory?.[0];
 
-        const params: GetProductsCommandInput = {
-          ServiceCode: "AmazonEC2",
-          Filters: [
-            { Type: "TERM_MATCH", Field: "location", Value: location },
-            { Type: "TERM_MATCH", Field: "instanceType", Value: instanceType },
-            { Type: "TERM_MATCH", Field: "operatingSystem", Value: operatingSystem },
-            { Type: "TERM_MATCH", Field: "preInstalledSw", Value: "NA" },
-            { Type: "TERM_MATCH", Field: "tenancy", Value: "Shared" },
-            { Type: "TERM_MATCH", Field: "capacitystatus", Value: "Used" },
-          ],
-          MaxResults: 100,
-          NextToken: nextToken,
-        };
-
-        const command = new GetProductsCommand(params);
-        const response = await this.client.send(command);
-
-
-
-        if (!response.PriceList || response.PriceList.length === 0) {
-          console.error("No EC2 pricing data found.");
-          return null;
-        }
-
-        for (const productString of response.PriceList) {
-          const product = JSON.parse(productString);
-          const productAttributes = product.product?.attributes || {};
-
-          // Extract pricing helper
-          const extractPricing = (
-            termsBlock: any,
-            spotInstance: boolean,
-            reservationTerm: string | null
-          ) => {
-            if (!termsBlock) return;
-            for (const termKey in termsBlock) {
-              const term = termsBlock[termKey];
-              const priceDimensions = term.priceDimensions;
-              const termAttributes = term.termAttributes || {};
-
-              for (const dimKey in priceDimensions) {
-                const dim = priceDimensions[dimKey];
-
-                const pricePerHourStr = dim.pricePerUnit?.USD ?? "0";
-                const pricePerHour = parseFloat(pricePerHourStr);
-                const unit = dim.unit || "";
-                const description = dim.description || "";
-                const usageType = dim.usageType || "";
-
-                // Filter out non-hour units and zero prices
-                if (!unit.toLowerCase().includes("hour") || pricePerHour === 0 || pricePerHour > 10) {
-                  continue;
-                }
-
-                // Filter BYOL Windows prices if OS is Windows
-                if (
-                  operatingSystem.toLowerCase() === "windows" &&
-                  description.toLowerCase().includes("byol")
-                ) {
-                  continue;
-                }
-
-                // For reserved terms, allow all purchaseOptions and offeringClasses (log for debugging)
-                if (reservationTerm) {
-                  const purchaseOption = (termAttributes.PurchaseOption || "").toLowerCase();
-                  const offeringClass = (termAttributes.OfferingClass || "").toLowerCase();
-
-                  // Only include reserved pricing if purchaseOption and offeringClass exist (skip upfront fees)
-                  if (!purchaseOption || !offeringClass) {
-                    continue;
-                  }
-
-                  // Skip upfront fees (unit: Quantity)
-                  if (unit.toLowerCase() === "quantity") {
-                    continue;
-                  }
-                }
-
-                results.push({
-                  id: idCounter++,
-                  region: productAttributes.location || location,
-                  instanceType: productAttributes.instanceType || instanceType,
-                  productName: productAttributes["productFamily"] || productAttributes["sku"] || "Unknown",
-                  pricePerHour,
-                  os: productAttributes.operatingSystem || operatingSystem,
-                  reservationTerm,
-                  spotInstance,
-                  provider: "aws",
-                  usageType,
-                });
-              }
-            }
-          };
-
-          // OnDemand terms (non-spot, non-reserved)
-          extractPricing(product.terms?.OnDemand, false, null);
-
-          // Reserved terms (may have reservation term)
-          const reservedTerms = product.terms?.Reserved || {};
-          for (const reservedKey in reservedTerms) {
-            const reservationTermRaw = reservedTerms[reservedKey].termAttributes?.LeaseContractLength || null;
-            let reservationTerm = reservationTermRaw;
-            if (reservationTermRaw) {
-              reservationTerm = reservationTermRaw
-                .replace("yr", " Year")
-                .replace("years", "Years");
-            }
-            extractPricing({ [reservedKey]: reservedTerms[reservedKey] }, false, reservationTerm);
-          }
-
-          // Spot terms
-          extractPricing(product.terms?.Spot, true, null);
-        }
-
-        nextToken = response.NextToken;
-      } while (nextToken);
-
-      if (results.length === 0) {
-        console.error("Still no matching EC2 price found.");
-        return null;
+      if (spotPriceEntry) {
+        results.push({
+          id: results.length + 1,
+          location,
+          instanceType,
+          productName: "EC2 Spot",
+          pricePerHour: parseFloat(spotPriceEntry.SpotPrice ?? "0"),
+          os: operatingSystem,
+          reservationTerm: null,
+          spotInstance: true,
+          provider: "AWS",
+        });
       }
-
-      return results;
-    } catch (err) {
-      console.error("Error fetching EC2 pricing:", err);
-      return null;
+    } catch (error) {
+      console.warn("Spot price fetch failed:", error);
     }
+
+    return results;
   }
-
-
-
-
 
   async getElbPricing(
     location: string,
