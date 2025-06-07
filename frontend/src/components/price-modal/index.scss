@@ -11,7 +11,9 @@
 .modal-container {
   background-color: white;
   border-radius: 12px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
   width: 100%;
   max-width: 64rem;
   max-height: 90vh;
@@ -66,13 +68,15 @@
   &.active {
     background-color: white;
     color: #1e293b;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    box-shadow:
+      0 1px 3px 0 rgba(0, 0, 0, 0.1),
+      0 1px 2px 0 rgba(0, 0, 0, 0.06);
   }
 }
 
 .tab-panel {
   display: none;
-  
+
   &.active {
     display: block;
   }
@@ -98,9 +102,36 @@
   line-height: 1.5;
 }
 
+.price-proposition-card {
+  width: 300px; // or any fixed value you like
+  height: 300px; // same as width
+  aspect-ratio: 1 / 1; // ensures it's always square, even if size is flexible
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: border-color 0.3s;
+
+  &.selected {
+    border-color: #007aff;
+  }
+}
+
 .provider-section {
+  display: flex;
+  gap: 16px;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  overflow-x: auto;
+  padding: 8px 0;
+
   margin-bottom: 2rem;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -132,6 +163,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 1rem;
+  margin-top: 1rem;
 }
 
 .no-resources {
@@ -282,20 +314,20 @@
     padding: 1.5rem;
     max-width: calc(100vw - 1rem);
   }
-  
+
   .resource-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .provider-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .actions {
     flex-direction: column;
-    
+
     .button {
       width: 100%;
     }

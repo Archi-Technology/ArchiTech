@@ -125,9 +125,9 @@
 
 .pricing-info {
   display: flex;
+  align-items: center;
   flex-direction: column;
   gap: 0.75rem;
-  align-items: flex-start;
 }
 
 .price-display {
@@ -139,7 +139,7 @@
 .price-amount {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #059669;
+  color: black;
   line-height: 1;
 }
 

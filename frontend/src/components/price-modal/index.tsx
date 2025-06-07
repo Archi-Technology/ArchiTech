@@ -61,8 +61,9 @@ export default function ResourceModal({
     if (selectedResourceName) {
       const fetchSuggestion = async () => {
         try {
-          const recommendation = await getResourceSuggestion(selectedResourceName);
-          
+          const recommendation =
+            await getResourceSuggestion(selectedResourceName);
+
           setSuggestion(recommendation?.message || null);
         } catch (error) {
           console.error('Failed to fetch suggestion:', error);
@@ -245,64 +246,45 @@ export default function ResourceModal({
                       maximum flexibility.
                     </p>
                   </div>
-
-                  <div className="provider-section">
-                    <div className="provider-header">
-                      <img
-                        src={awsIcon || '/placeholder.svg'}
-                        alt="AWS"
-                        className="provider-icon"
-                      />
-                      <h4 className="provider-title">AWS Options</h4>
+                  <div className="toggle-container">
+                    <div className="provider-section">
+                      {getAwsResources(resources).length === 0 ? (
+                        <div className="no-resources">
+                          No AWS resources available for this configuration
+                        </div>
+                      ) : (
+                        <div className="resource-grid">
+                          {getAwsResources(resources).map((resource) => (
+                            <PricePropositionCard
+                              key={resource.id}
+                              resource={resource}
+                              isSelected={selectedResource === resource.id}
+                              onSelect={setSelectedResource}
+                              pricingType="on-demand"
+                            />
+                          ))}
+                        </div>
+                      )}
+                      {getAzureResources(resources).length === 0 ? (
+                        <div className="no-resources">
+                          No Azure resources available for this configuration
+                        </div>
+                      ) : (
+                        <div className="resource-grid">
+                          {getAzureResources(resources).map((resource) => (
+                            <PricePropositionCard
+                              key={resource.id}
+                              resource={resource}
+                              isSelected={selectedResource === resource.id}
+                              onSelect={setSelectedResource}
+                              pricingType="on-demand"
+                            />
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    {getAwsResources(resources).length === 0 ? (
-                      <div className="no-resources">
-                        No AWS resources available for this configuration
-                      </div>
-                    ) : (
-                      <div className="resource-grid">
-                        {getAwsResources(resources).map((resource) => (
-                          <PricePropositionCard
-                            key={resource.id}
-                            resource={resource}
-                            isSelected={selectedResource === resource.id}
-                            onSelect={setSelectedResource}
-                            pricingType="on-demand"
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="provider-section">
-                    <div className="provider-header">
-                      <img
-                        src={azureIcon || '/placeholder.svg'}
-                        alt="Azure"
-                        className="provider-icon"
-                      />
-                      <h4 className="provider-title">Azure Options</h4>
-                    </div>
-                    {getAzureResources(resources).length === 0 ? (
-                      <div className="no-resources">
-                        No Azure resources available for this configuration
-                      </div>
-                    ) : (
-                      <div className="resource-grid">
-                        {getAzureResources(resources).map((resource) => (
-                          <PricePropositionCard
-                            key={resource.id}
-                            resource={resource}
-                            isSelected={selectedResource === resource.id}
-                            onSelect={setSelectedResource}
-                            pricingType="on-demand"
-                          />
-                        ))}
-                      </div>
-                    )}
                   </div>
                 </div>
-
                 {/* Spot Instances Panel */}
                 <div
                   className={`tab-panel ${pricingOption === 'spot' ? 'active' : ''}`}
@@ -319,16 +301,6 @@ export default function ResourceModal({
                     {pricingOption === 'spot' && (
                       <>
                         <div className="provider-section">
-                          <div className="provider-header">
-                            <img
-                              src={awsIcon || '/placeholder.svg'}
-                              alt="AWS"
-                              className="provider-icon"
-                            />
-                            <h4 className="provider-title">
-                              AWS Spot Instances
-                            </h4>
-                          </div>
                           {getAwsResources(spotInstances).length === 0 ? (
                             <div className="no-resources">
                               No AWS spot instances available for this
@@ -351,19 +323,7 @@ export default function ResourceModal({
                               )}
                             </div>
                           )}
-                        </div>
 
-                        <div className="provider-section">
-                          <div className="provider-header">
-                            <img
-                              src={azureIcon || '/placeholder.svg'}
-                              alt="Azure"
-                              className="provider-icon"
-                            />
-                            <h4 className="provider-title">
-                              Azure Spot Instances
-                            </h4>
-                          </div>
                           {getAzureResources(spotInstances).length === 0 ? (
                             <div className="no-resources">
                               No Azure spot instances available for this
@@ -420,19 +380,6 @@ export default function ResourceModal({
                             ))}
                           </div>
                         )}
-                      </div>
-
-                      <div className="provider-section">
-                        <div className="provider-header">
-                          <img
-                            src={azureIcon || '/placeholder.svg'}
-                            alt="Azure"
-                            className="provider-icon"
-                          />
-                          <h4 className="provider-title">
-                            Azure Spot Instances
-                          </h4>
-                        </div>
                         {getAzureResources(spotInstances).length === 0 ? (
                           <div className="no-resources">
                             No Azure spot instances available for this
