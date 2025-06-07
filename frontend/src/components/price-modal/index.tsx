@@ -95,7 +95,7 @@ export default function ResourceModal({
         setSpotInstances([]);
         setSavingsPlans([]);
 
-        let { awsParams, azureParams } = getTranslationParams(
+        const { awsParams, azureParams } = getTranslationParams(
           resourceParams || {},
         );
 
@@ -117,7 +117,14 @@ export default function ResourceModal({
               }),
             ]);
 
-            const combinedData = [...awsRes.data, ...azureRes.data];
+            const updatedAzureData = azureRes.data.map(
+              (item: Record<string, any>, index: number): ResourceOption => ({
+              ...item,
+              id: `${index + awsRes.data.length}`,
+              provider: 'azure',
+              }),
+            );
+            const combinedData = [...awsRes.data, ...updatedAzureData];
 
             const onDemandResources = combinedData.filter(
               (resource) => !resource.spotInstance && !resource.reservationTerm,
@@ -259,7 +266,7 @@ export default function ResourceModal({
                               key={resource.id}
                               resource={resource}
                               isSelected={selectedResource === resource.id}
-                              onSelect={setSelectedResource}
+                              onSelect={(id) => setSelectedResource(id)}
                               pricingType="on-demand"
                             />
                           ))}
@@ -276,7 +283,7 @@ export default function ResourceModal({
                               key={resource.id}
                               resource={resource}
                               isSelected={selectedResource === resource.id}
-                              onSelect={setSelectedResource}
+                              onSelect={(id) => setSelectedResource(id)}
                               pricingType="on-demand"
                             />
                           ))}
@@ -316,7 +323,7 @@ export default function ResourceModal({
                                     isSelected={
                                       selectedResource === resource.id
                                     }
-                                    onSelect={setSelectedResource}
+                                    onSelect={(id) => setSelectedResource(id)}
                                     pricingType="spot"
                                   />
                                 ),
@@ -339,7 +346,7 @@ export default function ResourceModal({
                                     isSelected={
                                       selectedResource === resource.id
                                     }
-                                    onSelect={setSelectedResource}
+                                    onSelect={(id) => setSelectedResource(id)}
                                     pricingType="spot"
                                   />
                                 ),
@@ -374,7 +381,7 @@ export default function ResourceModal({
                                 key={resource.id}
                                 resource={resource}
                                 isSelected={selectedResource === resource.id}
-                                onSelect={setSelectedResource}
+                                onSelect={(id) => setSelectedResource(id)}
                                 pricingType="spot"
                               />
                             ))}
@@ -393,7 +400,7 @@ export default function ResourceModal({
                                   key={resource.id}
                                   resource={resource}
                                   isSelected={selectedResource === resource.id}
-                                  onSelect={setSelectedResource}
+                                  onSelect={(id) => setSelectedResource(id)}
                                   pricingType="spot"
                                 />
                               ),

@@ -4,7 +4,7 @@ import { awsControllerInstance } from "../controllers/aws.controller";
 export const awsRouter = Router();
 /**
  * @swagger
- * /aws/cost/s3:
+ * /api/aws/cost/s3:
  *   get:
  *     description: get cost of s3 bucket
  *     tags:
@@ -51,7 +51,7 @@ awsRouter.get(
 
 /**
  * @swagger
- * /aws/cost/ec2:
+ * /api/aws/cost/ec2:
  *   get:
  *     description: Get cost of EC2 instances
  *     tags:
@@ -108,7 +108,7 @@ awsRouter.get(
 
 /**
  * @swagger
- * /aws/cost/elb:
+ * /api/aws/cost/elb:
  *   get:
  *     description: Get pricing for ELB
  *     tags:
@@ -139,7 +139,7 @@ awsRouter.get(
 
 /**
  * @swagger
- * /aws/cost/rds:
+ * /api/aws/cost/rds:
  *   get:
  *     description: Get pricing for Amazon RDS instances
  *     tags:
