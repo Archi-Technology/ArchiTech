@@ -9,7 +9,7 @@ export class awsController {
   }
   async getS3Pricing(req: Request, res: Response) {
     try {
-      const { region, storageClass } = req.query;
+      let { region, storageClass } = req.query;
 
       if (!region || !storageClass) {
         res.status(400).json({
@@ -18,6 +18,9 @@ export class awsController {
         return;
       }
 
+      region = region.toString().trim().toLowerCase();
+      storageClass = storageClass.toString().trim().toLowerCase();
+      
       const price = await this.service.getS3StoragePrice(
         region as string,
         storageClass as string
@@ -27,7 +30,7 @@ export class awsController {
         res.status(200).json({
           region: region,
           storageClass: storageClass,
-          pricePerGbPerMonth: price,
+          pricePerGbPerHour: price,
         });
       } else {
         res.status(500).json({ error: "Failed to fetch pricing data." });

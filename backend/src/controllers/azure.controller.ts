@@ -10,12 +10,12 @@ export class AzureController {
 
   async getBlobPricing(req: Request, res: Response) {
     try {
-      const { region, storageTier, redundancy, dataStoredGB } = req.query;
+      const { region, storageTier, redundancy } = req.query;
 
-      if (!region || !storageTier || !redundancy || !dataStoredGB) {
+      if (!region || !storageTier || !redundancy) {
         return res.status(400).json({
           error:
-            "Missing required parameters: region, storageTier, redundancy, dataStoredGB",
+            "Missing required parameters: region, storageTier, redundancy",
         });
       }
 
@@ -23,7 +23,6 @@ export class AzureController {
         region: region as string,
         storageTier: storageTier as string,
         redundancy: redundancy as string,
-        dataStoredGB: Number(dataStoredGB),
       });
 
       if (price) {

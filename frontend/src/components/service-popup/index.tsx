@@ -49,6 +49,7 @@ export default function ServicePopup({
   const [selectedDBInstanceType, setSelectedDBInstanceType] =
     useState<string>('');
   const [selectedDBEngine, setSelectedDBEngine] = useState<string>('');
+  const [selectedRedundancy, setSelectedRedundancy] = useState<string>('');
   const [recommendation, setRecommendation] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<'form' | 'price-comparison'>(
     'form',
@@ -487,7 +488,7 @@ export default function ServicePopup({
 
             <div className="popup-actions">
               <Button onClick={handleNext}>Next</Button>
-              <Button variant='destructive' onClick={onCancel}>
+              <Button variant="destructive" onClick={onCancel}>
                 Cancel
               </Button>
             </div>

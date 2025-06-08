@@ -26,11 +26,6 @@ export const azureRouter = Router();
  *         schema: { type: string }
  *         required: true
  *         example: LRS
- *       - in: query
- *         name: dataStoredGB
- *         schema: { type: number }
- *         required: true
- *         example: 100
  *     responses:
  *       200:
  *         description: Cost retrieved

@@ -83,23 +83,23 @@ export class awsService {
     storageClass = storageClass.trim();
 
     const storageClassUsagePatterns: Record<string, string[]> = {
-      Standard: ["TimedStorage-ByteHrs"],
-      StandardIA: ["TimedStorage-IA-ByteHrs", "TimedStorage-SIA-ByteHrs"],
-      OneZoneIA: ["TimedStorage-OneZoneIA-ByteHrs", "TimedStorage-ZIA-ByteHrs"],
-      Glacier: ["TimedStorage-GlacierByteHrs"],
-      GlacierDeepArchive: [
+      standard: ["TimedStorage-ByteHrs"],
+      standardia: ["TimedStorage-IA-ByteHrs", "TimedStorage-SIA-ByteHrs"],
+      onezoneia: ["TimedStorage-OneZoneIA-ByteHrs", "TimedStorage-ZIA-ByteHrs"],
+      glacier: ["TimedStorage-GlacierByteHrs"],
+      glacierdeeparchive: [
         "TimedStorage-GlacierDeepArchiveByteHrs",
         "TimedStorage-GDA-ByteHrs",
         "TimedStorage-DeepArchive-ByteHrs",
       ],
-      IntelligentTiering: [
+      intelligenttiering: [
         "TimedStorage-INT-FA-ByteHrs",
         "TimedStorage-INT-IA-ByteHrs",
         "TimedStorage-INT-AIA-ByteHrs",
         "TimedStorage-INT-AA-ByteHrs",
         "TimedStorage-INT-DAA-ByteHrs",
       ],
-      ReducedRedundancy: ["TimedStorage-RRS-ByteHrs"],
+      reducedredundancy: ["TimedStorage-RRS-ByteHrs"],
     };
 
     const usagePatterns = storageClassUsagePatterns[storageClass];
@@ -148,10 +148,8 @@ export class awsService {
                 const pricePerGb = parseFloat(
                   priceDimensions[dimensionKey].pricePerUnit.USD
                 );
-                console.log(
-                  `Found price for ${storageClass} in ${location}: $${pricePerGb}`
-                );
-                return pricePerGb;
+                
+                return parseFloat((pricePerGb / (30 * 24)).toFixed(6));
               }
             }
           }

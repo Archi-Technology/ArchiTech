@@ -4,7 +4,6 @@ export interface BlobPricingParams {
   region: string;
   storageTier: string;
   redundancy: string;
-  dataStoredGB: number;
 }
 
 export interface VmPricingParams {
@@ -34,13 +33,12 @@ export class AzureService {
         console.error("Storage pricing not found.");
         return null;
       }
-      let storageCost = storagePricePerGB * params.dataStoredGB;
 
       return {
         region: params.region,
-        tier: params.storageTier,
+        storageClass: params.storageTier,
         redundancy: params.redundancy,
-        storageCost: parseFloat(storageCost.toFixed(4)),
+        pricePerGbPerHour: parseFloat(storagePricePerGB.toFixed(4)),
       };
     } catch (err) {
       console.error("Error querying Azure pricing API:", err);

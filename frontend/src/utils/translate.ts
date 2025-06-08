@@ -79,6 +79,12 @@ export function getTranslationParams(resourceParams: Record<string, any>) {
                     'azure',
                 )[0],
             }),
+            ...(resourceParams.redundancy && {
+                redundency: translateStorageClassToCloudRedundancy(
+                    resourceParams.storageClass,
+                    'azure',
+                )[0],
+            }),
             ...(resourceParams.region && {
                 region: translateLocationToRegionCodes(
                     resourceParams.region,
