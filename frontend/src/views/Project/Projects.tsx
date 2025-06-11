@@ -109,11 +109,11 @@ export default function Projects() {
     transition: '0.3s',
     backgroundColor: '#ffffff',
     '&:hover': {
-      borderColor: '#6751f0',
-      backgroundColor: 'rgba(103, 81, 240, 0.08)',
-      boxShadow: '0 0 0 4px rgba(103, 81, 240, 0.15)',
+      borderColor: '#3C82F7',
+      backgroundColor: 'rgba(60, 130, 247, 0.08)',
+      boxShadow: '0 0 0 4px rgba(60, 130, 247, 0.15)',
       '& .hoverTitle': {
-        color: '#6751f0',
+        color: '#3C82F7',
       },
     },
   };
