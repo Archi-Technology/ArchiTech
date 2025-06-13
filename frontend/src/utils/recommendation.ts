@@ -3,36 +3,29 @@ import { IGenericResponse } from '../interfaces/user';
 
 import {
   getAllAvailableLocations,
-  translateLocationToRegionCodes,
 } from '../utils/Mappers/regionMapper';
 
 import {
-  translateInstanceTypeCategory,
   getAllAvailableInstanceCategories,
 } from '../utils/Mappers/typeMapper';
 
 import {
-  translateOSTypeToCloudOptions,
   getAllAvailableOSNames,
 } from '../utils/Mappers/osMapper';
 
 import {
-  translateStorageClassToCloudOptions,
   getAllAvailableObjectStorageClasses,
 } from '../utils/Mappers/objectStorageMapper';
 
 import {
-  translateLoadBalancerTypeToCloudOptions,
   getAllAvailableLoadBalancerTypes,
 } from '../utils/Mappers/loadBalancerMapper';
 
 import {
-  translateDBInstanceTypeToCloudOptions,
   getAllAvailableDBInstanceTypes,
 } from '../utils/Mappers/dbInstanceTypeMapper';
 
 import {
-  translateDBEngineToCloudOptions,
   getAllAvailableDBEngineNames,
 } from '../utils/Mappers/dbEngineMapper';
 
@@ -109,16 +102,12 @@ export async function getResourceSuggestion(serviceName: string): Promise<IGener
     question = `Given my user context, what is the best Object storage instance according to my user context and recommend between AWS S3 or Azure blob storage and Explain why.
     If you choose AWS S3: According to my user context refer to Lifecycle Policies,Object Versioning + Expiry  andData Compression
     If you choose Azure blob storage: According to my user context refer to Blob Lifecycle Management, Blob Versioning + Soft Delete,Compression + Chunking.
-    Please return text only wihout any formatting, and your answer should start with "The best option is: " followed by the type. For example: "The best option is: AWS S3...".
+    Please return text only wihout any formatting, and your answer should start with "The best option is: " followed by the cloud provider.
     Please no more than 3 sentences.`;
   } else if (serviceName === 'Load Balancer') {
-    const loadBalancerTypes = getAllAvailableLoadBalancerTypes();
-    const locations = getAllAvailableLocations();
-    question = `Given my user context, what are the optimal region and storage class for a load balancer?
-    I want to pick one as you see best from the following:
-    regions: ${locations}
-    storage classes: ${loadBalancerTypes}
-    Please return the answer only as JSON, for example: {"region": "...", "lbType": "..."}`;
+    question = `Given my user context, what is the best Load Balancer instance according to my user context and recommend between AWS ELB or Azure loadBalancer and Explain why.
+    Please return text only wihout any formatting, and your answer should start with "The best option is: " followed by the cloud provider".
+    Please no more than 3 sentences.`;
   } else if (serviceName === 'Database') {
     const locations = getAllAvailableLocations();
     const dbInstanceTypes = getAllAvailableDBInstanceTypes();
