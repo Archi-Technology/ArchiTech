@@ -16,7 +16,18 @@ import type { JSX } from "react"
 
 interface ServicePopupProps {
   service: { name: string; icon: JSX.Element }
-  onConfirm: (params: any) => void
+  onConfirm: (resourceInfo: {
+    instanceType?: string,
+    region?: string,
+    os?: string,
+    pricing?: any,
+    cloud?: string,
+    storageClass?: any,
+    lbType?: any,
+    dbInstanceType?: string,
+    engine?: any,
+
+  }, type: string, selectedCloud: string) => void
   onCancel: () => void
   availableVPCs: { id: string; name: string }[]
   availableSubnets: { id: string; name: string }[]
@@ -151,21 +162,21 @@ export default function ServicePopup({ service, onConfirm, onCancel }: ServicePo
         os: selectedOS,
         pricing: pricing,
         cloud: selectedCloud,
-      })
+      }, 'virtual-machine', selectedCloud)
     } else if (service.name === "Object Storage") {
       onConfirm({
         region: selectedRegion,
         storageClass: selectedStorageClass,
         pricing: pricing,
         cloud: selectedCloud,
-      })
+      }, 'object-storage', selectedCloud)
     } else if (service.name === "Load Balancer") {
       onConfirm({
         region: selectedRegion,
         lbType: selectedLBType,
         pricing: pricing,
         cloud: selectedCloud,
-      })
+      }, 'load-balancer', selectedCloud)
     } else if (service.name === "Database") {
       onConfirm({
         region: selectedRegion,
@@ -173,8 +184,9 @@ export default function ServicePopup({ service, onConfirm, onCancel }: ServicePo
         engine: selectedDBEngine,
         pricing: pricing,
         cloud: selectedCloud,
-      })
+      }, 'database', selectedCloud)
     }
+    onCancel() // Close the current ServicePopup
   }
 
   const isFormValid = () => {
@@ -253,9 +265,8 @@ export default function ServicePopup({ service, onConfirm, onCancel }: ServicePo
                   <select
                     value={selectedInstanceType}
                     onChange={(e) => setSelectedInstanceType(e.target.value)}
-                    className={`text-center ${showValidation && formErrors.instanceType ? "error" : ""} ${
-                      shakingFields.includes("instanceType") ? "shake" : ""
-                    }`}
+                    className={`text-center ${showValidation && formErrors.instanceType ? "error" : ""} ${shakingFields.includes("instanceType") ? "shake" : ""
+                      }`}
                   >
                     <option value="">-- Select Instance Type --</option>
                     {getAllAvailableInstanceCategories().map((type) => (
@@ -273,9 +284,8 @@ export default function ServicePopup({ service, onConfirm, onCancel }: ServicePo
                   <select
                     value={selectedRegion}
                     onChange={(e) => setSelectedRegion(e.target.value)}
-                    className={`text-center ${showValidation && formErrors.region ? "error" : ""} ${
-                      shakingFields.includes("region") ? "shake" : ""
-                    }`}
+                    className={`text-center ${showValidation && formErrors.region ? "error" : ""} ${shakingFields.includes("region") ? "shake" : ""
+                      }`}
                   >
                     <option value="">-- Select Region --</option>
                     {getAllAvailableLocations().map((loc) => (
@@ -291,9 +301,8 @@ export default function ServicePopup({ service, onConfirm, onCancel }: ServicePo
                   <select
                     value={selectedOS}
                     onChange={(e) => setSelectedOS(e.target.value)}
-                    className={`text-center ${showValidation && formErrors.os ? "error" : ""} ${
-                      shakingFields.includes("os") ? "shake" : ""
-                    }`}
+                    className={`text-center ${showValidation && formErrors.os ? "error" : ""} ${shakingFields.includes("os") ? "shake" : ""
+                      }`}
                   >
                     <option value="">-- Select OS --</option>
                     {getAllAvailableOSNames().map((os) => (
@@ -314,9 +323,8 @@ export default function ServicePopup({ service, onConfirm, onCancel }: ServicePo
                   <select
                     value={selectedRegion}
                     onChange={(e) => setSelectedRegion(e.target.value)}
-                    className={`text-center ${showValidation && formErrors.region ? "error" : ""} ${
-                      shakingFields.includes("region") ? "shake" : ""
-                    }`}
+                    className={`text-center ${showValidation && formErrors.region ? "error" : ""} ${shakingFields.includes("region") ? "shake" : ""
+                      }`}
                   >
                     <option value="">-- Select Region --</option>
                     {getAllAvailableLocations().map((loc) => (
@@ -332,9 +340,8 @@ export default function ServicePopup({ service, onConfirm, onCancel }: ServicePo
                   <select
                     value={selectedStorageClass}
                     onChange={(e) => setSelectedStorageClass(e.target.value)}
-                    className={`text-center ${showValidation && formErrors.storageClass ? "error" : ""} ${
-                      shakingFields.includes("storageClass") ? "shake" : ""
-                    }`}
+                    className={`text-center ${showValidation && formErrors.storageClass ? "error" : ""} ${shakingFields.includes("storageClass") ? "shake" : ""
+                      }`}
                   >
                     <option value="">-- Select Storage Class --</option>
                     {getAllAvailableObjectStorageClasses().map((sc) => (
@@ -357,9 +364,8 @@ export default function ServicePopup({ service, onConfirm, onCancel }: ServicePo
                   <select
                     value={selectedRegion}
                     onChange={(e) => setSelectedRegion(e.target.value)}
-                    className={`text-center ${showValidation && formErrors.region ? "error" : ""} ${
-                      shakingFields.includes("region") ? "shake" : ""
-                    }`}
+                    className={`text-center ${showValidation && formErrors.region ? "error" : ""} ${shakingFields.includes("region") ? "shake" : ""
+                      }`}
                   >
                     <option value="">-- Select Region --</option>
                     {getAllAvailableLocations().map((loc) => (
@@ -375,9 +381,8 @@ export default function ServicePopup({ service, onConfirm, onCancel }: ServicePo
                   <select
                     value={selectedLBType}
                     onChange={(e) => setSelectedLBType(e.target.value)}
-                    className={`text-center ${showValidation && formErrors.lbType ? "error" : ""} ${
-                      shakingFields.includes("lbType") ? "shake" : ""
-                    }`}
+                    className={`text-center ${showValidation && formErrors.lbType ? "error" : ""} ${shakingFields.includes("lbType") ? "shake" : ""
+                      }`}
                   >
                     <option value="">-- Select Type --</option>
                     {getAllAvailableLoadBalancerTypes().map((type) => (
@@ -398,9 +403,8 @@ export default function ServicePopup({ service, onConfirm, onCancel }: ServicePo
                   <select
                     value={selectedRegion}
                     onChange={(e) => setSelectedRegion(e.target.value)}
-                    className={`text-center ${showValidation && formErrors.region ? "error" : ""} ${
-                      shakingFields.includes("region") ? "shake" : ""
-                    }`}
+                    className={`text-center ${showValidation && formErrors.region ? "error" : ""} ${shakingFields.includes("region") ? "shake" : ""
+                      }`}
                   >
                     <option value="">-- Select Region --</option>
                     {getAllAvailableLocations().map((loc) => (
@@ -416,9 +420,8 @@ export default function ServicePopup({ service, onConfirm, onCancel }: ServicePo
                   <select
                     value={selectedDBInstanceType}
                     onChange={(e) => setSelectedDBInstanceType(e.target.value)}
-                    className={`text-center ${showValidation && formErrors.dbInstanceType ? "error" : ""} ${
-                      shakingFields.includes("dbInstanceType") ? "shake" : ""
-                    }`}
+                    className={`text-center ${showValidation && formErrors.dbInstanceType ? "error" : ""} ${shakingFields.includes("dbInstanceType") ? "shake" : ""
+                      }`}
                   >
                     <option value="">-- Select Type --</option>
                     {getAllAvailableDBInstanceTypes().map((type) => (
@@ -436,9 +439,8 @@ export default function ServicePopup({ service, onConfirm, onCancel }: ServicePo
                   <select
                     value={selectedDBEngine}
                     onChange={(e) => setSelectedDBEngine(e.target.value)}
-                    className={`text-center ${showValidation && formErrors.dbEngine ? "error" : ""} ${
-                      shakingFields.includes("dbEngine") ? "shake" : ""
-                    }`}
+                    className={`text-center ${showValidation && formErrors.dbEngine ? "error" : ""} ${shakingFields.includes("dbEngine") ? "shake" : ""
+                      }`}
                   >
                     <option value="">-- Select Engine --</option>
                     {getAllAvailableDBEngineNames().map((engine) => (
@@ -469,7 +471,10 @@ export default function ServicePopup({ service, onConfirm, onCancel }: ServicePo
           >
             <ResourceModal
               isOpen={currentPage === "price-comparison"}
-              onClose={() => setCurrentPage("form")}
+              onClose={() => {
+                setCurrentPage("form");
+              }}
+              onConfirm={handleConfirm}
               selectedResourceName={service.name}
               resourceParams={formData}
             />

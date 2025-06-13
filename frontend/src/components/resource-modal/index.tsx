@@ -15,12 +15,14 @@ import "./index.scss"
 export default function ResourceModal({
   isOpen,
   onClose,
+  onConfirm,
   selectedResourceName,
   onResourceChange,
   resourceParams,
 }: {
   isOpen: boolean
   onClose: () => void
+  onConfirm: (selectedCloud: string, pricing: any) => void
   selectedResourceName: string
   onResourceChange?: (name: string) => void
   resourceParams?: Record<string, any>
@@ -172,7 +174,18 @@ export default function ResourceModal({
 
             <SuggestionSection suggestion={suggestion} />
 
-            <ModalActions onClose={onClose} />
+            <ModalActions
+              onClose={onClose}
+              onConfirm={() => {
+                if (selectedResource) {
+                  const selectedResourceDetails = resources.find((resource) => resource.id === selectedResource);
+                  const selectedCloud = selectedResourceDetails?.provider || "unknown";
+
+                  onConfirm(selectedCloud, '10$'); // Pass the selected cloud provider
+                  document.dispatchEvent(new Event("closeParentModal")); // Trigger parent modal close
+                }
+              }}
+            />
           </div>
         </div>
       )}

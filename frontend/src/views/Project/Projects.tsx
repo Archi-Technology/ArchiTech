@@ -97,6 +97,13 @@ export default function Projects() {
     });
   };
 
+  useEffect(() => {
+    const handleCloseParentModal = () => setOpenDialog(false);
+
+    document.addEventListener("closeParentModal", handleCloseParentModal);
+    return () => document.removeEventListener("closeParentModal", handleCloseParentModal);
+  }, []);
+
   return (
     <Box
       sx={{

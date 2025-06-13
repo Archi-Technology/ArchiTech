@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import './index.scss';
 import ReactFlow, {
   MiniMap,
@@ -90,14 +90,14 @@ const initialEdges: Edge[] = [
   { id: 'e3-4', source: '4', target: '3', animated: true, type: 'smoothstep', style: { stroke: '#555', strokeWidth: 2 } },
 ];
 
-export default function BasicFlow() {
+const BasicFlow = forwardRef((_, ref) => {
   const [expandedNodeId, setExpandedNodeId] = useState<string | null>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(defaultNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
   const reactFlowInstance = useRef<ReactFlowInstance | null>(null);
   const { registerAddNodeFunction } = useCanvas(); // Access the function to register node addition
-  const [openNodes, setOpenNodes] = useState<string[]>([]);
+  const [openNodes, setOpenNodes] = useState<string[]>([]); // State for clicked nodes
 
   interface CustomConnection extends Connection {
     animated: boolean;
@@ -657,6 +657,15 @@ export default function BasicFlow() {
   }, [nodes, edges]);
 
 
+  const isNodeClicked = (nodeId: string) => {
+    return openNodes.includes(nodeId); // Check if the node is already clicked
+  };
+
+  useImperativeHandle(ref, () => ({
+    onNodeClick,
+    isNodeClicked, // Expose the method
+  }));
+
   return (
     <div style={{ width: '100%', height: '100%' }} ref={reactFlowWrapper}>
       <ReactFlow
@@ -682,4 +691,8 @@ export default function BasicFlow() {
       </ReactFlow>
     </div>
   );
-}
+});
+
+export default BasicFlow;
+
+

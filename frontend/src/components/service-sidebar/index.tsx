@@ -7,8 +7,15 @@ import loadBalancerIcon from '../../assets/canvas/loadbalancer.png';
 
 import { useCanvas } from '../../contexts/canvasContext'; // Import canvas context
 import ServicePopup from '../service-popup'; // Import the popup component
+import BasicFlow from '../diagram-canvas'; // Import the canvas component
 
-export default function ServiceSidebar() {
+// Define a type for the ref that includes onNodeClick and isNodeClicked
+type BasicFlowRef = {
+  onNodeClick: (event: any, node: any) => void;
+  isNodeClicked: (nodeId: string) => boolean;
+};
+
+export default function ServiceSidebar({ canvasRef }: { canvasRef: React.RefObject<BasicFlowRef> }) {
   const [activeTab, setActiveTab] = useState('catalog');
   const { addNodeToCanvas } = useCanvas(); // Access the function to add nodes to the canvas
   const [selectedService, setSelectedService] = useState<Service | null>(null); // Track the selected service
@@ -17,15 +24,33 @@ export default function ServiceSidebar() {
     setSelectedService(service); // Open the popup with the selected service
   };
 
-  const handlePopupConfirm = ({
-    vpc,
-    subnet,
-  }: {
-    vpc: string;
-    subnet: string;
-  }) => {
+  const handlePopupConfirm = (
+    resourceInfo: {
+      instanceType?: string;
+      region?: string;
+      os?: string;
+      pricing?: any;
+      cloud?: string;
+      storageClass?: any;
+      lbType?: any;
+      dbInstanceType?: string;
+      engine?: any;
+    },
+    type: string,
+    selectedCloud: string
+  ) => {
     if (selectedService) {
-      addNodeToCanvas({ ...selectedService, vpc, subnet }); // Pass VPC and subnet to the canvas
+      if (canvasRef.current) {
+        const nodeId = selectedCloud === 'azure' ? '1' : selectedCloud === 'GCP' ? '2' : '3';
+
+        // Check if the node is already clicked
+        if (canvasRef.current.isNodeClicked(nodeId)) {
+          console.log(`Node ${nodeId} is already clicked.`);
+        } else {
+          canvasRef.current.onNodeClick({}, { id: nodeId } as any); // Simulate a node click
+        }
+      }
+
       setSelectedService(null); // Close the popup
     }
   };
