@@ -65,9 +65,9 @@ export class AzureController {
   }
 
   async getLoadBalancerPricing(req: Request, res: Response) {
-    const { region, type } = req.query;
+    const { region, lbType } = req.query;
 
-    if (!region || !type) {
+    if (!region || !lbType) {
       return res.status(400).json({
         error: "Missing required parameters: region, loadBalancerType",
       });
@@ -75,11 +75,13 @@ export class AzureController {
 
     const price = await this.service.getLoadBalancerPrice(
       region as string,
-      type as string
+      lbType as string
     );
+    price.id = 0;
+    price.provider = "azure";
 
     if (price) {
-      return res.status(200).json(price);
+      return res.status(200).json([price]);
     } else {
       return res
         .status(404)

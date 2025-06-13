@@ -160,6 +160,7 @@ export default function ResourceModal({
             <h2 className="modal-title">Select Resource</h2>
 
             <ResourceTabs
+              serviceName={selectedResourceName}
               pricingOption={pricingOption}
               setPricingOption={setPricingOption}
               resources={resources}

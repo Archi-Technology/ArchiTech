@@ -2,11 +2,13 @@ import type { ResourceOption } from "../../../types/resource-types"
 import { ProviderResourceGrid } from "../provider-resource-grid"
 
 export function OnDemandTab({
+  serviceName,
   isActive,
   resources,
   selectedResource,
   setSelectedResource,
 }: {
+  serviceName?: string
   isActive: boolean
   resources: ResourceOption[]
   selectedResource: string
@@ -28,6 +30,7 @@ export function OnDemandTab({
       <div className="toggle-container">
         <div className="provider-section">
           <ProviderResourceGrid
+            serviceName={serviceName}
             provider="AWS"
             resources={awsResources}
             selectedResource={selectedResource}
@@ -36,6 +39,7 @@ export function OnDemandTab({
           />
 
           <ProviderResourceGrid
+            serviceName={serviceName}
             provider="Azure"
             resources={azureResources}
             selectedResource={selectedResource}

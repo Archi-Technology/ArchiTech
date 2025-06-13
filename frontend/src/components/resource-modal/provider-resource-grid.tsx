@@ -4,12 +4,14 @@ import type { ResourceOption } from "../../types/resource-types"
 import PricePropositionCard from "../price-proposition-card"
 
 export function ProviderResourceGrid({
+  serviceName,
   provider,
   resources,
   selectedResource,
   setSelectedResource,
   pricingType,
 }: {
+  serviceName?: string
   provider: "AWS" | "Azure"
   resources: ResourceOption[]
   selectedResource: string
@@ -24,6 +26,7 @@ export function ProviderResourceGrid({
     <div className="resource-grid">
       {resources.map((resource) => (
         <PricePropositionCard
+          serviceName={serviceName}
           key={resource.id}
           resource={resource}
           isSelected={selectedResource === resource.id}

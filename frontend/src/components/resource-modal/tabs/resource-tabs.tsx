@@ -5,6 +5,7 @@ import { SpotInstancesTab } from "./spot-instances-tab"
 import { SavingsPlansTab } from "./savings-plans-tab"
 
 export function ResourceTabs({
+  serviceName,
   pricingOption,
   setPricingOption,
   resources,
@@ -14,6 +15,7 @@ export function ResourceTabs({
   setSelectedResource,
   isVirtualMachine,
 }: {
+  serviceName: string
   pricingOption: string
   setPricingOption: (option: string) => void
   resources: ResourceOption[]
@@ -60,6 +62,7 @@ export function ResourceTabs({
         />
 
         <OnDemandTab
+          serviceName={serviceName}
           isActive={pricingOption === "on-demand"}
           resources={resources}
           selectedResource={selectedResource}

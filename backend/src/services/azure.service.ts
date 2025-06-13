@@ -134,7 +134,7 @@ export class AzureService {
       }
 
       const filter = encodeURIComponent(
-        `serviceName eq 'Load Balancer' and skuName eq '${loadBalancerType}'`
+        `serviceName eq 'Load Balancer' and unitOfMeasure eq '1 Hour' and skuName eq '${loadBalancerType}'`
       );
 
       const response = await axios.get(
@@ -148,23 +148,10 @@ export class AzureService {
         return null;
       }
 
-      const summarized = items.map((item: any) => ({
-        skuName: item.skuName,
-        meterName: item.meterName,
-        retailPrice: item.retailPrice,
-        unitOfMeasure: item.unitOfMeasure,
-      }));
-
-      const totalHourlyCost = items.reduce(
-        (sum: number, item: any) => sum + item.retailPrice,
-        0
-      );
-
       return {
         region,
-        loadBalancerType,
-        totalHourlyCost: parseFloat(totalHourlyCost.toFixed(4)),
-        pricingDetails: summarized,
+        lbType: loadBalancerType,
+        pricePerHour: parseFloat(items[0].retailPrice.toFixed(4)),
       };
     } catch (err) {
       console.error("Error fetching Load Balancer pricing:", err);

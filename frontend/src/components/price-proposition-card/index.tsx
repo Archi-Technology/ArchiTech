@@ -5,6 +5,7 @@ import azureIcon from "../../assets/azureIcon.png"
 import "./index.scss"
 
 interface PricePropositionCardProps {
+  serviceName?: string
   resource: ResourceOption
   isSelected: boolean
   onSelect: (id: string) => void
@@ -12,6 +13,7 @@ interface PricePropositionCardProps {
 }
 
 export default function PricePropositionCard({
+  serviceName,
   resource,
   isSelected,
   onSelect,
@@ -21,12 +23,16 @@ export default function PricePropositionCard({
     if (resource.provider === "AWS") {
       return awsIcon || "/placeholder.svg?height=24&width=32"
     }
+
     return azureIcon || "/placeholder.svg?height=24&width=24"
   }
 
   const formatPrice = (price?: number) => {
     if (!price) return "Contact for pricing"
-    return `$${price.toFixed(4)}/hour`
+    if (serviceName === "Object Storage") {
+      return `$${price.toFixed(4)}/Month`
+    }
+    return `$${price.toFixed(4)}/Hour`
   }
 
   return (
@@ -48,7 +54,7 @@ export default function PricePropositionCard({
 
       <div className="card-content">
         <div className="instance-info">
-          <h4 className="instance-name">{resource.productName || resource.instanceType || "Standard Instance"}</h4>
+          <h4 className="instance-name">{resource.productName || resource.instanceType || resource.lbType}</h4>
           {resource.instanceType && resource.productName && (
             <p className="instance-type">Type: {resource.instanceType}</p>
           )}
