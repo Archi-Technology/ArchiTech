@@ -202,15 +202,15 @@ const BasicFlow = forwardRef((_, ref) => {
 
     if (openNodes.includes(nodeId)) {
       // Close the node
-      newOpenNodes = newOpenNodes.filter((id) => id !== nodeId);
-      setExpandedNodeId(null);
+      // newOpenNodes = newOpenNodes.filter((id) => id !== nodeId);
+      // setExpandedNodeId(null);
     } else {
       // Open the node only if it has children
       if (hasChildren) {
         newOpenNodes = [...openNodes, nodeId];
         setExpandedNodeId(nodeId);
       } else {
-        alert('Please Add resoruce to ' + containerLabelMapReverse[nodeId]);
+        // alert('Please Add resoruce to ' + containerLabelMapReverse[nodeId]);
         return; // Don't expand if no children
       }
     }

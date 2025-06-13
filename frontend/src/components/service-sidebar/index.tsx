@@ -44,11 +44,11 @@ export default function ServiceSidebar({ canvasRef }: { canvasRef: React.RefObje
         const nodeId = selectedCloud === 'azure' ? '1' : selectedCloud === 'GCP' ? '2' : '3';
 
         // Check if the node is already clicked
-        if (canvasRef.current.isNodeClicked(nodeId)) {
-          console.log(`Node ${nodeId} is already clicked.`);
-        } else {
+        // if (canvasRef.current.isNodeClicked(nodeId)) {
+        //   console.log(`Node ${nodeId} is already clicked.`);
+        // } else {
           canvasRef.current.onNodeClick({}, { id: nodeId } as any); // Simulate a node click
-        }
+        // }
       }
 
       setSelectedService(null); // Close the popup
