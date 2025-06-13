@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import './index.scss';
 
 interface ResourceLoaderProps {
   isVisible: boolean;
@@ -24,7 +26,6 @@ export default function ResourceLoader({
 }: ResourceLoaderProps) {
   const [progress, setProgress] = useState(0);
   const [currentCommentIndex, setCurrentCommentIndex] = useState(0);
-  const [commentVisible, setCommentVisible] = useState(true);
   const [hasCompleted, setHasCompleted] = useState(false);
   const startTimeRef = useRef<number | null>(null);
   const animationFrameRef = useRef<number | null>(null);
@@ -57,28 +58,14 @@ export default function ResourceLoader({
   const cycleComments = useCallback(() => {
     if (!isVisible) return;
 
-    const commentDuration = duration / (comments.length * 0.25); // Much much slower cycling
-    const fadeOutDuration = 1500; // Even longer fade out
-    const fadeInDuration = 1500; // Even longer fade in
-    const displayDuration = commentDuration - fadeOutDuration - fadeInDuration;
+    const commentDuration = duration / (comments.length * 0.25); // Much slower cycling
+    const displayDuration = commentDuration - 3000; // Time to display each comment
 
-    // Fade out current comment
-    setCommentVisible(false);
-
+    // Schedule next comment change
     commentTimeoutRef.current = setTimeout(() => {
-      // Change to next comment
       setCurrentCommentIndex((prev) => (prev + 1) % comments.length);
-
-      // Fade in new comment
-      setTimeout(() => {
-        setCommentVisible(true);
-      }, 100); // Slight delay before fade in
-
-      // Schedule next cycle
-      setTimeout(() => {
-        cycleComments();
-      }, displayDuration);
-    }, fadeOutDuration);
+      cycleComments();
+    }, displayDuration);
   }, [isVisible, duration, comments.length]);
 
   useEffect(() => {
@@ -86,7 +73,6 @@ export default function ResourceLoader({
       // Reset everything when not visible
       setProgress(0);
       setCurrentCommentIndex(0);
-      setCommentVisible(true);
       setHasCompleted(false);
       startTimeRef.current = null;
 
@@ -106,7 +92,6 @@ export default function ResourceLoader({
     startTimeRef.current = Date.now();
     setProgress(0);
     setCurrentCommentIndex(0);
-    setCommentVisible(true);
     setHasCompleted(false);
 
     // Start progress animation
@@ -132,18 +117,17 @@ export default function ResourceLoader({
 
   if (!isVisible) return null;
 
-  const circumference = 2 * Math.PI * 35; // Reduced radius from 45 to 35
+  const circumference = 2 * Math.PI * 35; // Circle circumference
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] backdrop-blur-sm">
       <div className="bg-white rounded-xl shadow-2xl p-6 max-w-xs w-full mx-4 text-center">
-        {/* Circular Progress - Made smaller */}
+        {/* Circular Progress with centered percentage */}
         <div className="relative w-20 h-20 mx-auto mb-4 flex items-center justify-center">
           <svg
             className="absolute w-20 h-20 transform -rotate-90"
             viewBox="0 0 80 80"
-            style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
           >
             {/* Background circle */}
             <circle
@@ -154,6 +138,7 @@ export default function ResourceLoader({
               strokeWidth="5"
               fill="none"
             />
+            {/* Progress circle */}
             <circle
               cx="40"
               cy="40"
@@ -182,11 +167,12 @@ export default function ResourceLoader({
               </linearGradient>
             </defs>
           </svg>
-          {/* Percentage text - positioned absolutely within the flex container */}
+          {/* Percentage text - centered in the circle */}
           <span className="absolute text-lg font-bold text-gray-800 tabular-nums z-10">
             {Math.round(progress)}%
           </span>
         </div>
+
         {/* Loading title */}
         <div className="mb-3">
           <div className="flex items-center justify-center space-x-2 mb-2">
@@ -197,15 +183,20 @@ export default function ResourceLoader({
           </div>
         </div>
 
-        {/* Single comment with fade animation */}
+        {/* Animated comments section */}
         <div className="h-10 flex items-center justify-center">
-          <p
-            className={`text-sm text-gray-600 text-center leading-relaxed px-2 transition-opacity duration-1000 ${
-              commentVisible ? 'opacity-100' : 'opacity-0'
-            }`}
-          >
-            {comments[currentCommentIndex]}
-          </p>
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={currentCommentIndex}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.5 }}
+              className="text-sm text-gray-600 text-center leading-relaxed px-2"
+            >
+              {comments[currentCommentIndex]}
+            </motion.p>
+          </AnimatePresence>
         </div>
       </div>
     </div>

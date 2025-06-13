@@ -14,7 +14,7 @@ import { getAllAvailableLoadBalancerTypes } from '../../utils/Mappers/loadBalanc
 import { getAllAvailableDBInstanceTypes } from '../../utils/Mappers/dbInstanceTypeMapper';
 import { getAllAvailableDBEngineNames } from '../../utils/Mappers/dbEngineMapper';
 import { Button } from '../ui/button/button';
-import ResourceModal from '../price-modal/index';
+import ResourceModal from '../resource-modal/index';
  
         
 interface ServicePopupProps {

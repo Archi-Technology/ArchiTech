@@ -1,56 +1,40 @@
-'use client';
-import awsIcon from '../../assets/awsIcon.png';
-import azureIcon from '../../assets/azureIcon.png';
-import './index.scss';
-
-interface ResourceOption {
-  id: string;
-  productName?: string;
-  instanceType?: string;
-  os?: string;
-  region?: string;
-  pricePerHour?: number;
-  provider: 'AWS' | 'azure';
-  spotInstance?: boolean;
-  reservationTerm?: string | null;
-  savingsPlan?: boolean;
-  pricePerGbPerMonth?: number;
-}
+"use client"
+import type { ResourceOption } from "../../types/resource-types"
+import awsIcon from "../../assets/awsIcon.png"
+import azureIcon from "../../assets/azureIcon.png"
+import "./index.scss"
 
 interface PricePropositionCardProps {
-  resource: ResourceOption;
-  isSelected: boolean;
-  onSelect: (id: string) => void;
-  pricingType?: 'on-demand' | 'spot' | 'savings';
+  resource: ResourceOption
+  isSelected: boolean
+  onSelect: (id: string) => void
+  pricingType?: "on-demand" | "spot" | "savings"
 }
 
 export default function PricePropositionCard({
   resource,
   isSelected,
   onSelect,
-  pricingType = 'on-demand',
+  pricingType = "on-demand",
 }: PricePropositionCardProps) {
   const getProviderIcon = () => {
-    if (resource.provider === 'AWS') {
-      return awsIcon || '/placeholder.svg?height=24&width=32';
+    if (resource.provider === "AWS") {
+      return awsIcon || "/placeholder.svg?height=24&width=32"
     }
-    return azureIcon || '/placeholder.svg?height=24&width=24';
-  };
+    return azureIcon || "/placeholder.svg?height=24&width=24"
+  }
 
   const formatPrice = (price?: number) => {
-    if (!price) return 'Contact for pricing';
-    return `$${price.toFixed(4)}/hour`;
-  };
+    if (!price) return "Contact for pricing"
+    return `$${price.toFixed(4)}/hour`
+  }
 
   return (
-    <div
-      className={`price-proposition-card ${isSelected ? 'selected' : ''}`}
-      onClick={() => onSelect(resource.id)}
-    >
+    <div className={`price-proposition-card ${isSelected ? "selected" : ""}`} onClick={() => onSelect(resource.id)}>
       <div className="card-header">
         <div className="provider-info">
           <img
-            src={getProviderIcon() || '/placeholder.svg'}
+            src={getProviderIcon() || "/placeholder.svg"}
             alt={`${resource.provider} logo`}
             className="provider-logo"
           />
@@ -64,28 +48,20 @@ export default function PricePropositionCard({
 
       <div className="card-content">
         <div className="instance-info">
-          <h4 className="instance-name">
-            {resource.productName ||
-              resource.instanceType ||
-              'Standard Instance'}
-          </h4>
+          <h4 className="instance-name">{resource.productName || resource.instanceType || "Standard Instance"}</h4>
           {resource.instanceType && resource.productName && (
             <p className="instance-type">Type: {resource.instanceType}</p>
           )}
           {resource.os && <p className="instance-os">OS: {resource.os}</p>}
-          {resource.region && (
-            <p className="instance-region">Region: {resource.region}</p>
-          )}
+          {resource.region && <p className="instance-region">Region: {resource.region}</p>}
         </div>
 
         <div className="pricing-info">
           <div className="price-display">
-            <span className="price-amount">
-                {formatPrice(resource.pricePerHour ?? resource.pricePerGbPerMonth)}
-            </span>
+            <span className="price-amount">{formatPrice(resource.pricePerHour ?? resource.pricePerGbPerMonth)}</span>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }
