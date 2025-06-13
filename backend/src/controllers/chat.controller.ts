@@ -59,6 +59,7 @@ Main users location: ${userContext.regions || "N/A"}
 Os dependecies: ${userContext.osDependencies || "N/A"}
 Software dependencies: ${userContext.softwareDependencies || "N/A"}
 Budget considerations: ${userContext.budgetConsiderations || "N/A"}
+General Description: ${userContext.generalDescription || "N/A"}
 
 Question:
 ${question}

@@ -134,3 +134,6 @@ projectRouter.put('/:id', projectController.update.bind(projectController));
  *         description: Problem deleting project
  */
 projectRouter.delete('/:id', projectController.delete.bind(projectController));
+
+
+projectRouter.get('/artchitecture/:id', projectController.getProjectArtchitecture.bind(projectController));

@@ -4,13 +4,12 @@ export interface BlobPricingParams {
   region: string;
   storageTier: string;
   redundancy: string;
-  dataStoredGB: number;
 }
 
 export interface VmPricingParams {
   region: string;
-  vmSize: string;
-  osType: string;
+  instanceType: string;
+  os: string;
 }
 
 export interface SqlDbPricingParams {
@@ -34,13 +33,12 @@ export class AzureService {
         console.error("Storage pricing not found.");
         return null;
       }
-      let storageCost = storagePricePerGB * params.dataStoredGB;
 
       return {
         region: params.region,
-        tier: params.storageTier,
+        storageTier: params.storageTier,
         redundancy: params.redundancy,
-        storageCost: parseFloat(storageCost.toFixed(4)),
+        pricePerGbPerMonth: parseFloat(storagePricePerGB.toFixed(4)),
       };
     } catch (err) {
       console.error("Error querying Azure pricing API:", err);
@@ -56,23 +54,32 @@ export class AzureService {
     const filter = encodeURIComponent(
       `serviceName eq 'Storage' and armRegionName eq '${region}' and productName eq 'Blob Storage' and skuName eq '${storageTier} ${redundancy}' and contains(meterName, 'Data Stored')`
     );
+
     const response = await axios.get(`${this.pricingApiUrl}?$filter=${filter}`);
     const priceItems = response.data.Items;
     if (priceItems && priceItems.length > 0) {
       const item = priceItems[0];
-      return parseFloat(item.retailPrice);
+      return parseFloat((item.retailPrice).toFixed(4));
     }
     return null;
   }
 
-  async getVmPricing(params: VmPricingParams): Promise<any | null> {
+  async getVmPricing(params: VmPricingParams): Promise<any[] | null> {
     try {
-      const baseFilter = `serviceName eq 'Virtual Machines' and armRegionName eq '${params.region}' and armSkuName eq '${params.vmSize}' and contains(productName, '${params.osType}')`;
-      const fullFilter = encodeURIComponent(baseFilter);
+      let filter = `serviceName eq 'Virtual Machines' and armRegionName eq '${params.region}' and armSkuName eq '${params.instanceType}' and indexof(skuName, 'Low Priority') eq -1 and type ne 'DevTestConsumption'`;
+
+      if (params.os.toLowerCase() === 'linux') {
+        filter += " and indexof(productName, 'Windows') eq -1";
+      } else if (params.os.toLowerCase() === 'windows') {
+        filter += " and contains(productName, 'Windows')";
+      }
+
+      const fullFilter = encodeURIComponent(filter);
 
       const response = await axios.get(
         `${this.pricingApiUrl}?$filter=${fullFilter}`
       );
+
       const priceItems = response.data.Items;
 
       if (!priceItems || priceItems.length === 0) {
@@ -80,21 +87,36 @@ export class AzureService {
         return null;
       }
 
-      const vmItem = priceItems[0];
-      const unitPrice = parseFloat(vmItem.retailPrice);
-      const unitOfMeasure = vmItem.unitOfMeasure;
+      let filteredItems = priceItems.filter((item: any) => !item.effectiveEndDate); //we only want active items
 
-      return {
-        region: params.region,
-        vmSize: params.vmSize,
-        osType: params.osType,
-        unitPrice,
-        unitOfMeasure,
-      };
+      let results = filteredItems.map((item: any, index: number) => {
+        let pricePerHour = parseFloat(item.retailPrice);
+
+        if (item.reservationTerm === "1 Year") {
+          pricePerHour = pricePerHour / (365 * 24);
+        } else if (item.reservationTerm === "3 Years") {
+          pricePerHour = pricePerHour / (3 * 365 * 24);
+        }
+
+        return {
+          id: index,
+          region: params.region,
+          instanceType: params.instanceType,
+          productName: item.productName,
+          pricePerHour: parseFloat(pricePerHour.toFixed(6)),
+          os: params.os,
+          reservationTerm: item.reservationTerm || null,
+          spotInstance: item.meterName.includes("Spot") ? true : false,
+          provider: "azure"
+        };
+      });
+
+      return results;
     } catch (error) {
       console.error("Error fetching VM pricing:", error);
       return null;
     }
+
   }
 
   async getLoadBalancerPrice(

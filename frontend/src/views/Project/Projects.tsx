@@ -59,8 +59,8 @@ export default function Projects() {
 
   const handleCreateProject = async () => {
     try {
+
       await createProject('New Project');
-      await fetchProjects();
       navigate('/home');
     } catch (err) {
       console.error('Error creating project', err);
@@ -101,6 +101,12 @@ export default function Projects() {
     });
   };
 
+  useEffect(() => {
+    const handleCloseParentModal = () => setOpenDialog(false);
+
+    document.addEventListener("closeParentModal", handleCloseParentModal);
+    return () => document.removeEventListener("closeParentModal", handleCloseParentModal);
+  }, []);
   const paperStyle = {
     p: 4,
     textAlign: 'center',
@@ -292,6 +298,7 @@ export default function Projects() {
                           variant="contained"
                           size="small"
                           onClick={() => {
+                            sessionStorage.setItem('selectedProjectId', project._id); // Save project ID in session storage
                             setOpenDialog(false);
                             navigate(`/home?projectId=${project._id}`);
                           }}

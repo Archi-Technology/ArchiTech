@@ -10,12 +10,12 @@ export class AzureController {
 
   async getBlobPricing(req: Request, res: Response) {
     try {
-      const { region, storageTier, redundancy, dataStoredGB } = req.query;
+      const { region, storageTier, redundancy } = req.query;
 
-      if (!region || !storageTier || !redundancy || !dataStoredGB) {
+      if (!region || !storageTier || !redundancy) {
         return res.status(400).json({
           error:
-            "Missing required parameters: region, storageTier, redundancy, dataStoredGB",
+            "Missing required parameters: region, storageTier, redundancy",
         });
       }
 
@@ -23,11 +23,11 @@ export class AzureController {
         region: region as string,
         storageTier: storageTier as string,
         redundancy: redundancy as string,
-        dataStoredGB: Number(dataStoredGB),
       });
-
+      price.id = 0;
+      price.provider = "azure";
       if (price) {
-        return res.status(200).json(price);
+        return res.status(200).json([price]);
       } else {
         return res.status(500).json({ error: "Failed to fetch pricing data." });
       }
@@ -39,18 +39,18 @@ export class AzureController {
 
   async getVmPricing(req: Request, res: Response) {
     try {
-      const { region, vmSize, osType } = req.query;
+      const { region, instanceType, os } = req.query;
 
-      if (!region || !vmSize || !osType) {
+      if (!region || !instanceType || !os) {
         return res.status(400).json({
-          error: "Missing required parameters: region, vmSize, osType",
+          error: "Missing required parameters: region, instanceType, os",
         });
       }
 
       const price = await this.service.getVmPricing({
         region: region as string,
-        vmSize: vmSize as string,
-        osType: osType as string,
+        instanceType: instanceType as string,
+        os: os as string,
       });
 
       if (price) {
