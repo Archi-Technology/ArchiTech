@@ -1,24 +1,8 @@
 "use client"
 
+import type { ResourceOption } from "../../types/resource-types"
 import awsIcon from "../../assets/awsIcon.png"
 import azureIcon from "../../assets/azureIcon.png"
-
-interface ResourceOption {
-  id: string
-  provider: "AWS" | "azure"
-  region?: string
-  productName?: string
-  instanceType?: string
-  os?: string
-  pricePerHour?: number
-  spotInstance?: boolean
-  reservationTerm?: string | null
-  savingsPlan?: boolean
-  pricePerGbPerMonth?: number
-  redundancy?: string
-  storageClass?: string
-  storageTier?: string
-}
 
 export function SavingsTable({
   savingsPlans,
@@ -31,7 +15,6 @@ export function SavingsTable({
 }) {
   // Group savings plans by term
   const oneYearPlans = savingsPlans.filter((resource) => resource.reservationTerm === "1 Year")
-
   const threeYearPlans = savingsPlans.filter((resource) => resource.reservationTerm === "3 Years")
 
   return (

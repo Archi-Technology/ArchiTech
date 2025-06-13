@@ -31,7 +31,6 @@ export default function ResourceLoader({
   const animationFrameRef = useRef<number | null>(null);
   const commentTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Memoized completion handler to prevent multiple calls
   const handleComplete = useCallback(() => {
     if (!hasCompleted && onComplete) {
       setHasCompleted(true);
@@ -39,7 +38,6 @@ export default function ResourceLoader({
     }
   }, [hasCompleted, onComplete]);
 
-  // Smooth progress animation using requestAnimationFrame
   const updateProgress = useCallback(() => {
     if (!startTimeRef.current || !isVisible) return;
 
@@ -58,19 +56,15 @@ export default function ResourceLoader({
   const cycleComments = useCallback(() => {
     if (!isVisible) return;
 
-    const commentDuration = duration / (comments.length * 0.25); // Much slower cycling
-    const displayDuration = commentDuration - 3000; // Time to display each comment
-
-    // Schedule next comment change
+    const commentDuration = duration / comments.length; // Reduce duration per comment
     commentTimeoutRef.current = setTimeout(() => {
       setCurrentCommentIndex((prev) => (prev + 1) % comments.length);
       cycleComments();
-    }, displayDuration);
+    }, commentDuration);
   }, [isVisible, duration, comments.length]);
 
   useEffect(() => {
     if (!isVisible) {
-      // Reset everything when not visible
       setProgress(0);
       setCurrentCommentIndex(0);
       setHasCompleted(false);
@@ -88,22 +82,19 @@ export default function ResourceLoader({
       return;
     }
 
-    // Start fresh when becoming visible
     startTimeRef.current = Date.now();
     setProgress(0);
     setCurrentCommentIndex(0);
     setHasCompleted(false);
 
-    // Start progress animation
     animationFrameRef.current = requestAnimationFrame(updateProgress);
 
-    // Start comment cycling after initial display
     setTimeout(
       () => {
         cycleComments();
       },
       duration / comments.length - 600,
-    ); // Start cycling before first comment ends
+    );
 
     return () => {
       if (animationFrameRef.current) {
@@ -117,43 +108,38 @@ export default function ResourceLoader({
 
   if (!isVisible) return null;
 
-  const circumference = 2 * Math.PI * 35; // Circle circumference
+  const radius = 40;
+  const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] backdrop-blur-sm">
-      <div className="bg-white rounded-xl shadow-2xl p-6 max-w-xs w-full mx-4 text-center">
-        {/* Circular Progress with centered percentage */}
-        <div className="relative w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+      <div className="bg-white rounded-xl shadow-2xl p-6 max-w-xs w-full mx-4 text-center space-y-5">
+        <div className="relative w-28 h-28 mx-auto">
           <svg
-            className="absolute w-20 h-20 transform -rotate-90"
-            viewBox="0 0 80 80"
+            className="absolute w-28 h-28 transform -rotate-90"
+            viewBox="0 0 100 100"
           >
-            {/* Background circle */}
             <circle
-              cx="40"
-              cy="40"
-              r="35"
+              cx="50"
+              cy="50"
+              r={radius}
               stroke="#f3f4f6"
-              strokeWidth="5"
+              strokeWidth="8"
               fill="none"
             />
-            {/* Progress circle */}
             <circle
-              cx="40"
-              cy="40"
-              r="35"
+              cx="50"
+              cy="50"
+              r={radius}
               stroke="url(#progressGradient)"
-              strokeWidth="5"
+              strokeWidth="8"
               fill="none"
               strokeLinecap="round"
               strokeDasharray={circumference}
               strokeDashoffset={strokeDashoffset}
-              style={{
-                transition: 'stroke-dashoffset 0.1s ease-out',
-              }}
+              className="animated-stroke"
             />
-            {/* Gradient definition */}
             <defs>
               <linearGradient
                 id="progressGradient"
@@ -166,33 +152,33 @@ export default function ResourceLoader({
                 <stop offset="100%" stopColor="#1d4ed8" />
               </linearGradient>
             </defs>
+            <text
+              x="50"
+              y="50"
+              textAnchor="middle"
+              dominantBaseline="middle"
+              className="text-2xl font-bold text-gray-900 tabular-nums animate-pulse"
+            >
+              {Math.round(progress)}%
+            </text>
           </svg>
-          {/* Percentage text - centered in the circle */}
-          <span className="absolute text-lg font-bold text-gray-800 tabular-nums z-10">
-            {Math.round(progress)}%
+        </div>
+
+        <div>
+          <span className="text-base font-semibold text-gray-800">
+            Loading Resources
           </span>
         </div>
 
-        {/* Loading title */}
-        <div className="mb-3">
-          <div className="flex items-center justify-center space-x-2 mb-2">
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-            <span className="text-base font-semibold text-gray-800">
-              Loading Resources
-            </span>
-          </div>
-        </div>
-
-        {/* Animated comments section */}
-        <div className="h-10 flex items-center justify-center">
+        <div className="min-h-[2rem] flex items-center justify-center px-2">
           <AnimatePresence mode="wait">
             <motion.p
               key={currentCommentIndex}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.5 }}
-              className="text-sm text-gray-600 text-center leading-relaxed px-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-sm text-gray-900 text-center leading-relaxed font-medium"
             >
               {comments[currentCommentIndex]}
             </motion.p>

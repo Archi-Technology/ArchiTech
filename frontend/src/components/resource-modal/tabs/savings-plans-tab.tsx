@@ -1,21 +1,5 @@
+import type { ResourceOption } from "../../../types/resource-types"
 import { SavingsTable } from "../savings-table"
-
-interface ResourceOption {
-  id: string
-  provider: "AWS" | "azure"
-  region?: string
-  productName?: string
-  instanceType?: string
-  os?: string
-  pricePerHour?: number
-  spotInstance?: boolean
-  reservationTerm?: string | null
-  savingsPlan?: boolean
-  pricePerGbPerMonth?: number
-  redundancy?: string
-  storageClass?: string
-  storageTier?: string
-}
 
 export function SavingsPlansTab({
   isActive,

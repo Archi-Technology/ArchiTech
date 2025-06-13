@@ -1,11 +1,6 @@
 "use client"
 
-interface PricingOption {
-  id: string
-  name: string
-  description: string
-  discount: string
-}
+import type { PricingOption } from "../../types/resource-types"
 
 export function TabList({
   pricingOptions,
