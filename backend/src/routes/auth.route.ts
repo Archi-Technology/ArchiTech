@@ -6,50 +6,27 @@ export const authRouter = Router();
  * @swagger
  * /auth/register:
  *   post:
- *     description: registrer user
+ *     description: Register a new user
  *     tags:
  *       - Auth
- *     parameters:
- *       - name: username
- *         in: body
- *         description: The user name
- *         required: true
- *         schema:
- *           type: string
- *           example: ilayhagever   
- *       - name: email
- *         in: body
- *         description: The user email
- *         required: true
- *         schema:
- *           type: string
- *           example: daniel@gmail.com
- *       - name: password
- *         in: body
- *         description: The user password
- *         required: true
- *         schema:
- *           type: string
- *           example: 123456   
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: johndoe
+ *               password:
+ *                 type: string
+ *                 example: securepassword123
  *     responses:
  *       201:
- *         description: user created
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- *                   example: 123
- *                 username:
- *                   type: string
- *                   example: "Sample Name"
- *                 password:
- *                   type: string
- *                   example: encryptedpassword
+ *         description: User registered successfully
  *       400:
- *         description: problem creating user 
+ *         description: Registration failed
  */
 authRouter.post('/register',authController.register.bind(authController));
 
@@ -57,67 +34,91 @@ authRouter.post('/register',authController.register.bind(authController));
  * @swagger
  * /auth/login:
  *   post:
- *     description: user login
+ *     description: Login a user
  *     tags:
  *       - Auth
- *     parameters:
- *       - name: username
- *         in: body
- *         description: The user name
- *         required: true
- *         schema:
- *           type: string
- *           example: ilayhagever   
- *       - name: password
- *         in: body
- *         description: The user password
- *         required: true
- *         schema:
- *           type: string
- *           example: 123456   
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: johndoe
+ *               password:
+ *                 type: string
+ *                 example: securepassword123
  *     responses:
  *       200:
- *         description: sucsses login
-*         content:
+ *         description: User logged in successfully
+ *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 acssesToken:
+ *                 accessToken:
  *                   type: string
- *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzUzNDUwY2M3NDc2OWI1NTZlNDdkNjMiLCJpYXQiOjE3MzM1MTA0NTUsImV4cCI6MTczMzU0NjQ1NX0.jO3FokENigSM6IsaagxKrDMwNd8IhuoJr5fXZtMpwus
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *                 refreshToken:
  *                   type: string
- *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzUzNDUwY2M3NDc2OWI1NTZlNDdkNjMiLCJpYXQiOjE3MzM1MTA0NTUsImV4cCI6MTczMzU0NjQ1NX0.jO3FokENigSM6IsaagxKrDMwNd8IhuoJr5fXZtMpwus
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *       400:
- *         description: problem logging user 
+ *         description: Login failed
  */
-
 authRouter.post('/login',authController.login.bind(authController));
 
-
+/**
+ * @swagger
+ * /auth/login/google:
+ *   post:
+ *     description: Login a user using Google OAuth
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               idToken:
+ *                 type: string
+ *                 example: eyJhbGciOiJSUzI1NiIsImtpZCI6IjE2MzQ2NzAifQ...
+ *     responses:
+ *       200:
+ *         description: User logged in successfully using Google
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                 refreshToken:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *       400:
+ *         description: Google login failed
+ */
 authRouter.post('/login/google',authController.googleSignin.bind(authController));
 
 /**
  * @swagger
  * /auth/logout:
  *   post:
- *     description: user logout
+ *     description: Logout a user
  *     tags:
  *       - Auth
- *     parameters:
- *       - name: refresh token
- *         in: header
- *         description: The refresh token
- *         required: true
- *         schema:
- *           type: string
- *           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzUzNDUwY2M3NDc2OWI1NTZlNDdkNjMiLCJpYXQiOjE3MzM1MTA0NTUsImV4cCI6MTczMzU0NjQ1NX0.jO3FokENigSM6IsaagxKrDMwNd8IhuoJr5fXZtMpwus   
+ *     requestBody:
+ *       required: false
  *     responses:
  *       200:
- *         description: sucsses refresh
+ *         description: User logged out successfully
  *       400:
- *         description: problem logging out
+ *         description: Logout failed
  */
 authRouter.post('/logout',authController.logout.bind(authController));
 
@@ -126,33 +127,32 @@ authRouter.post('/logout',authController.logout.bind(authController));
  * @swagger
  * /auth/refresh:
  *   post:
- *     description: user refersh tokens
+ *     description: Refresh access token
  *     tags:
  *       - Auth
- *     parameters:
- *       - name: refresh token
- *         in: header
- *         description: The refresh token
- *         required: true
- *         schema:
- *           type: string
- *           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzUzNDUwY2M3NDc2OWI1NTZlNDdkNjMiLCJpYXQiOjE3MzM1MTA0NTUsImV4cCI6MTczMzU0NjQ1NX0.jO3FokENigSM6IsaagxKrDMwNd8IhuoJr5fXZtMpwus   
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *     responses:
  *       200:
- *         description: sucsses refresh
-*         content:
+ *         description: Access token refreshed successfully
+ *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 acssesToken:
+ *                 accessToken:
  *                   type: string
- *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzUzNDUwY2M3NDc2OWI1NTZlNDdkNjMiLCJpYXQiOjE3MzM1MTA0NTUsImV4cCI6MTczMzU0NjQ1NX0.jO3FokENigSM6IsaagxKrDMwNd8IhuoJr5fXZtMpwus
- *                 refreshToken:
- *                   type: string
- *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzUzNDUwY2M3NDc2OWI1NTZlNDdkNjMiLCJpYXQiOjE3MzM1MTA0NTUsImV4cCI6MTczMzU0NjQ1NX0.jO3FokENigSM6IsaagxKrDMwNd8IhuoJr5fXZtMpwus
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *       400:
- *         description: problem refreshing tokens 
+ *         description: Token refresh failed
  */
 authRouter.post('/refresh',authController.refresh.bind(authController));
 

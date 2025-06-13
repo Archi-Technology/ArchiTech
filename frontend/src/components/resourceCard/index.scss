@@ -1,0 +1,52 @@
+.provider-icon {
+  margin-left: 8px;
+  font-size: 1.2rem;
+}
+
+.aws {
+  color: #ff9900;
+}
+
+.azure {
+  color: #0078d4;
+}
+
+.resource-option {
+  border: 1px solid #e0e0e0;
+  padding: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &.selected {
+    background-color: #f0f8ff;
+    border-color: #0078d4;
+  }
+}
+
+.sorting-controls {
+  margin-bottom: 15px;
+
+  select {
+    margin-left: 10px;
+  }
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+
+  button {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
