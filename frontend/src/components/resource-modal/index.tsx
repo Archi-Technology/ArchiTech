@@ -177,7 +177,7 @@ export default function ResourceModal({
             <ModalActions
               onClose={onClose}
               onConfirm={() => {
-                if (selectedResource) {
+                if (selectedResource !== null) {
                   const selectedResourceDetails = resources.find((resource) => resource.id === selectedResource);
                   const selectedCloud = selectedResourceDetails?.provider || "unknown";
 

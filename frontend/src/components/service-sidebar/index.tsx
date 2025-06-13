@@ -43,6 +43,7 @@ export default function ServiceSidebar({ canvasRef }: { canvasRef: React.RefObje
       if (canvasRef.current) {
         const nodeId = selectedCloud === 'azure' ? '1' : selectedCloud === 'GCP' ? '2' : '3';
 
+
         // Check if the node is already clicked
         // if (canvasRef.current.isNodeClicked(nodeId)) {
         //   console.log(`Node ${nodeId} is already clicked.`);
