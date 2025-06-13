@@ -133,8 +133,8 @@ export default function ServicePopup({ service, onConfirm, onCancel }: ServicePo
         }),
         ...(service.name === "Database" && {
           region: selectedRegion,
-          dbInstanceType: selectedDBInstanceType,
-          engine: selectedDBEngine,
+          instanceType: selectedDBInstanceType,
+          databaseEngine: selectedDBEngine,
         }),
       }
 

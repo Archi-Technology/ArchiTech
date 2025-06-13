@@ -109,15 +109,9 @@ export async function getResourceSuggestion(serviceName: string): Promise<IGener
     Please return text only wihout any formatting, and your answer should start with "The best option is: " followed by the cloud provider".
     Please no more than 3 sentences.`;
   } else if (serviceName === 'Database') {
-    const locations = getAllAvailableLocations();
-    const dbInstanceTypes = getAllAvailableDBInstanceTypes();
-    const dbEngines = getAllAvailableDBEngineNames();
-    question = `Given my user context, what are the optimal region and storage class for a Database?
-    I want to pick one as you see best from the following:
-    regions: ${locations}
-    DB instance type: ${dbInstanceTypes}
-    DB engines: ${dbEngines}
-    Please return the answer only in JSON, for example: {"region": "...", "dbType": "...", "dbEngine": "..."}`;
+    question = `Given my user context, what is the best Database according to my user context and recommend between AWS RDS or Azure SQL and Explain why.
+    Please return text only wihout any formatting, and your answer should start with "The best option is: " followed by the cloud provider".
+    Please no more than 3 sentences.`;
   }
 
   try {
@@ -139,8 +133,8 @@ export function parseGeminiRecommendation(
     // Remove Markdown code block formatting
     const cleanedJson = rawOutput
       .trim()
-      .replace(/^```json\s*/, '') // remove starting ```json + any whitespace/newlines
-      .replace(/\s*```$/, ''); // remove ending ```
+      .replace(/^```json/, '') // remove starting ```json only, no whitespace
+      .replace(/```$/, ''); // remove ending ```
 
     // Parse JSON
     const parsed = JSON.parse(cleanedJson);

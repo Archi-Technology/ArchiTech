@@ -162,13 +162,12 @@ export class AzureService {
   async getSqlDbPricing(params: {
     region: string;
     skuName: string;
-    productName: string;
   }): Promise<any | null> {
     try {
       const filter = encodeURIComponent(
-        `serviceName eq 'SQL Database' and armRegionName eq '${params.region}' and contains(skuName, '${params.skuName}') and contains(productName, '${params.productName}') and type eq 'Consumption'`
+        `serviceName eq 'SQL Database' and armRegionName eq '${params.region}' and contains(skuName, '${params.skuName}') and type eq 'Consumption'`
       );
-
+      
       const response = await axios.get(
         `${this.pricingApiUrl}?$filter=${filter}`
       );
@@ -181,11 +180,12 @@ export class AzureService {
 
       const price = items[0];
       return {
+        id: 0,
+        provider: "azure",
         region: params.region,
+        instanceType: price.productName,
         sku: params.skuName,
-        productName: params.productName,
-        unitOfMeasure: price.unitOfMeasure,
-        pricePerUnit: price.retailPrice,
+        pricePerHour: price.retailPrice,
       };
     } catch (error) {
       console.error("Error fetching SQL DB pricing:", error);

@@ -127,11 +127,6 @@ azureRouter.get("/cost/loadbalancer", async (req, res) => {
  *         required: true
  *         schema: { type: string }
  *         example: 36 vCore
- *       - in: query
- *         name: productName
- *         required: true
- *         schema: { type: string }
- *         example: SQL Database Single/Elastic Pool General Purpose - Compute FSv2 Series
  *     responses:
  *       200:
  *         description: Pricing retrieved

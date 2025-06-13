@@ -120,23 +120,25 @@ export class awsController {
         return;
       }
 
-      const price = await this.service.getRDSPricing(
+      const rdsPricingResult = await this.service.getRDSPricing(
         region as string,
-        instanceType as string,
+        instanceType as string[],
         databaseEngine as string
       );
 
-      if (price === null) {
+      if (!rdsPricingResult || rdsPricingResult.price === null || rdsPricingResult.type === null) {
         res.status(404).json({ error: "Pricing data not found" });
         return;
       }
 
-      res.status(200).json({
+      res.status(200).json([{
+        id: 0,
+        provider: "AWS",
         region,
-        instanceType,
+        instanceType: rdsPricingResult.type,
         databaseEngine,
-        pricePerHour: price,
-      });
+        pricePerHour: rdsPricingResult.price,
+      }]);
     } catch (error) {
       console.error("Error fetching RDS pricing:", error);
       res.status(500).json({ error: "Failed to retrieve RDS pricing" });

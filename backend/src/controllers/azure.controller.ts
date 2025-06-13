@@ -91,22 +91,21 @@ export class AzureController {
 
   async getSqlDbPricing(req: Request, res: Response) {
     try {
-      const { region, skuName, productName } = req.query;
+      const { region, skuName } = req.query;
 
-      if (!region || !skuName || !productName) {
+      if (!region || !skuName ) {
         return res
           .status(400)
-          .json({ error: "region, skuName, and productName are required." });
+          .json({ error: "region and skuName are required." });
       }
 
       const result = await this.service.getSqlDbPricing({
         region: region as string,
         skuName: skuName as string,
-        productName: productName as string,
       });
 
       if (result) {
-        return res.status(200).json(result);
+        return res.status(200).json([result]);
       } else {
         return res.status(404).json({ error: "No pricing found." });
       }

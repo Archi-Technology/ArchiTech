@@ -371,9 +371,9 @@ export class awsService {
 
   async getRDSPricing(
     location: string,
-    instanceType: string,
+    instanceTypes: string[],
     databaseEngine: string
-  ): Promise<number | null> {
+  ): Promise<{ price: number; type: string } | null> {
     let nextToken: string | undefined = undefined;
 
     try {
@@ -382,16 +382,10 @@ export class awsService {
           ServiceCode: "AmazonRDS",
           Filters: [
             { Type: "TERM_MATCH", Field: "location", Value: location },
-            { Type: "TERM_MATCH", Field: "instanceType", Value: instanceType },
             {
               Type: "TERM_MATCH",
               Field: "databaseEngine",
               Value: databaseEngine,
-            },
-            {
-              Type: "TERM_MATCH",
-              Field: "deploymentOption",
-              Value: "Single-AZ",
             },
           ],
           MaxResults: 100,
@@ -406,9 +400,13 @@ export class awsService {
           return null;
         }
 
-        console.log(`Found ${response.PriceList.length} products.`);
         for (const productString of response.PriceList) {
           const product = JSON.parse(productString);
+          const attributes = product.product?.attributes;
+
+          const type = attributes?.instanceType;
+          if (!type || !instanceTypes.includes(type)) continue;
+
           const terms = product.terms.OnDemand;
           for (const termKey in terms) {
             const priceDimensions = terms[termKey].priceDimensions;
@@ -416,10 +414,7 @@ export class awsService {
               const price = parseFloat(
                 priceDimensions[dimensionKey].pricePerUnit.USD
               );
-              console.log(
-                `Found RDS price for ${databaseEngine} in ${location}: $${price}/hour`
-              );
-              return price;
+              return { price, type };
             }
           }
         }

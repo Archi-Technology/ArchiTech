@@ -48,7 +48,7 @@ export function getTranslationParams(resourceParams: Record<string, any>) {
                 instanceType: translateInstanceTypeCategory(
                     resourceParams.instanceType,
                     'aws',
-                )[0],
+                ),
             }),
         };
 
@@ -91,7 +91,7 @@ export function getTranslationParams(resourceParams: Record<string, any>) {
                 )[0],
             }),
             ...(resourceParams.instanceType && {
-                instanceType: translateInstanceTypeCategory(
+                skuName: translateInstanceTypeCategory(
                     resourceParams.instanceType,
                     'azure',
                 )[0],
