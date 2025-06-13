@@ -106,13 +106,11 @@ export async function getResourceSuggestion(serviceName: string): Promise<IGener
     Please return text only wihout any formatting, and your answer should start with "The best option is: " followed by the type. For example: "The best option is: Spot".
     Please no more than 3 sentences.`;
   } else if (serviceName === 'Object Storage') {
-    const locations = getAllAvailableLocations();
-    const storageClasses = getAllAvailableObjectStorageClasses();
-    question = `Given my user context, what are the optimal region and storage class for a Object storage?
-    I want to pick one as you see best from the following:
-    regions: ${locations}
-    storage classes: ${storageClasses}
-    Please return the answer only as JSON, for example: {"region": "...", "storageClass": "..."}`;
+    question = `Given my user context, what is the best Object storage instance according to my user context and recommend between AWS S3 or Azure blob storage and Explain why.
+    If you choose AWS S3: According to my user context refer to Lifecycle Policies,Object Versioning + Expiry  andData Compression
+    If you choose Azure blob storage: According to my user context refer to Blob Lifecycle Management, Blob Versioning + Soft Delete,Compression + Chunking.
+    Please return text only wihout any formatting, and your answer should start with "The best option is: " followed by the type. For example: "The best option is: AWS S3...".
+    Please no more than 3 sentences.`;
   } else if (serviceName === 'Load Balancer') {
     const loadBalancerTypes = getAllAvailableLoadBalancerTypes();
     const locations = getAllAvailableLocations();

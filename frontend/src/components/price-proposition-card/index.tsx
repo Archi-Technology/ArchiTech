@@ -14,6 +14,7 @@ interface ResourceOption {
   spotInstance?: boolean;
   reservationTerm?: string | null;
   savingsPlan?: boolean;
+  pricePerGbPerMonth?: number;
 }
 
 interface PricePropositionCardProps {
@@ -80,7 +81,7 @@ export default function PricePropositionCard({
         <div className="pricing-info">
           <div className="price-display">
             <span className="price-amount">
-              {formatPrice(resource.pricePerHour)}
+                {formatPrice(resource.pricePerHour ?? resource.pricePerGbPerMonth)}
             </span>
           </div>
         </div>

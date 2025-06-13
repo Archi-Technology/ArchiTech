@@ -148,8 +148,8 @@ export class awsService {
                 const pricePerGb = parseFloat(
                   priceDimensions[dimensionKey].pricePerUnit.USD
                 );
-                
-                return parseFloat((pricePerGb / (30 * 24)).toFixed(6));
+
+                return parseFloat((pricePerGb).toFixed(6));
               }
             }
           }

@@ -14,15 +14,23 @@ import { getResourceSuggestion } from '../../utils/recommendation';
 
 interface ResourceOption {
   id: string;
+  provider: 'AWS' | 'azure';
+  region?: string;
+
+  //virtual machine specific fields
   productName?: string;
   instanceType?: string;
   os?: string;
-  region?: string;
   pricePerHour?: number;
-  provider: 'AWS' | 'azure';
   spotInstance?: boolean;
   reservationTerm?: string | null;
   savingsPlan?: boolean;
+
+  //object storage specific fields
+  pricePerGbPerMonth?: number;
+  redundancy?: string;
+  storageClass?: string;
+  storageTier?: string;
 }
 
 interface PricingOption {
@@ -119,9 +127,9 @@ export default function ResourceModal({
 
             const updatedAzureData = azureRes.data.map(
               (item: Record<string, any>, index: number): ResourceOption => ({
-              ...item,
-              id: `${index + awsRes.data.length}`,
-              provider: 'azure',
+                ...item,
+                id: `${index + awsRes.data.length}`,
+                provider: 'azure',
               }),
             );
             const combinedData = [...awsRes.data, ...updatedAzureData];
@@ -296,8 +304,12 @@ export default function ResourceModal({
                 <div
                   className={`tab-panel ${pricingOption === 'spot' ? 'active' : ''}`}
                 >
-                  <div className="pricing-header">
-                    <h3 className="pricing-option-name">Spot Instances</h3>
+                  <div className={`pricing-header`}>
+                    <h3
+                      className={`pricing-option-name ${selectedResourceName !== 'Virtual Machine' ? 'disabled-header' : ''}`}
+                    >
+                      Spot Instances
+                    </h3>
                     <p className="pricing-option-description">
                       Up to 90% off on-demand pricing with variable
                       availability. Best for fault-tolerant workloads.
@@ -305,9 +317,79 @@ export default function ResourceModal({
                   </div>
 
                   <div className="toggle-container">
-                    {pricingOption === 'spot' && (
+                    {selectedResourceName !== 'Virtual Machine' ? (
+                      <div className="disabled-tab">
+                        Spot Instances are not available for this service type.
+                      </div>
+                    ) : (
+                      pricingOption === 'spot' && (
+                        <>
+                          <div className="provider-section">
+                            {getAwsResources(spotInstances).length === 0 ? (
+                              <div className="no-resources">
+                                No AWS spot instances available for this
+                                configuration
+                              </div>
+                            ) : (
+                              <div className="resource-grid">
+                                {getAwsResources(spotInstances).map(
+                                  (resource) => (
+                                    <PricePropositionCard
+                                      key={resource.id}
+                                      resource={resource}
+                                      isSelected={
+                                        selectedResource === resource.id
+                                      }
+                                      onSelect={(id) => setSelectedResource(id)}
+                                      pricingType="spot"
+                                    />
+                                  ),
+                                )}
+                              </div>
+                            )}
+
+                            {getAzureResources(spotInstances).length === 0 ? (
+                              <div className="no-resources">
+                                No Azure spot instances available for this
+                                configuration
+                              </div>
+                            ) : (
+                              <div className="resource-grid">
+                                {getAzureResources(spotInstances).map(
+                                  (resource) => (
+                                    <PricePropositionCard
+                                      key={resource.id}
+                                      resource={resource}
+                                      isSelected={
+                                        selectedResource === resource.id
+                                      }
+                                      onSelect={(id) => setSelectedResource(id)}
+                                      pricingType="spot"
+                                    />
+                                  ),
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )
+                    )}
+                  </div>
+
+                  {useSpotInstances &&
+                    selectedResourceName === 'Virtual Machine' && (
                       <>
                         <div className="provider-section">
+                          <div className="provider-header">
+                            <img
+                              src={awsIcon || '/placeholder.svg'}
+                              alt="AWS"
+                              className="provider-icon"
+                            />
+                            <h4 className="provider-title">
+                              AWS Spot Instances
+                            </h4>
+                          </div>
                           {getAwsResources(spotInstances).length === 0 ? (
                             <div className="no-resources">
                               No AWS spot instances available for this
@@ -330,7 +412,6 @@ export default function ResourceModal({
                               )}
                             </div>
                           )}
-
                           {getAzureResources(spotInstances).length === 0 ? (
                             <div className="no-resources">
                               No Azure spot instances available for this
@@ -356,60 +437,133 @@ export default function ResourceModal({
                         </div>
                       </>
                     )}
+                </div>
+
+                <div
+                  className={`tab-panel ${pricingOption === 'savings' ? 'active' : ''}`}
+                >
+                  <div className={`pricing-header`}>
+                    <h3 className={`pricing-option-name ${selectedResourceName !== 'Virtual Machine' ? 'disabled-header' : ''}`}>
+                      Savings Plans & Reserved Instances
+                    </h3>
+                    <p className="pricing-option-description">
+                      Commit to 1 or 3 years for significant discounts. Best for
+                      stable, predictable workloads.
+                    </p>
                   </div>
 
-                  {useSpotInstances && (
-                    <>
-                      <div className="provider-section">
-                        <div className="provider-header">
-                          <img
-                            src={awsIcon || '/placeholder.svg'}
-                            alt="AWS"
-                            className="provider-icon"
-                          />
-                          <h4 className="provider-title">AWS Spot Instances</h4>
-                        </div>
-                        {getAwsResources(spotInstances).length === 0 ? (
-                          <div className="no-resources">
-                            No AWS spot instances available for this
-                            configuration
-                          </div>
-                        ) : (
-                          <div className="resource-grid">
-                            {getAwsResources(spotInstances).map((resource) => (
-                              <PricePropositionCard
-                                key={resource.id}
-                                resource={resource}
-                                isSelected={selectedResource === resource.id}
-                                onSelect={(id) => setSelectedResource(id)}
-                                pricingType="spot"
-                              />
-                            ))}
-                          </div>
-                        )}
-                        {getAzureResources(spotInstances).length === 0 ? (
-                          <div className="no-resources">
-                            No Azure spot instances available for this
-                            configuration
-                          </div>
-                        ) : (
-                          <div className="resource-grid">
-                            {getAzureResources(spotInstances).map(
-                              (resource) => (
-                                <PricePropositionCard
-                                  key={resource.id}
-                                  resource={resource}
-                                  isSelected={selectedResource === resource.id}
-                                  onSelect={(id) => setSelectedResource(id)}
-                                  pricingType="spot"
-                                />
-                              ),
+                  <div className="toggle-container">
+                    {selectedResourceName !== 'Virtual Machine' ? (
+                      <div className="disabled-tab">
+                        Savings Plans are not available for this service type.
+                      </div>
+                    ) : (
+                      pricingOption === 'savings' && (
+                        <>
+                          <div className="provider-section">
+                            {savingsPlans.length === 0 ? (
+                              <div className="no-resources">
+                                No savings plans available for this
+                                configuration
+                              </div>
+                            ) : (
+                              <table className="savings-table">
+                                <thead>
+                                  <tr>
+                                    <th>Term</th>
+                                    <th>Provider</th>
+                                    <th>Price Per Hour</th>
+                                    <th>Select</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {/* 1-Year Term Rows */}
+                                  {savingsPlans
+                                    .filter(
+                                      (resource) =>
+                                        resource.reservationTerm === '1 Year',
+                                    )
+                                    .map((resource) => (
+                                      <tr key={resource.id}>
+                                        <td>1 Year</td>
+                                        <td>
+                                          <img
+                                            src={
+                                              resource.provider === 'AWS'
+                                                ? awsIcon
+                                                : azureIcon
+                                            }
+                                            alt={resource.provider}
+                                            className="provider-icon"
+                                          />
+                                        </td>
+                                        <td>
+                                          $
+                                          {resource.pricePerHour?.toFixed(4) ||
+                                            'N/A'}
+                                        </td>
+                                        <td>
+                                          <input
+                                            type="radio"
+                                            name="savings-plan"
+                                            checked={
+                                              selectedResource === resource.id
+                                            }
+                                            onChange={() =>
+                                              setSelectedResource(resource.id)
+                                            }
+                                          />
+                                        </td>
+                                      </tr>
+                                    ))}
+
+                                  {/* 3-Year Term Rows */}
+                                  {savingsPlans
+                                    .filter(
+                                      (resource) =>
+                                        resource.reservationTerm === '3 Years',
+                                    )
+                                    .map((resource) => (
+                                      <tr key={resource.id}>
+                                        <td>3 Years</td>
+                                        <td>
+                                          <img
+                                            src={
+                                              resource.provider === 'AWS'
+                                                ? awsIcon
+                                                : azureIcon
+                                            }
+                                            alt={resource.provider}
+                                            className="provider-icon"
+                                          />
+                                        </td>
+                                        <td>
+                                          $
+                                          {resource.pricePerHour?.toFixed(4) ||
+                                            'N/A'}
+                                        </td>
+                                        <td>
+                                          <input
+                                            type="radio"
+                                            name="savings-plan"
+                                            checked={
+                                              selectedResource === resource.id
+                                            }
+                                            onChange={() =>
+                                              setSelectedResource(resource.id)
+                                            }
+                                          />
+                                        </td>
+                                      </tr>
+                                    ))}
+                                </tbody>
+                              </table>
                             )}
                           </div>
-                        )}
-                      </div>
-                    </>
-                  )}
+                        </>
+                      )
+                    )}
+                  </div>
                 </div>
 
                 {/* Savings Plans Panel */}

@@ -36,9 +36,9 @@ export class AzureService {
 
       return {
         region: params.region,
-        storageClass: params.storageTier,
+        storageTier: params.storageTier,
         redundancy: params.redundancy,
-        pricePerGbPerHour: parseFloat(storagePricePerGB.toFixed(4)),
+        pricePerGbPerMonth: parseFloat(storagePricePerGB.toFixed(4)),
       };
     } catch (err) {
       console.error("Error querying Azure pricing API:", err);
@@ -54,11 +54,12 @@ export class AzureService {
     const filter = encodeURIComponent(
       `serviceName eq 'Storage' and armRegionName eq '${region}' and productName eq 'Blob Storage' and skuName eq '${storageTier} ${redundancy}' and contains(meterName, 'Data Stored')`
     );
+
     const response = await axios.get(`${this.pricingApiUrl}?$filter=${filter}`);
     const priceItems = response.data.Items;
     if (priceItems && priceItems.length > 0) {
       const item = priceItems[0];
-      return parseFloat(item.retailPrice);
+      return parseFloat((item.retailPrice).toFixed(4));
     }
     return null;
   }

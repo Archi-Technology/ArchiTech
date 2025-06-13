@@ -102,6 +102,11 @@
   line-height: 1.5;
 }
 
+.disabled-header {
+  opacity: 0.5; /* Greyed-out effect */
+  pointer-events: none; /* Prevent interaction */
+}
+
 .price-proposition-card {
   width: 250px; // or any fixed value you like
   height: 250px; // same as width

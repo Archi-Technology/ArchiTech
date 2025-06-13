@@ -20,18 +20,20 @@ export class awsController {
 
       region = region.toString().trim().toLowerCase();
       storageClass = storageClass.toString().trim().toLowerCase();
-      
+
       const price = await this.service.getS3StoragePrice(
         region as string,
         storageClass as string
       );
 
       if (price !== null) {
-        res.status(200).json({
+        res.status(200).json([{
+          id: 0,
+          provider: "AWS",
           region: region,
           storageClass: storageClass,
-          pricePerGbPerHour: price,
-        });
+          pricePerGbPerMonth: price,
+        }]);
       } else {
         res.status(500).json({ error: "Failed to fetch pricing data." });
       }

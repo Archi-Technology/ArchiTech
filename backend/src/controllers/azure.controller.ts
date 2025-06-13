@@ -24,9 +24,10 @@ export class AzureController {
         storageTier: storageTier as string,
         redundancy: redundancy as string,
       });
-
+      price.id = 0;
+      price.provider = "azure";
       if (price) {
-        return res.status(200).json(price);
+        return res.status(200).json([price]);
       } else {
         return res.status(500).json({ error: "Failed to fetch pricing data." });
       }

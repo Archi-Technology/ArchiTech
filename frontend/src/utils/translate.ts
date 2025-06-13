@@ -4,7 +4,7 @@ import { translateLoadBalancerTypeToCloudOptions } from './Mappers/loadBalancerM
 import { translateStorageClassToCloudOptions } from './Mappers/objectStorageMapper';
 import { translateLocationToRegionCodes } from './Mappers/regionMapper';
 import { translateInstanceTypeCategory } from './Mappers/typeMapper';
-
+import { translateStorageClassToCloudRedundancy } from './Mappers/redundencyMapper';
 
 export function getTranslationParams(resourceParams: Record<string, any>) {
     let awsParams: Record<string, any> = {};
@@ -53,7 +53,6 @@ export function getTranslationParams(resourceParams: Record<string, any>) {
         };
 
         azureParams = {
-            ...resourceParams,
             ...(resourceParams.os && { os: resourceParams.os }),
             ...(resourceParams.dbEngine && {
                 databaseEngine: translateDBEngineToCloudOptions(
@@ -73,14 +72,14 @@ export function getTranslationParams(resourceParams: Record<string, any>) {
                     'azure',
                 )[0],
             }),
-            ...(resourceParams.storageClass && {
-                storageClass: translateStorageClassToCloudOptions(
+            ...({
+                storageTier: translateStorageClassToCloudOptions(
                     resourceParams.storageClass,
                     'azure',
                 )[0],
             }),
-            ...(resourceParams.redundancy && {
-                redundency: translateStorageClassToCloudRedundancy(
+            ...(resourceParams.storageClass && {
+                redundancy: translateStorageClassToCloudRedundancy(
                     resourceParams.storageClass,
                     'azure',
                 )[0],
