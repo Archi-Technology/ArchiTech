@@ -92,7 +92,9 @@ const initialEdges: Edge[] = [
 
 const BasicFlow = forwardRef((_, ref) => {
   const [expandedNodeId, setExpandedNodeId] = useState<string | null>(null);
-  const [nodes, setNodes, onNodesChange] = useNodesState(defaultNodes);
+  const [nodes, setNodes, onNodesChange] = useNodesState(
+    defaultNodes.map((node) => ({ ...node, draggable: false })) // Make all nodes undraggable
+  );
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
   const reactFlowInstance = useRef<ReactFlowInstance | null>(null);
@@ -173,6 +175,13 @@ const BasicFlow = forwardRef((_, ref) => {
 
 
   const onNodeClick = async (_: React.MouseEvent, node: Node) => {
+    // Ensure the node remains undraggable
+    setNodes((nds) =>
+      nds.map((n) =>
+        n.id === node.id ? { ...n, draggable: false } : n
+      )
+    );
+
     const nodeId = node.id;
     const canvasWidth = reactFlowWrapper.current?.clientWidth || 0;
     const canvasCenterX = canvasWidth / 2;
@@ -317,6 +326,7 @@ const BasicFlow = forwardRef((_, ref) => {
               id: node._id,
               type: node.type === ServiceType.VPC || node.type === ServiceType.Subnet ? 'bigSquare' : 'circle',
               position,
+              draggable: false, // Ensure dynamic nodes are undraggable
               data: {
                 label: node.name,
                 icon: getIconForType(node.type),
@@ -393,6 +403,12 @@ const BasicFlow = forwardRef((_, ref) => {
       }
     });
 
+
+
+    dynamicNodes = dynamicNodes.map((node: Node) => ({
+      ...node,
+      draggable: false, // Ensure all dynamic nodes are undraggable
+    }));
 
 
     dynamicNodes = dynamicNodes.map((node: Node) => {
