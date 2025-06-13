@@ -95,11 +95,13 @@ export class awsController {
         return;
       }
 
-      res.status(200).json({
+      res.status(200).json([{
+        id: 0,
+        provider: "AWS",
         region,
         lbType,
         pricePerHour: price,
-      });
+      }]);
     } catch (error) {
       console.error("Error fetching ELB pricing:", error);
       res.status(500).json({ error: "Failed to retrieve ELB pricing" });
