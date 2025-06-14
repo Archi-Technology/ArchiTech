@@ -14,8 +14,7 @@ export class AzureController {
 
       if (!region || !storageTier || !redundancy) {
         return res.status(400).json({
-          error:
-            "Missing required parameters: region, storageTier, redundancy",
+          error: "Missing required parameters: region, storageTier, redundancy",
         });
       }
 
@@ -27,9 +26,11 @@ export class AzureController {
       price.id = 0;
       price.provider = "azure";
       if (price) {
-        return res.status(200).json([price]);
+        res.status(200).json([price]);
       } else {
-        return res.status(500).json({ error: "Failed to fetch pricing data." });
+        res
+          .status(400)
+          .json({ message: "No Blob available", provider: "azure" });
       }
     } catch (error: any) {
       console.error("Error fetching Azure Blob pricing:", error);
@@ -54,9 +55,9 @@ export class AzureController {
       });
 
       if (price) {
-        return res.status(200).json(price);
+        res.status(200).json(price);
       } else {
-        return res.status(500).json({ error: "Failed to fetch VM pricing." });
+        res.status(400).json({ message: "No VM available", provider: "azure" });
       }
     } catch (error) {
       console.error("Error fetching Azure VM pricing:", error);
@@ -81,11 +82,9 @@ export class AzureController {
     price.provider = "azure";
 
     if (price) {
-      return res.status(200).json([price]);
+      res.status(200).json([price]);
     } else {
-      return res
-        .status(404)
-        .json({ error: "No pricing data found for specified parameters." });
+      res.status(400).json({ message: "No LB available", provider: "azure" });
     }
   }
 
@@ -93,7 +92,7 @@ export class AzureController {
     try {
       const { region, skuName } = req.query;
 
-      if (!region || !skuName ) {
+      if (!region || !skuName) {
         return res
           .status(400)
           .json({ error: "region and skuName are required." });
@@ -105,9 +104,9 @@ export class AzureController {
       });
 
       if (result) {
-        return res.status(200).json([result]);
+        res.status(200).json([result]);
       } else {
-        return res.status(404).json({ error: "No pricing found." });
+        res.status(400).json([{ message: "No SQL available", provider: "azure" }]);
       }
     } catch (e) {
       console.error("Error:", e);

@@ -149,7 +149,7 @@ export class awsService {
                   priceDimensions[dimensionKey].pricePerUnit.USD
                 );
 
-                return parseFloat((pricePerGb).toFixed(6));
+                return parseFloat(pricePerGb.toFixed(6));
               }
             }
           }
@@ -168,13 +168,21 @@ export class awsService {
     }
   }
 
-  async getFormattedEC2Pricing(location: string, instanceType: string, operatingSystem: string) {
+  async getFormattedEC2Pricing(
+    location: string,
+    instanceTypes: string[],
+    operatingSystem: string
+  ) {
     const params: GetProductsCommandInput = {
       ServiceCode: "AmazonEC2",
       Filters: [
         { Type: "TERM_MATCH", Field: "location", Value: location },
-        { Type: "TERM_MATCH", Field: "instanceType", Value: instanceType },
-        { Type: "TERM_MATCH", Field: "operatingSystem", Value: operatingSystem },
+        // { Type: "TERM_MATCH", Field: "instanceType", Value: instanceType },
+        {
+          Type: "TERM_MATCH",
+          Field: "operatingSystem",
+          Value: operatingSystem,
+        },
         { Type: "TERM_MATCH", Field: "preInstalledSw", Value: "NA" },
         { Type: "TERM_MATCH", Field: "tenancy", Value: "Shared" },
         { Type: "TERM_MATCH", Field: "capacitystatus", Value: "Used" },
@@ -193,7 +201,7 @@ export class awsService {
       const terms = priceItem.terms;
       const region = product.attributes.location || location;
       const os = product.attributes.operatingSystem || operatingSystem;
-      const type = product.attributes.instanceType || instanceType;
+      const type = product.attributes.instanceType;
 
       // On-Demand
       if (terms.OnDemand) {
@@ -201,7 +209,12 @@ export class awsService {
           const term = terms.OnDemand[termKey];
           for (const dimKey in term.priceDimensions) {
             const dim = term.priceDimensions[dimKey];
-            if (dim.unit === "Hrs" && dim.pricePerUnit?.USD && !dim.description?.toLowerCase().includes("byol")) {
+            if (
+              dim.unit === "Hrs" &&
+              dim.pricePerUnit?.USD &&
+              !dim.description?.toLowerCase().includes("byol") &&
+              instanceTypes.includes(type)
+            ) {
               results.push({
                 id: results.length + 1,
                 region,
@@ -223,8 +236,10 @@ export class awsService {
         for (const termKey in terms.Reserved) {
           const term = terms.Reserved[termKey];
           const length = term.termAttributes?.LeaseContractLength;
-          const noUpfront = term.termAttributes?.PurchaseOption === "No Upfront";
-          const standardOferringClass = term.termAttributes?.OfferingClass === "standard";
+          const noUpfront =
+            term.termAttributes?.PurchaseOption === "No Upfront";
+          const standardOferringClass =
+            term.termAttributes?.OfferingClass === "standard";
 
           let reservationTerm = null;
           if (length === "1yr") reservationTerm = "1 Year";
@@ -232,7 +247,13 @@ export class awsService {
 
           for (const dimKey in term.priceDimensions) {
             const dim = term.priceDimensions[dimKey];
-            if (dim.unit === "Hrs" && dim.pricePerUnit?.USD && noUpfront && standardOferringClass) {
+            if (
+              dim.unit === "Hrs" &&
+              dim.pricePerUnit?.USD &&
+              noUpfront &&
+              standardOferringClass &&
+              instanceTypes.includes(type)
+            ) {
               results.push({
                 id: results.length + 1,
                 region,
@@ -253,7 +274,7 @@ export class awsService {
     // Spot (separate API)
     try {
       const spotCommand = new DescribeSpotPriceHistoryCommand({
-        InstanceTypes: [instanceType as any], // Cast to match expected type
+        InstanceTypes: [instanceTypes as any], // Cast to match expected type
         ProductDescriptions: [operatingSystem],
         MaxResults: 1,
         StartTime: new Date(),
@@ -266,7 +287,7 @@ export class awsService {
         results.push({
           id: results.length + 1,
           location,
-          instanceType,
+          instanceType: spotPriceEntry.InstanceType,
           productName: "EC2 Spot",
           pricePerHour: parseFloat(spotPriceEntry.SpotPrice ?? "0"),
           os: operatingSystem,

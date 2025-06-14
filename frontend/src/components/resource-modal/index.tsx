@@ -1,16 +1,16 @@
-"use client"
+'use client';
 
-import type React from "react"
-import { useState, useEffect, useCallback } from "react"
-import { AxiosInstence } from "../../services/axios/AxiosInstance"
-import { getTranslationParams } from "../../utils/translate"
-import { getResourceSuggestion } from "../../utils/recommendation"
-import type { ResourceOption } from "../../types/resource-types"
-import ResourceLoader from "../resource-loader"
-import { ResourceTabs } from "./tabs/resource-tabs"
-import { SuggestionSection } from "./suggestion-section"
-import { ModalActions } from "./modal-actions"
-import "./index.scss"
+import type React from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { AxiosInstence } from '../../services/axios/AxiosInstance';
+import { getTranslationParams } from '../../utils/translate';
+import { getResourceSuggestion } from '../../utils/recommendation';
+import type { ResourceOption } from '../../types/resource-types';
+import ResourceLoader from '../resource-loader';
+import { ResourceTabs } from './tabs/resource-tabs';
+import { SuggestionSection } from './suggestion-section';
+import { ModalActions } from './modal-actions';
+import './index.scss';
 
 export default function ResourceModal({
   isOpen,
@@ -19,140 +19,174 @@ export default function ResourceModal({
   onResourceChange,
   resourceParams,
 }: {
-  isOpen: boolean
-  onClose: () => void
-  selectedResourceName: string
-  onResourceChange?: (name: string) => void
-  resourceParams?: Record<string, any>
+  isOpen: boolean;
+  onClose: () => void;
+  selectedResourceName: string;
+  onResourceChange?: (name: string) => void;
+  resourceParams?: Record<string, any>;
 }) {
-  const [selectedResource, setSelectedResource] = useState<string>("")
-  const [resources, setResources] = useState<ResourceOption[]>([])
-  const [pricingOption, setPricingOption] = useState("on-demand")
-  const [mounted, setMounted] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [showModalContent, setShowModalContent] = useState(false)
-  const [spotInstances, setSpotInstances] = useState<ResourceOption[]>([])
-  const [savingsPlans, setSavingsPlans] = useState<ResourceOption[]>([])
-  const [suggestion, setSuggestion] = useState<string | null>(null)
+  const [selectedResource, setSelectedResource] = useState<string>('');
+  const [resources, setResources] = useState<ResourceOption[]>([]);
+  const [pricingOption, setPricingOption] = useState('on-demand');
+  const [mounted, setMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showModalContent, setShowModalContent] = useState(false);
+  const [spotInstances, setSpotInstances] = useState<ResourceOption[]>([]);
+  const [savingsPlans, setSavingsPlans] = useState<ResourceOption[]>([]);
+  const [suggestion, setSuggestion] = useState<string | null>(null);
 
   // Check if the resource is a virtual machine to determine tab visibility
-  const isVirtualMachine = selectedResourceName === "Virtual Machine"
+  const isVirtualMachine = selectedResourceName === 'Virtual Machine';
 
   useEffect(() => {
     if (selectedResourceName) {
       const fetchSuggestion = async () => {
         try {
-          const recommendation = await getResourceSuggestion(selectedResourceName)
-          setSuggestion(recommendation?.message || null)
+          const recommendation =
+            await getResourceSuggestion(selectedResourceName);
+          setSuggestion(recommendation?.message || null);
         } catch (error) {
-          console.error("Failed to fetch suggestion:", error)
-          setSuggestion(null)
+          console.error('Failed to fetch suggestion:', error);
+          setSuggestion(null);
         }
-      }
+      };
 
-      fetchSuggestion()
+      fetchSuggestion();
     }
-  }, [selectedResourceName])
+  }, [selectedResourceName]);
 
   useEffect(() => {
-    setMounted(true)
+    setMounted(true);
 
     const handleEsc = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose()
+      if (event.key === 'Escape') {
+        onClose();
       }
-    }
+    };
 
     if (isOpen) {
-      document.addEventListener("keydown", handleEsc)
-      document.body.style.overflow = "hidden"
+      document.addEventListener('keydown', handleEsc);
+      document.body.style.overflow = 'hidden';
 
       if (!isLoading && !showModalContent) {
-        setIsLoading(true)
-        setShowModalContent(false)
-        setResources([])
-        setSpotInstances([])
-        setSavingsPlans([])
+        setIsLoading(true);
+        setShowModalContent(false);
+        setResources([]);
+        setSpotInstances([]);
+        setSavingsPlans([]);
 
-        const { awsParams, azureParams } = getTranslationParams(resourceParams || {})
+        const { awsParams, azureParams } = getTranslationParams(
+          resourceParams || {},
+        );
 
         const fetchResources = async () => {
           try {
-            const awsName = mapServiceNameToProvider(selectedResourceName, "aws")
-            const azureName = mapServiceNameToProvider(selectedResourceName, "azure")
+            const awsName = mapServiceNameToProvider(
+              selectedResourceName,
+              'aws',
+            );
+            const azureName = mapServiceNameToProvider(
+              selectedResourceName,
+              'azure',
+            );
 
             const [awsRes, azureRes] = await Promise.all([
-              AxiosInstence.get(`/aws/cost/${awsName}`, { params: awsParams }),
-              AxiosInstence.get(`/azure/cost/${azureName}`, { params: azureParams }),
-            ])
-
-            const updatedAzureData = azureRes.data.map(
-              (item: Record<string, any>, index: number): ResourceOption => ({
-                ...item,
-                id: `${index + awsRes.data.length}`,
-                provider: "azure",
+              AxiosInstence.get(`/aws/cost/${awsName}`, {
+                params: awsParams,
+                validateStatus: (status) => status === 200 || status === 400,
               }),
-            )
-            const combinedData = [...awsRes.data, ...updatedAzureData]
+              AxiosInstence.get(`/azure/cost/${azureName}`, {
+                params: azureParams,
+                validateStatus: (status) => status === 200 || status === 400,
+              }),
+            ]);
+
+            const awsData = awsRes && awsRes.status === 200 ? awsRes.data : [];
+            const azureData =
+              azureRes && azureRes.status === 200
+                ? azureRes.data.map(
+                    (
+                      item: Record<string, any>,
+                      index: number,
+                    ): ResourceOption => ({
+                      ...item,
+                      id: `${index + awsData.length}`,
+                      provider: 'azure',
+                    }),
+                  )
+                : [];
+
+            const combinedData = [...awsData, ...azureData];
 
             const onDemandResources = combinedData.filter(
               (resource) => !resource.spotInstance && !resource.reservationTerm,
-            )
+            );
 
-            const spotInstances = combinedData.filter((resource) => resource.spotInstance === true)
+            const spotInstances = combinedData.filter(
+              (resource) => resource.spotInstance === true,
+            );
 
-            const savingsPlans = combinedData.filter((resource) => resource.reservationTerm !== null)
+            const savingsPlans = combinedData.filter(
+              (resource) => resource.reservationTerm !== null,
+            );
 
-            setResources(onDemandResources)
-            setSpotInstances(spotInstances)
-            setSavingsPlans(savingsPlans)
+            setResources(onDemandResources);
+            setSpotInstances(spotInstances);
+            setSavingsPlans(savingsPlans);
 
             if (combinedData.length > 0) {
-              setSelectedResource(combinedData[0].id)
+              setSelectedResource(combinedData[0].id);
             }
           } catch (error) {
-            console.error("Failed to fetch resources:", error)
-            setIsLoading(false)
+            console.error('Failed to fetch resources:', error);
+            setIsLoading(false);
           }
-        }
+        };
 
-        fetchResources()
+        fetchResources();
       }
     } else {
-      setIsLoading(false)
-      setShowModalContent(false)
+      setIsLoading(false);
+      setShowModalContent(false);
     }
 
     return () => {
-      document.removeEventListener("keydown", handleEsc)
-      document.body.style.overflow = ""
-    }
-  }, [isOpen, onClose, selectedResourceName, resourceParams])
+      document.removeEventListener('keydown', handleEsc);
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, onClose, selectedResourceName, resourceParams]);
 
   const handleLoaderComplete = useCallback(() => {
-    setIsLoading(false)
-    setShowModalContent(true)
-  }, [])
+    setIsLoading(false);
+    setShowModalContent(true);
+  }, []);
 
-  function mapServiceNameToProvider(serviceName: string, provider: "aws" | "azure"): string {
+  function mapServiceNameToProvider(
+    serviceName: string,
+    provider: 'aws' | 'azure',
+  ): string {
     const mapping: Record<string, { aws: string; azure: string }> = {
-      "Virtual Machine": { aws: "ec2", azure: "vm" },
-      "Load Balancer": { aws: "elb", azure: "loadbalancer" },
-      Database: { aws: "rds", azure: "sql" },
-      "Object Storage": { aws: "s3", azure: "blob" },
-    }
-    return mapping[serviceName]?.[provider] ?? serviceName
+      'Virtual Machine': { aws: 'ec2', azure: 'vm' },
+      'Load Balancer': { aws: 'elb', azure: 'loadbalancer' },
+      Database: { aws: 'rds', azure: 'sql' },
+      'Object Storage': { aws: 's3', azure: 'blob' },
+    };
+    return mapping[serviceName]?.[provider] ?? serviceName;
   }
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) onClose()
-  }
+    if (e.target === e.currentTarget) onClose();
+  };
 
-  if (!mounted || !isOpen) return null
+  if (!mounted || !isOpen) return null;
 
   return (
     <>
-      <ResourceLoader isVisible={isLoading} onComplete={handleLoaderComplete} duration={4000} />
+      <ResourceLoader
+        isVisible={isLoading}
+        onComplete={handleLoaderComplete}
+        duration={4000}
+      />
 
       {showModalContent && (
         <div className="modal-overlay" onClick={handleOverlayClick}>
@@ -178,5 +212,5 @@ export default function ResourceModal({
         </div>
       )}
     </>
-  )
+  );
 }

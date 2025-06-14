@@ -27,15 +27,17 @@ export class awsController {
       );
 
       if (price !== null) {
-        res.status(200).json([{
-          id: 0,
-          provider: "AWS",
-          region: region,
-          storageClass: storageClass,
-          pricePerGbPerMonth: price,
-        }]);
+        res.status(200).json([
+          {
+            id: 0,
+            provider: "AWS",
+            region: region,
+            storageTier: storageClass,
+            pricePerGbPerMonth: price,
+          },
+        ]);
       } else {
-        res.status(500).json({ error: "Failed to fetch pricing data." });
+        res.status(400).json({ message: "No S3 available", provider: "AWS" });
       }
     } catch (error: any) {
       console.error("Error fetching S3 pricing:", error);
@@ -47,23 +49,22 @@ export class awsController {
     try {
       const { instanceType, region, os } = req.query;
 
+      console.log(instanceType)
       if (!instanceType || !region || !os) {
         res.status(400).json({
-          error:
-            "Missing required parameters: instanceType or region or os",
+          error: "Missing required parameters: instanceType or region or os",
         });
         return;
       }
 
-
       const pricing = await this.service.getFormattedEC2Pricing(
         region as string,
-        instanceType as string,
+        instanceType as string[],
         os as string
       );
 
       if (pricing === null) {
-        res.status(404).json({ error: "Pricing data not found" });
+        res.status(400).json({ message: "No EC2 available", provider: "AWS" });
         return;
       }
 
@@ -91,17 +92,19 @@ export class awsController {
       );
 
       if (price === null) {
-        res.status(404).json({ error: "Pricing data not found" });
+        res.status(400).json({ message: "No ELB available", provider: "AWS" });
         return;
       }
 
-      res.status(200).json([{
-        id: 0,
-        provider: "AWS",
-        region,
-        lbType,
-        pricePerHour: price,
-      }]);
+      res.status(200).json([
+        {
+          id: 0,
+          provider: "AWS",
+          region,
+          lbType,
+          pricePerHour: price,
+        },
+      ]);
     } catch (error) {
       console.error("Error fetching ELB pricing:", error);
       res.status(500).json({ error: "Failed to retrieve ELB pricing" });
@@ -126,19 +129,25 @@ export class awsController {
         databaseEngine as string
       );
 
-      if (!rdsPricingResult || rdsPricingResult.price === null || rdsPricingResult.type === null) {
-        res.status(404).json({ error: "Pricing data not found" });
+      if (
+        !rdsPricingResult ||
+        rdsPricingResult.price === null ||
+        rdsPricingResult.type === null
+      ) {
+        res.status(400).json({ message: "No RDS available", provider: "AWS" });
         return;
       }
 
-      res.status(200).json([{
-        id: 0,
-        provider: "AWS",
-        region,
-        instanceType: rdsPricingResult.type,
-        databaseEngine,
-        pricePerHour: rdsPricingResult.price,
-      }]);
+      res.status(200).json([
+        {
+          id: 0,
+          provider: "AWS",
+          region,
+          instanceType: rdsPricingResult.type,
+          databaseEngine,
+          pricePerHour: rdsPricingResult.price,
+        },
+      ]);
     } catch (error) {
       console.error("Error fetching RDS pricing:", error);
       res.status(500).json({ error: "Failed to retrieve RDS pricing" });
