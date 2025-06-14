@@ -8,6 +8,7 @@ import Navbar from './components/navbar';
 import './index.scss';
 import { LoginScreen } from './views/Login';
 import Projects from './views/Project/Projects';
+import Dashboard from './views/Dashboard/dashboard';
 
 const App: React.FC = () => {
   return (
@@ -23,6 +24,7 @@ const App: React.FC = () => {
         <Route element={<LoginWrapper />}>
           <Route element={<MainLayout />}>
             <Route path="/home" element={<Feed />} />
+            <Route path="/dashboard" element={<Dashboard />} />
           </Route>
         </Route>
         <Route path="/projects" element={<Projects />} />
