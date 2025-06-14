@@ -49,7 +49,6 @@ export class awsController {
     try {
       const { instanceType, region, os } = req.query;
 
-      console.log(instanceType)
       if (!instanceType || !region || !os) {
         res.status(400).json({
           error: "Missing required parameters: instanceType or region or os",
