@@ -7,7 +7,9 @@ import { Label } from '../ui/label/label';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group/radio-group';
 import './index.css';
 import { saveUserContext } from '../../services/userService';
+
 import { Textarea } from '../ui/textarea/textarea';
+
 
 
 export interface IUserContext {
@@ -102,12 +104,14 @@ const questions: Question[] = [
     ],
     name: 'osDependencies',
   },
+
   {
     id: 7,
     text: 'Tell us more about your application, its architecture, and any specific requirements or constraints you have in mind.',
     type: 'textarea',
     name: 'generalDescription',
   },
+
 ];
 
 export function CloudAssistantPopup({ onClose }: { onClose: () => void }) {
@@ -194,6 +198,7 @@ export function CloudAssistantPopup({ onClose }: { onClose: () => void }) {
             className="text-input"
           />
         )}
+
         {currentQuestionData.type === 'textarea' && (
           <Textarea
             value={getCurrentValue()}
@@ -205,6 +210,7 @@ export function CloudAssistantPopup({ onClose }: { onClose: () => void }) {
         {currentQuestionData.type === 'radio' && (
           <RadioGroup
             value={getCurrentValue()}
+
             onValueChange={handleAnswerChange}
             className="radio-options"
           >

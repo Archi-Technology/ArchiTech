@@ -8,30 +8,33 @@ import Navbar from './components/navbar';
 import './index.scss';
 import { LoginScreen } from './views/Login';
 import Projects from './views/Project/Projects';
+import { ServiceProvider } from './contexts/serviceContext'; // Import ServiceProvider
 
 const App: React.FC = () => {
   return (
-    <div className="whole-app">
-      <Routes>
-        {/* Landing page route */}
-        <Route path="/landing" element={<LandingPage />} />
+    <ServiceProvider>
+      <div className="whole-app">
+        <Routes>
+          {/* Landing page route */}
+          <Route path="/landing" element={<LandingPage />} />
 
-        {/* Default route redirects to landing page */}
-        <Route path="/" element={<Navigate to="/landing" replace />} />
+          {/* Default route redirects to landing page */}
+          <Route path="/" element={<Navigate to="/landing" replace />} />
 
-        {/* Protected routes */}
-        <Route element={<LoginWrapper />}>
-          <Route element={<MainLayout />}>
-            <Route path="/home" element={<Feed />} />
+          {/* Protected routes */}
+          <Route element={<LoginWrapper />}>
+            <Route element={<MainLayout />}>
+              <Route path="/home" element={<Feed />} />
+            </Route>
           </Route>
-        </Route>
-        <Route path="/projects" element={<Projects />} />
+          <Route path="/projects" element={<Projects />} />
 
-        {/* Login route */}
-        <Route path="/login" element={<LoginScreen />} />
-      </Routes>
-      <ToastContainer position="bottom-left" />
-    </div>
+          {/* Login route */}
+          <Route path="/login" element={<LoginScreen />} />
+        </Routes>
+        <ToastContainer position="bottom-left" />
+      </div>
+    </ServiceProvider>
   );
 };
 

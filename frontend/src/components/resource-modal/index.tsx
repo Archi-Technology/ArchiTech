@@ -15,15 +15,17 @@ import './index.scss';
 export default function ResourceModal({
   isOpen,
   onClose,
+  onConfirm,
   selectedResourceName,
   onResourceChange,
   resourceParams,
 }: {
-  isOpen: boolean;
-  onClose: () => void;
-  selectedResourceName: string;
-  onResourceChange?: (name: string) => void;
-  resourceParams?: Record<string, any>;
+  isOpen: boolean
+  onClose: () => void
+  onConfirm: (selectedCloud: string, pricing: any) => void
+  selectedResourceName: string
+  onResourceChange?: (name: string) => void
+  resourceParams?: Record<string, any>
 }) {
   const [selectedResource, setSelectedResource] = useState<string>('');
   const [resources, setResources] = useState<ResourceOption[]>([]);
@@ -212,7 +214,18 @@ export default function ResourceModal({
 
             <SuggestionSection suggestion={suggestion} />
 
-            <ModalActions onClose={onClose} />
+            <ModalActions
+              onClose={onClose}
+              onConfirm={() => {
+                if (selectedResource !== null) {
+                  const selectedResourceDetails = resources.find((resource) => resource.id === selectedResource);
+                  const selectedCloud = selectedResourceDetails?.provider || "unknown";
+
+                  onConfirm(selectedCloud, '10$'); // Pass the selected cloud provider
+                  document.dispatchEvent(new Event("closeParentModal")); // Trigger parent modal close
+                }
+              }}
+            />
           </div>
         // </div>
       )}

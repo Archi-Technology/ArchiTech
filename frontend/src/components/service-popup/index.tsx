@@ -19,19 +19,32 @@ import ResourceModal from '../resource-modal';
 import type { JSX } from 'react';
 
 interface ServicePopupProps {
-  service: { name: string; icon: JSX.Element };
-  onConfirm: (params: any) => void;
-  onCancel: () => void;
-  availableVPCs: { id: string; name: string }[];
-  availableSubnets: { id: string; name: string }[];
-  pricingOptions: any[];
-  instanceTypes?: { id: string; name: string }[];
-  regions?: { id: string; name: string }[];
-  oses?: string[];
-  storageClasses?: string[];
-  lbTypes?: string[];
-  dbInstanceTypes?: string[];
-  dbEngines?: string[];
+
+  service: { name: string; icon: JSX.Element }
+  onConfirm: (resourceInfo: {
+    instanceType?: string,
+    region?: string,
+    os?: string,
+    pricing?: any,
+    cloud?: string,
+    storageClass?: any,
+    lbType?: any,
+    dbInstanceType?: string,
+    engine?: any,
+
+  }, type: string, selectedCloud: string) => void
+  onCancel: () => void
+  availableVPCs: { id: string; name: string }[]
+  availableSubnets: { id: string; name: string }[]
+  pricingOptions: any[]
+  instanceTypes?: { id: string; name: string }[]
+  regions?: { id: string; name: string }[]
+  oses?: string[]
+  storageClasses?: string[]
+  lbTypes?: string[]
+  dbInstanceTypes?: string[]
+  dbEngines?: string[]
+
 }
 
 export default function ServicePopup({
@@ -164,31 +177,32 @@ export default function ServicePopup({
         os: selectedOS,
         pricing: pricing,
         cloud: selectedCloud,
-      });
-    } else if (service.name === 'Object Storage') {
+      }, 'virtual-machine', selectedCloud)
+    } else if (service.name === "Object Storage") {
       onConfirm({
         region: selectedRegion,
         storageClass: selectedStorageClass,
         pricing: pricing,
         cloud: selectedCloud,
-      });
-    } else if (service.name === 'Load Balancer') {
+      }, 'object-storage', selectedCloud)
+    } else if (service.name === "Load Balancer") {
       onConfirm({
         region: selectedRegion,
         lbType: selectedLBType,
         pricing: pricing,
         cloud: selectedCloud,
-      });
-    } else if (service.name === 'Database') {
+      }, 'load-balancer', selectedCloud)
+    } else if (service.name === "Database") {
       onConfirm({
         region: selectedRegion,
         dbInstanceType: selectedDBInstanceType,
         engine: selectedDBEngine,
         pricing: pricing,
         cloud: selectedCloud,
-      });
+      }, 'database', selectedCloud)
     }
-  };
+    onCancel() // Close the current ServicePopup
+  }
 
   const isFormValid = () => {
     if (service.name === 'Virtual Machine') {
@@ -508,8 +522,11 @@ export default function ServicePopup({
             transition={{ duration: 0.3 }}
           >
             <ResourceModal
-              isOpen={currentPage === 'price-comparison'}
-              onClose={() => setCurrentPage('form')}
+              isOpen={currentPage === "price-comparison"}
+              onClose={() => {
+                setCurrentPage("form");
+              }}
+              onConfirm={handleConfirm}
               selectedResourceName={service.name}
               resourceParams={formData}
             />

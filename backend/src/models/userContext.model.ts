@@ -8,6 +8,7 @@ export interface IBaseUserContext extends Document {
   softwareDependencies: string;
   budgetConsiderations: string;
   generalDescription?: string;
+
 }
 
 export interface IUserContext extends IBaseUserContext {

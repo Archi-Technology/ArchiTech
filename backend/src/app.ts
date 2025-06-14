@@ -15,6 +15,7 @@ import { projectRouter } from './routes/project.route';
 import { chatRouter } from './routes/chat.route';
 import { awsRouter } from './routes/aws.route';
 import { azureRouter } from './routes/azure.route';
+import { resourceRouter } from "./routes/resource.route";
 
 
 const appPromise: Promise<Application> = new Promise(async (resolve, reject) => {
