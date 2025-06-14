@@ -1,196 +1,207 @@
-"use client"
-import "./index.scss"
-import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { askOptimalChoices, parseGeminiRecommendation } from "../../utils/recommendation"
-import { getAllAvailableLocations } from "../../utils/Mappers/regionMapper"
-import { getAllAvailableInstanceCategories } from "../../utils/Mappers/typeMapper"
-import { getAllAvailableOSNames } from "../../utils/Mappers/osMapper"
-import { getAllAvailableObjectStorageClasses } from "../../utils/Mappers/objectStorageMapper"
-import { getAllAvailableLoadBalancerTypes } from "../../utils/Mappers/loadBalancerMapper"
-import { getAllAvailableDBInstanceTypes } from "../../utils/Mappers/dbInstanceTypeMapper"
-import { getAllAvailableDBEngineNames } from "../../utils/Mappers/dbEngineMapper"
-import { getAllAvailableVMInstanceCategories } from "../../utils/Mappers/vmInstanceTypeMapper"
-import { Button } from "../ui/button/button"
-import ResourceModal from "../resource-modal"
-import type { JSX } from "react"
+'use client';
+import './index.scss';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  askOptimalChoices,
+  parseGeminiRecommendation,
+} from '../../utils/recommendation';
+import { getAllAvailableLocations } from '../../utils/Mappers/regionMapper';
+import { getAllAvailableInstanceCategories } from '../../utils/Mappers/typeMapper';
+import { getAllAvailableOSNames } from '../../utils/Mappers/osMapper';
+import { getAllAvailableObjectStorageClasses } from '../../utils/Mappers/objectStorageMapper';
+import { getAllAvailableLoadBalancerTypes } from '../../utils/Mappers/loadBalancerMapper';
+import { getAllAvailableDBInstanceTypes } from '../../utils/Mappers/dbInstanceTypeMapper';
+import { getAllAvailableDBEngineNames } from '../../utils/Mappers/dbEngineMapper';
+import { getAllAvailableVMInstanceCategories } from '../../utils/Mappers/vmInstanceTypeMapper';
+import { Button } from '../ui/button/button';
+import ResourceModal from '../resource-modal';
+import type { JSX } from 'react';
 
 interface ServicePopupProps {
-  service: { name: string; icon: JSX.Element }
-  onConfirm: (params: any) => void
-  onCancel: () => void
-  availableVPCs: { id: string; name: string }[]
-  availableSubnets: { id: string; name: string }[]
-  pricingOptions: any[]
-  instanceTypes?: { id: string; name: string }[]
-  regions?: { id: string; name: string }[]
-  oses?: string[]
-  storageClasses?: string[]
-  lbTypes?: string[]
-  dbInstanceTypes?: string[]
-  dbEngines?: string[]
+  service: { name: string; icon: JSX.Element };
+  onConfirm: (params: any) => void;
+  onCancel: () => void;
+  availableVPCs: { id: string; name: string }[];
+  availableSubnets: { id: string; name: string }[];
+  pricingOptions: any[];
+  instanceTypes?: { id: string; name: string }[];
+  regions?: { id: string; name: string }[];
+  oses?: string[];
+  storageClasses?: string[];
+  lbTypes?: string[];
+  dbInstanceTypes?: string[];
+  dbEngines?: string[];
 }
 
-export default function ServicePopup({ service, onConfirm, onCancel }: ServicePopupProps) {
-  const [selectedVPC, setSelectedVPC] = useState<string>("")
-  const [selectedSubnet, setSelectedSubnet] = useState<string>("")
-  const [selectedPricing, setSelectedPricing] = useState<string>("")
-  const [selectedInstanceType, setSelectedInstanceType] = useState<string>("")
-  const [selectedVmInstanceType, setSelectedVmInstanceType] = useState<string>("")
-  const [selectedRegion, setSelectedRegion] = useState<string>("")
-  const [selectedOS, setSelectedOS] = useState<string>("")
-  const [selectedStorageClass, setSelectedStorageClass] = useState<string>("")
-  const [selectedLBType, setSelectedLBType] = useState<string>("")
-  const [selectedDBInstanceType, setSelectedDBInstanceType] = useState<string>("")
-  const [selectedDBEngine, setSelectedDBEngine] = useState<string>("")
-  const [selectedRedundancy, setSelectedRedundancy] = useState<string>("")
-  const [recommendation, setRecommendation] = useState<string>("")
-  const [currentPage, setCurrentPage] = useState<"form" | "price-comparison">("form")
-  const [formData, setFormData] = useState<any>(null)
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({})
-  const [showValidation, setShowValidation] = useState(false)
-  const [shakingFields, setShakingFields] = useState<string[]>([])
+export default function ServicePopup({
+  service,
+  onConfirm,
+  onCancel,
+}: ServicePopupProps) {
+  const [selectedVPC, setSelectedVPC] = useState<string>('');
+  const [selectedSubnet, setSelectedSubnet] = useState<string>('');
+  const [selectedPricing, setSelectedPricing] = useState<string>('');
+  const [selectedInstanceType, setSelectedInstanceType] = useState<string>('');
+  const [selectedVmInstanceType, setSelectedVmInstanceType] =
+    useState<string>('');
+  const [selectedRegion, setSelectedRegion] = useState<string>('');
+  const [selectedOS, setSelectedOS] = useState<string>('');
+  const [selectedStorageClass, setSelectedStorageClass] = useState<string>('');
+  const [selectedLBType, setSelectedLBType] = useState<string>('');
+  const [selectedDBInstanceType, setSelectedDBInstanceType] =
+    useState<string>('');
+  const [selectedDBEngine, setSelectedDBEngine] = useState<string>('');
+  const [selectedRedundancy, setSelectedRedundancy] = useState<string>('');
+  const [recommendation, setRecommendation] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState<'form' | 'price-comparison'>(
+    'form',
+  );
+  const [formData, setFormData] = useState<any>(null);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [showValidation, setShowValidation] = useState(false);
+  const [shakingFields, setShakingFields] = useState<string[]>([]);
 
   useEffect(() => {
     setRecommendation(
       `Based on your app context, click here to get optimal cost and performance for "${service.name}".`,
-    )
-  }, [service])
+    );
+  }, [service]);
 
   const handleNext = () => {
-    setShowValidation(true)
+    setShowValidation(true);
 
-    const errors: Record<string, string> = {}
-    const fieldsToShake: string[] = []
+    const errors: Record<string, string> = {};
+    const fieldsToShake: string[] = [];
 
-    if (service.name === "Virtual Machine") {
+    if (service.name === 'Virtual Machine') {
       if (!selectedVmInstanceType) {
-        errors.instanceType = "Please select an instance type"
-        fieldsToShake.push("instanceType")
+        errors.instanceType = 'Please select an instance type';
+        fieldsToShake.push('instanceType');
       }
       if (!selectedRegion) {
-        errors.region = "Please select a region"
-        fieldsToShake.push("region")
+        errors.region = 'Please select a region';
+        fieldsToShake.push('region');
       }
       if (!selectedOS) {
-        errors.os = "Please select an operating system"
-        fieldsToShake.push("os")
+        errors.os = 'Please select an operating system';
+        fieldsToShake.push('os');
       }
-    } else if (service.name === "Object Storage") {
+    } else if (service.name === 'Object Storage') {
       if (!selectedRegion) {
-        errors.region = "Please select a region"
-        fieldsToShake.push("region")
+        errors.region = 'Please select a region';
+        fieldsToShake.push('region');
       }
       if (!selectedStorageClass) {
-        errors.storageClass = "Please select a storage class"
-        fieldsToShake.push("storageClass")
+        errors.storageClass = 'Please select a storage class';
+        fieldsToShake.push('storageClass');
       }
-    } else if (service.name === "Load Balancer") {
+    } else if (service.name === 'Load Balancer') {
       if (!selectedRegion) {
-        errors.region = "Please select a region"
-        fieldsToShake.push("region")
+        errors.region = 'Please select a region';
+        fieldsToShake.push('region');
       }
       if (!selectedLBType) {
-        errors.lbType = "Please select a load balancer type"
-        fieldsToShake.push("lbType")
+        errors.lbType = 'Please select a load balancer type';
+        fieldsToShake.push('lbType');
       }
-    } else if (service.name === "Database") {
+    } else if (service.name === 'Database') {
       if (!selectedRegion) {
-        errors.region = "Please select a region"
-        fieldsToShake.push("region")
+        errors.region = 'Please select a region';
+        fieldsToShake.push('region');
       }
       if (!selectedDBInstanceType) {
-        errors.dbInstanceType = "Please select a database instance type"
-        fieldsToShake.push("dbInstanceType")
+        errors.dbInstanceType = 'Please select a database instance type';
+        fieldsToShake.push('dbInstanceType');
       }
       if (!selectedDBEngine) {
-        errors.dbEngine = "Please select a database engine"
-        fieldsToShake.push("dbEngine")
+        errors.dbEngine = 'Please select a database engine';
+        fieldsToShake.push('dbEngine');
       }
     }
 
-    setFormErrors(errors)
+    setFormErrors(errors);
 
     // Trigger shaking animation
-    setShakingFields(fieldsToShake)
+    setShakingFields(fieldsToShake);
     setTimeout(() => {
-      setShakingFields([])
-    }, 500)
+      setShakingFields([]);
+    }, 500);
 
     if (Object.keys(errors).length === 0) {
       const data = {
         service: service.name,
-        ...(service.name === "Virtual Machine" && {
+        ...(service.name === 'Virtual Machine' && {
           vmInstanceType: selectedVmInstanceType,
           region: selectedRegion,
           os: selectedOS,
         }),
-        ...(service.name === "Object Storage" && {
+        ...(service.name === 'Object Storage' && {
           region: selectedRegion,
           storageClass: selectedStorageClass,
         }),
-        ...(service.name === "Load Balancer" && {
+        ...(service.name === 'Load Balancer' && {
           region: selectedRegion,
           lbType: selectedLBType,
         }),
-        ...(service.name === "Database" && {
+        ...(service.name === 'Database' && {
           region: selectedRegion,
           instanceType: selectedDBInstanceType,
           databaseEngine: selectedDBEngine,
         }),
-      }
+      };
 
-      setFormData(data)
-      setCurrentPage("price-comparison")
+      setFormData(data);
+      setCurrentPage('price-comparison');
     }
-  }
+  };
 
   const handleConfirm = (selectedCloud: string, pricing: any) => {
-    if (service.name === "Virtual Machine") {
+    if (service.name === 'Virtual Machine') {
       onConfirm({
         vmInstanceType: selectedVmInstanceType,
         region: selectedRegion,
         os: selectedOS,
         pricing: pricing,
         cloud: selectedCloud,
-      })
-    } else if (service.name === "Object Storage") {
+      });
+    } else if (service.name === 'Object Storage') {
       onConfirm({
         region: selectedRegion,
         storageClass: selectedStorageClass,
         pricing: pricing,
         cloud: selectedCloud,
-      })
-    } else if (service.name === "Load Balancer") {
+      });
+    } else if (service.name === 'Load Balancer') {
       onConfirm({
         region: selectedRegion,
         lbType: selectedLBType,
         pricing: pricing,
         cloud: selectedCloud,
-      })
-    } else if (service.name === "Database") {
+      });
+    } else if (service.name === 'Database') {
       onConfirm({
         region: selectedRegion,
         dbInstanceType: selectedDBInstanceType,
         engine: selectedDBEngine,
         pricing: pricing,
         cloud: selectedCloud,
-      })
+      });
     }
-  }
+  };
 
   const isFormValid = () => {
-    if (service.name === "Virtual Machine") {
-      return selectedVmInstanceType && selectedRegion && selectedOS
-    } else if (service.name === "Object Storage") {
-      return selectedRegion && selectedStorageClass
-    } else if (service.name === "Load Balancer") {
-      return selectedRegion && selectedLBType
-    } else if (service.name === "Database") {
-      return selectedRegion && selectedDBInstanceType && selectedDBEngine
+    if (service.name === 'Virtual Machine') {
+      return selectedVmInstanceType && selectedRegion && selectedOS;
+    } else if (service.name === 'Object Storage') {
+      return selectedRegion && selectedStorageClass;
+    } else if (service.name === 'Load Balancer') {
+      return selectedRegion && selectedLBType;
+    } else if (service.name === 'Database') {
+      return selectedRegion && selectedDBInstanceType && selectedDBEngine;
     }
-    return false
-  }
+    return false;
+  };
 
   return (
     <div className="popup-overlay">
@@ -479,10 +490,13 @@ export default function ServicePopup({ service, onConfirm, onCancel }: ServicePo
             )}
 
             <div className="popup-actions">
-              <Button onClick={handleNext}>Next</Button>
-              <Button variant="destructive" onClick={onCancel}>
+              <button onClick={handleNext} className="button primary">
+                Next
+              </button>
+
+              <button className="button secondary" onClick={onCancel}>
                 Cancel
-              </Button>
+              </button>
             </div>
           </motion.div>
         ) : (

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useUser } from '../../contexts/userContext';
-import appLogo from '../../assets/site-logo.png';
+import appLogo from '../../assets/logoIcon.png';
 import './index.scss'; // Import the CSS styles for the navbar
 import { AxiosInstence } from '../../services/axios/AxiosInstance';
 
@@ -13,7 +13,12 @@ const Navbar: React.FC = () => {
     <div className="navbar">
       <div className="navbarLeft">
         <div className="logoContainer">
-          <div className="logo">A</div>
+          <img
+            src={appLogo}
+            alt="ArchiTech Logo"
+            className="logoImage"
+            style={{ width: 64, height: 64 }}
+          />
           <div className="appName">ArchiTech</div>
           <Link to="/projects">
             <button className="navButton">Projects</button>
