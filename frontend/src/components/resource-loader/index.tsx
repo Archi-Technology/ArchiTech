@@ -1,35 +1,32 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { Check } from 'lucide-react';
 import './index.scss';
 
 interface ResourceLoaderProps {
   isVisible: boolean;
   onComplete?: () => void;
   duration?: number;
-  comments?: string[];
+  steps?: string[];
 }
 
 export default function ResourceLoader({
   isVisible,
   onComplete,
   duration = 3000,
-  comments = [
-    'Finding the best price for you...',
-    'Comparing cloud providers...',
-    'Analyzing cost optimization...',
-    'Searching for deals and discounts...',
-    'Calculating savings opportunities...',
-    'Reviewing performance metrics...',
+  steps = [
+    'Analyzing your answers',
+    'Analyzing your preferences',
+    'Selecting budget-friendly options',
   ],
 }: ResourceLoaderProps) {
   const [progress, setProgress] = useState(0);
-  const [currentCommentIndex, setCurrentCommentIndex] = useState(0);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [hasCompleted, setHasCompleted] = useState(false);
   const startTimeRef = useRef<number | null>(null);
   const animationFrameRef = useRef<number | null>(null);
-  const commentTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleComplete = useCallback(() => {
     if (!hasCompleted && onComplete) {
@@ -46,27 +43,31 @@ export default function ResourceLoader({
 
     setProgress(newProgress);
 
+    // Update completed steps based on progress - more generous timing
+    const stepProgress = newProgress / 100;
+    const newCompletedSteps: number[] = [];
+
+    for (let i = 0; i < steps.length; i++) {
+      // Make steps complete earlier for better UX
+      if (stepProgress > (i + 0.5) / steps.length) {
+        newCompletedSteps.push(i);
+      }
+    }
+    setCompletedSteps(newCompletedSteps);
+
     if (newProgress >= 100) {
-      setTimeout(handleComplete, 300);
+      // Mark all steps as completed
+      setCompletedSteps(steps.map((_, index) => index));
+      setTimeout(handleComplete, 500);
     } else {
       animationFrameRef.current = requestAnimationFrame(updateProgress);
     }
-  }, [duration, isVisible, handleComplete]);
-
-  const cycleComments = useCallback(() => {
-    if (!isVisible) return;
-
-    const commentDuration = duration / comments.length; // Reduce duration per comment
-    commentTimeoutRef.current = setTimeout(() => {
-      setCurrentCommentIndex((prev) => (prev + 1) % comments.length);
-      cycleComments();
-    }, commentDuration);
-  }, [isVisible, duration, comments.length]);
+  }, [duration, isVisible, handleComplete, steps]);
 
   useEffect(() => {
     if (!isVisible) {
       setProgress(0);
-      setCurrentCommentIndex(0);
+      setCompletedSteps([]);
       setHasCompleted(false);
       startTimeRef.current = null;
 
@@ -74,65 +75,46 @@ export default function ResourceLoader({
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
       }
-
-      if (commentTimeoutRef.current) {
-        clearTimeout(commentTimeoutRef.current);
-        commentTimeoutRef.current = null;
-      }
       return;
     }
 
     startTimeRef.current = Date.now();
     setProgress(0);
-    setCurrentCommentIndex(0);
+    setCompletedSteps([]);
     setHasCompleted(false);
 
     animationFrameRef.current = requestAnimationFrame(updateProgress);
-
-    setTimeout(
-      () => {
-        cycleComments();
-      },
-      duration / comments.length - 600,
-    );
 
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
-      if (commentTimeoutRef.current) {
-        clearTimeout(commentTimeoutRef.current);
-      }
     };
-  }, [isVisible, duration, comments.length, updateProgress, cycleComments]);
+  }, [isVisible, updateProgress]);
 
   if (!isVisible) return null;
 
-  const radius = 40;
+  const radius = 45;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] backdrop-blur-sm">
-      <div className="bg-white rounded-xl shadow-2xl p-6 max-w-xs w-full mx-4 text-center space-y-5">
-        <div className="relative w-28 h-28 mx-auto">
-          <svg
-            className="absolute w-28 h-28 transform -rotate-90"
-            viewBox="0 0 100 100"
-          >
+      <div className="loader-container">
+        <div className="progress-circle">
+          <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
             <circle
-              cx="50"
-              cy="50"
+              cx="60"
+              cy="60"
               r={radius}
-              stroke="#f3f4f6"
+              stroke="#e5e7eb"
               strokeWidth="8"
               fill="none"
             />
             <circle
-              cx="50"
-              cy="50"
+              cx="60"
+              cy="60"
               r={radius}
-              stroke="url(#progressGradient)"
+              stroke="#4c8bf5"
               strokeWidth="8"
               fill="none"
               strokeLinecap="round"
@@ -140,51 +122,35 @@ export default function ResourceLoader({
               strokeDashoffset={strokeDashoffset}
               className="animated-stroke"
             />
-            <defs>
-              <linearGradient
-                id="progressGradient"
-                x1="0%"
-                y1="0%"
-                x2="100%"
-                y2="0%"
-              >
-                <stop offset="0%" stopColor="#3b82f6" />
-                <stop offset="100%" stopColor="#1d4ed8" />
-              </linearGradient>
-            </defs>
-            <text
-              x="50"
-              y="50"
-              textAnchor="middle"
-              dominantBaseline="middle"
-              className="text-2xl font-bold text-gray-900 tabular-nums animate-pulse"
-            >
-              {Math.round(progress)}%
-            </text>
           </svg>
+          <div className="progress-text">{Math.round(progress)}%</div>
         </div>
 
-        <div>
-          <span className="text-base font-semibold text-gray-800">
-            Loading Resources
-          </span>
-        </div>
+        <div className="status-text">Finalizing...</div>
 
-        <div className="min-h-[2rem] flex items-center justify-center px-2">
-          <AnimatePresence mode="wait">
-            <motion.p
-              key={currentCommentIndex}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-sm text-gray-900 text-center leading-relaxed font-medium"
-            >
-              {comments[currentCommentIndex]}
-            </motion.p>
-          </AnimatePresence>
+        <div className="steps-list">
+          {steps.map((step, index) => {
+            const isCompleted = completedSteps.includes(index);
+            return (
+              <motion.div
+                key={index}
+                className="step-item"
+                initial={{ opacity: 0.5 }}
+                animate={{
+                  opacity: isCompleted ? 1 : 0.5,
+                }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className={`step-icon ${isCompleted ? 'completed' : ''}`}>
+                  {isCompleted && <Check size={12} />}
+                </div>
+                <span className={`step-text ${isCompleted ? 'completed' : ''}`}>
+                  {step}
+                </span>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
-    </div>
   );
 }

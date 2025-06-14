@@ -186,6 +186,11 @@ export default function ResourceModal({
         isVisible={isLoading}
         onComplete={handleLoaderComplete}
         duration={4000}
+        steps={[
+          'Analyzing your answers',
+          'Analyzing your preferences',
+          'Selecting budget-friendly options',
+        ]}
       />
 
       {showModalContent && (
@@ -209,7 +214,7 @@ export default function ResourceModal({
 
             <ModalActions onClose={onClose} />
           </div>
-        </div>
+        // </div>
       )}
     </>
   );

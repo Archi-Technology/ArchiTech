@@ -19,6 +19,19 @@
     text-align: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
+
+    .popup-content-loader {
+      background: transparent;
+      padding: 2rem;
+      /* Increased padding */
+      border-radius: 0.5rem;
+      width: 95%;
+      /* Increased width */
+      max-width: 600px;
+      /* Increased max width */
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
 }
 
 .popup-service {

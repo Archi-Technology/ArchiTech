@@ -2,23 +2,107 @@
   transition: stroke-dashoffset 0.3s ease-in-out;
 }
 
-.animate-pulse {
-  animation: pulse 2s infinite ease-in-out;
+.loader-container {
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  padding: 2rem 1.5rem;
+  max-width: auto;
+  max-height: auto;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.text-center {
-  color: #000; /* Black text for maximum contrast */
-  font-size: 16px; /* Slightly larger font size */
-  font-weight: bold; /* Make the text bold */
+.loader-container .progress-circle {
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 1.5rem;
+  position: relative;
+  color: #4c8bf5;
 }
 
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
+.loader-container .progress-circle .progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #4c8bf5;
+}
+
+.loader-container .status-text {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+  color: #4c8bf5;
+}
+
+.loader-container .steps-list {
+  text-align: left;
+}
+
+.loader-container .steps-list .step-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.loader-container .steps-list .step-item .step-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  background-color: transparent;
+  color: #4c8bf5;
+}
+
+.loader-container .steps-list .step-item .step-icon.completed {
+  background-color: #4c8bf5;
+  border-color: #4c8bf5;
+  color: white;
+}
+
+.loader-container .steps-list .step-item .step-text {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.loader-container .steps-list .step-item .step-text.completed {
+  color: #374151;
+  font-weight: 600;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 640px) {
+  .loader-container {
+    margin: 1rem;
+    padding: 1.5rem 1rem;
   }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.7;
+
+  .loader-container .progress-circle {
+    width: 100px;
+    height: 100px;
+  }
+
+  .loader-container .progress-circle .progress-text {
+    font-size: 1.25rem;
+  }
+
+  .loader-container .status-text {
+    font-size: 1.125rem;
   }
 }
