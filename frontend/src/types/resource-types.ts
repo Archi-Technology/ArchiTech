@@ -17,6 +17,9 @@ export interface ResourceOption {
   redundancy?: string
   storageClass?: string
   storageTier?: string
+
+  //Load balancer specific fiedlds
+  lbType?: string
 }
 
 export interface PricingOption {

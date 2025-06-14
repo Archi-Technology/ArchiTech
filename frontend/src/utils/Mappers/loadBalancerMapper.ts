@@ -12,17 +12,17 @@ const loadBalancerTypeMap: LoadBalancerTypeMapEntry[] = [
   {
     name: 'Application',
     aws: ['application'],
-    azure: ['Application Gateway'],
+    azure: [],
   },
   {
     name: 'Network',
     aws: ['network'],
-    azure: ['Load Balancer'],
+    azure: ['Standard'],
   },
   {
     name: 'Gateway',
     aws: [],
-    azure: ['Gateway Load Balancer'],
+    azure: ['Gateway'],
   },
 ];
 

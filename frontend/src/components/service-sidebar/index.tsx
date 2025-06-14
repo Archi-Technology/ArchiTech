@@ -62,19 +62,16 @@ export default function ServiceSidebar({ canvasRef }: { canvasRef: React.RefObje
 
   return (
     <div className="sidebar">
-      <div className="search-container">
-        <div className="search-input-wrapper">
-          <span className="search-icon">🔍</span>
-          <input
-            type="text"
-            placeholder="Search resources..."
-            className="search-input"
-          />
-        </div>
-      </div>
-
       <div className="tabs">
-        <h3 style={{ textAlign: 'center' }}>Catalog</h3>
+        <h3
+          style={{
+            textAlign: 'center',
+            marginTop: '20px',
+            marginBottom: '20px',
+          }}
+        >
+          Catalog
+        </h3>
 
         <div className="tab-content">
           {activeTab === 'catalog' ? (
