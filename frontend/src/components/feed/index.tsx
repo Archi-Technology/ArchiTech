@@ -8,7 +8,7 @@ import DiagramCanvas from "../diagram-canvas";
 import NeededAssistantCheck from "../neededAssistantCheck";
 import ServiceSidebar from "../service-sidebar";
 import Chat from "../Chat";
-
+import "./index.scss"
 // Define a type for the ref that matches BasicFlowRef
 type DiagramCanvasRef = {
   onNodeClick: (event: any, node: any) => void;
