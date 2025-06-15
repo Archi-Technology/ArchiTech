@@ -21,6 +21,15 @@ class ProjectController {
     }
   }
 
+  async getProjectArtchitecture(req: Request, res: Response) {
+    try {
+      const data = await this.service.getProjectArtchitecture(req.params.id);
+      res.json(data);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
   async create(req: Request, res: Response) {
     try {
       const userId = exractUserIdFromToken(req);

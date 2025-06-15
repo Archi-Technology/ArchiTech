@@ -15,6 +15,7 @@ import { projectRouter } from './routes/project.route';
 import { chatRouter } from './routes/chat.route';
 import { awsRouter } from './routes/aws.route';
 import { azureRouter } from './routes/azure.route';
+import { resourceRouter } from "./routes/resource.route";
 
 
 const appPromise: Promise<Application> = new Promise(async (resolve, reject) => {
@@ -40,23 +41,16 @@ const appPromise: Promise<Application> = new Promise(async (resolve, reject) => 
     fs.mkdirSync(uploadsPath, { recursive: true });
   }
 
-    app.use(cors());
-  
-    app.use('/api', authMiddleware);
-    app.use('/api/auth', authRouter);
-    app.use('/api/user', userRouter);
-    app.use('/api/chat', chatRouter);
-    app.use('/api/projects', projectRouter);
+  app.use(cors());
 
-    app.use('/aws', awsRouter);
-    app.use("/azure", azureRouter);
 
   app.use('/api', authMiddleware);
   app.use('/api/auth', authRouter);
   app.use('/api/user', userRouter);
   app.use('/api/chat', chatRouter);
-  app.use('/aws', awsRouter);
-  app.use("/azure", azureRouter);
+  app.use('/api/projects', projectRouter);
+  app.use('/api/aws', awsRouter);
+  app.use("/api/azure", azureRouter);
 
   try {
     await mongoose.connect(config.MONGO_URI as string);

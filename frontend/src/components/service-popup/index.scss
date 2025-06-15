@@ -19,9 +19,20 @@
     text-align: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
-  
-}
 
+    .popup-content-loader {
+      background: transparent;
+      padding: 2rem;
+      /* Increased padding */
+      border-radius: 0.5rem;
+      width: 95%;
+      /* Increased width */
+      max-width: 600px;
+      /* Increased max width */
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+}
 
 .popup-service {
   display: flex;
@@ -83,6 +94,7 @@
   border-radius: 0.25rem;
   font-size: 0.875rem;
   margin-bottom: 1rem; /* Added margin for spacing */
+  text-align: center; /* Center text in select dropdowns */
 }
 
 .popup-selection select:focus {
@@ -142,4 +154,26 @@
 .popup-pricing td span {
   font-weight: bold;
   color: #374151;
+}
+
+/* Animation for error fields */
+.shake {
+  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.error {
+  border-color: #ef4444 !important;
+}
+
+.error-message {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: -0.75rem;
+  margin-bottom: 0.5rem;
 }

@@ -3,6 +3,14 @@ export type Cloud = 'aws' | 'azure';
 type OSMap = Record<string, { aws?: string[]; azure?: string[] }>;
 
 const osMap: OSMap = {
+  Linux: {
+    aws: ['Linux'],
+    azure: ['Canonical:UbuntuServer:22_04-lts:latest'],
+  },
+  Windows: {
+    aws: ['Windows_Server-2022-English-Full-Base'],
+    azure: ['MicrosoftWindowsServer:WindowsServer:2022-datacenter:latest'],
+  },
   Ubuntu: {
     aws: ['ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server'],
     azure: ['Canonical:UbuntuServer:22_04-lts:latest'],

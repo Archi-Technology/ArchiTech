@@ -4,13 +4,13 @@ import { awsControllerInstance } from "../controllers/aws.controller";
 export const awsRouter = Router();
 /**
  * @swagger
- * /aws/cost/s3:
+ * /api/aws/cost/s3:
  *   get:
  *     description: get cost of s3 bucket
  *     tags:
  *       - AWS
  *     parameters:
- *       - name: location
+ *       - name: region
  *         in: query
  *         description: The region of the s3 bucket
  *         required: false
@@ -51,7 +51,7 @@ awsRouter.get(
 
 /**
  * @swagger
- * /aws/cost/ec2:
+ * /api/aws/cost/ec2:
  *   get:
  *     description: Get cost of EC2 instances
  *     tags:
@@ -71,7 +71,7 @@ awsRouter.get(
  *         schema:
  *           type: string
  *           example: Canada (Central)
- *       - name: operatingSystem
+ *       - name: os
  *         in: query
  *         description: The operating system (e.g., Linux, Windows)
  *         required: true
@@ -92,7 +92,7 @@ awsRouter.get(
  *                 region:
  *                   type: string
  *                   example: us-east-1
- *                 operatingSystem:
+ *                 os:
  *                   type: string
  *                   example: Linux
  *                 pricePerHour:
@@ -108,7 +108,7 @@ awsRouter.get(
 
 /**
  * @swagger
- * /aws/cost/elb:
+ * /api/aws/cost/elb:
  *   get:
  *     description: Get pricing for ELB
  *     tags:
@@ -139,7 +139,7 @@ awsRouter.get(
 
 /**
  * @swagger
- * /aws/cost/rds:
+ * /api/aws/cost/rds:
  *   get:
  *     description: Get pricing for Amazon RDS instances
  *     tags:
