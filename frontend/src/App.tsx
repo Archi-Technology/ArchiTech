@@ -8,6 +8,7 @@ import Navbar from './components/navbar';
 import './index.scss';
 import { LoginScreen } from './views/Login';
 import Projects from './views/Project/Projects';
+import Dashboard from './views/Dashboard/dashboard';
 import { ServiceProvider } from './contexts/serviceContext'; // Import ServiceProvider
 
 const App: React.FC = () => {
@@ -21,13 +22,14 @@ const App: React.FC = () => {
           {/* Default route redirects to landing page */}
           <Route path="/" element={<Navigate to="/landing" replace />} />
 
-          {/* Protected routes */}
-          <Route element={<LoginWrapper />}>
-            <Route element={<MainLayout />}>
-              <Route path="/home" element={<Feed />} />
-            </Route>
+        {/* Protected routes */}
+        <Route element={<LoginWrapper />}>
+          <Route element={<MainLayout />}>
+            <Route path="/home" element={<Feed />} />
+            <Route path="/dashboard" element={<Dashboard />} />
           </Route>
           <Route path="/projects" element={<Projects />} />
+        </Route>
 
           {/* Login route */}
           <Route path="/login" element={<LoginScreen />} />
