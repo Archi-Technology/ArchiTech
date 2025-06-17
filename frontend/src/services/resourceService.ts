@@ -8,7 +8,7 @@ export interface IResource {
     projectId: string;
     name: string;
     type: ServiceType;
-    parentId: string;
+    parentId?: string;
     connnectedTo: string[];
     cloudProvider: CloudProvider;
     extraData: any;

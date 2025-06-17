@@ -1,5 +1,7 @@
 import {AxiosInstence} from './axios/AxiosInstance';
-
+import useSWR from 'swr';
+const projectVpcKey = 'projectVpcs'; // Key for caching project VPCs
+const projectSubnetsKey = 'projectSubnets'; // Key for caching project subnets
 
 const projectId = sessionStorage.getItem('selectedProjectId'); // Fetch project ID from session storage
 export const getAllProjects = async () => {
@@ -12,6 +14,17 @@ export const getProjectSubnets = async () => {
   return response.data;
 };
 
+export const useGetProjectSubnets = (userid: string | null) =>
+  useSWR<any>(
+    projectSubnetsKey,
+    () => getProjectSubnets(),
+  );
+
+  export const useGetProjectVpcs = (userid: string | null) =>
+  useSWR<any>(
+    projectVpcKey,
+    () => getProjectVpcs(),
+  );
 export const getProjectVpcs = async () => {
   const response = await AxiosInstence.get(`/projects/${projectId}/vpcs/`);
   return response.data;

@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import subnetIcon from '../../assets/canvas/network-wired-svgrepo-com.svg';
+import vpcIcon from '../../assets/canvas/cloud-svgrepo-com.svg';
 import databaseIcon from '../../assets/canvas/database.png';
 import loadBalancerIcon from '../../assets/canvas/loadbalancer.png';
 import objectStorageIcon from '../../assets/canvas/objectstorage.png';
@@ -6,7 +8,7 @@ import virtualMachineIcon from '../../assets/canvas/virtualmachine.png';
 import './index.scss';
 
 import { useCanvas } from '../../contexts/canvasContext'; // Import canvas context
-import ServicePopup from '../service-popup'; // Import the popup component
+import ServicePopup, { ServiceType } from '../service-popup'; // Import the popup component
 import { get } from 'react-hook-form';
 import { getProjectSubnets, getProjectVpcs } from '../../services/projectService';
 import { createResource, generateTerraform, IResource } from '../../services/resourceService';
@@ -42,7 +44,13 @@ export default function ServiceSidebar() {
         const terraformCode = await generateTerraform(newResource._id);
         setLoading(false);
         updateTerraformCode(terraformCode);
+        if(data.type === ServiceType.VPC || data.type === ServiceType.SUBNET) {
+        const vpcs = await getProjectVpcs(); // Replace with actual function to fetch VPCs
+        const subnets = await getProjectSubnets(); // Replace with actual function to fetch subnets
 
+        setAvailableVPCs(vpcs); // Assuming vpc has a name property
+        setAvailableSubnets(subnets);
+        }
     };
   // const handlePopupConfirm = ({
   //   vpc,
@@ -181,6 +189,18 @@ const services: Service[] = [
     name: 'Database',
     icon: (
       <img src={databaseIcon} alt="Database" className="service-icon-img" />
+    ),
+  },
+  {
+    name: 'Vpc',
+    icon: (
+      <img src={vpcIcon} alt="Vpc" className="service-icon-img" />
+    ),
+  },
+  {
+    name: 'Subnet',
+    icon: (
+      <img src={subnetIcon} alt="Subnet" className="service-icon-img" />
     ),
   },
 ];
