@@ -3,36 +3,29 @@ import { IGenericResponse } from '../interfaces/user';
 
 import {
   getAllAvailableLocations,
-  translateLocationToRegionCodes,
 } from '../utils/Mappers/regionMapper';
 
 import {
-  translateInstanceTypeCategory,
   getAllAvailableInstanceCategories,
 } from '../utils/Mappers/typeMapper';
 
 import {
-  translateOSTypeToCloudOptions,
   getAllAvailableOSNames,
 } from '../utils/Mappers/osMapper';
 
 import {
-  translateStorageClassToCloudOptions,
   getAllAvailableObjectStorageClasses,
 } from '../utils/Mappers/objectStorageMapper';
 
 import {
-  translateLoadBalancerTypeToCloudOptions,
   getAllAvailableLoadBalancerTypes,
 } from '../utils/Mappers/loadBalancerMapper';
 
 import {
-  translateDBInstanceTypeToCloudOptions,
   getAllAvailableDBInstanceTypes,
 } from '../utils/Mappers/dbInstanceTypeMapper';
 
 import {
-  translateDBEngineToCloudOptions,
   getAllAvailableDBEngineNames,
 } from '../utils/Mappers/dbEngineMapper';
 
@@ -98,6 +91,40 @@ export async function askOptimalChoices(serviceName: string) {
     return null;
   }
 }
+export async function getResourceSuggestion(serviceName: string): Promise<IGenericResponse | null> {
+  let question = '';
+
+  if (serviceName === 'Virtual Machine') {
+    question = `Given my user context, what is the best Virtual Machine instance according to the context: Spot, Reserved, or On-Demand? Explain why.
+    Please return text only wihout any formatting, and your answer should start with "The best option is: " followed by the type. For example: "The best option is: Spot".
+    Please no more than 3 sentences.`;
+  } else if (serviceName === 'Object Storage') {
+    question = `Given my user context, what is the best Object storage instance according to my user context and recommend between AWS S3 or Azure blob storage and Explain why.
+    If you choose AWS S3: According to my user context refer to Lifecycle Policies,Object Versioning + Expiry  andData Compression
+    If you choose Azure blob storage: According to my user context refer to Blob Lifecycle Management, Blob Versioning + Soft Delete,Compression + Chunking.
+    Please return text only wihout any formatting, and your answer should start with "The best option is: " followed by the cloud provider.
+    Please no more than 3 sentences.`;
+  } else if (serviceName === 'Load Balancer') {
+    question = `Given my user context, what is the best Load Balancer instance according to my user context and recommend between AWS ELB or Azure loadBalancer and Explain why.
+    Please return text only wihout any formatting, and your answer should start with "The best option is: " followed by the cloud provider".
+    Please no more than 3 sentences.`;
+  } else if (serviceName === 'Database') {
+    question = `Given my user context, what is the best Database according to my user context and recommend between AWS RDS or Azure SQL and Explain why.
+    Please return text only wihout any formatting, and your answer should start with "The best option is: " followed by the cloud provider".
+    Please no more than 3 sentences.`;
+  }
+
+  try {
+    const response = await AxiosInstence.post<IGenericResponse>('/chat', {
+      question,
+    });
+
+    return response.data
+  } catch (error) {
+    console.error('Error asking chat:', error);
+    return null;
+  }
+}
 
 export function parseGeminiRecommendation(
   rawOutput: string,
@@ -106,8 +133,8 @@ export function parseGeminiRecommendation(
     // Remove Markdown code block formatting
     const cleanedJson = rawOutput
       .trim()
-      .replace(/^```json\s*/, '') // remove starting ```json + any whitespace/newlines
-      .replace(/\s*```$/, ''); // remove ending ```
+      .replace(/^```json/, '') // remove starting ```json only, no whitespace
+      .replace(/```$/, ''); // remove ending ```
 
     // Parse JSON
     const parsed = JSON.parse(cleanedJson);

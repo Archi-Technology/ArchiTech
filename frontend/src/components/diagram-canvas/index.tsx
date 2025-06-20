@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import './index.scss';
 import ReactFlow, {
   MiniMap,
@@ -93,15 +93,17 @@ const initialEdges: Edge[] = [
   { id: 'e3-4', source: '4', target: '3', animated: true, type: 'smoothstep', style: { stroke: '#555', strokeWidth: 2 } },
 ];
 
-export default function BasicFlow() {
+const BasicFlow = forwardRef((_, ref) => {
   const [expandedNodeId, setExpandedNodeId] = useState<string | null>(null);
-  const [nodes, setNodes, onNodesChange] = useNodesState(defaultNodes);
+  const [nodes, setNodes, onNodesChange] = useNodesState(
+    defaultNodes.map((node) => ({ ...node, draggable: false })) // Make all nodes undraggable
+  );
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const {updateTerraformCode, setLoading} = useTerraform(); // Access the Terraform context to update code
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
   const reactFlowInstance = useRef<ReactFlowInstance | null>(null);
   const { registerAddNodeFunction } = useCanvas(); // Access the function to register node addition
-  const [openNodes, setOpenNodes] = useState<string[]>([]);
+  const [openNodes, setOpenNodes] = useState<string[]>([]); // State for clicked nodes
 
   interface CustomConnection extends Connection {
     animated: boolean;
@@ -177,6 +179,13 @@ export default function BasicFlow() {
 
 
   const onNodeClick = async (_: React.MouseEvent, node: Node) => {
+    // Ensure the node remains undraggable
+    setNodes((nds) =>
+      nds.map((n) =>
+        n.id === node.id ? { ...n, draggable: false } : n
+      )
+    );
+
     const nodeId = node.id;
     console.log('Node clicked:', nodeId);
     const canvasWidth = reactFlowWrapper.current?.clientWidth || 0;
@@ -204,15 +213,15 @@ export default function BasicFlow() {
 
     if (openNodes.includes(nodeId)) {
       // Close the node
-      newOpenNodes = newOpenNodes.filter((id) => id !== nodeId);
-      setExpandedNodeId(null);
+      // newOpenNodes = newOpenNodes.filter((id) => id !== nodeId);
+      // setExpandedNodeId(null);
     } else {
       // Open the node only if it has children
       if (hasChildren) {
         newOpenNodes = [...openNodes, nodeId];
         setExpandedNodeId(nodeId);
       } else {
-        alert('Please Add resoruce to ' + containerLabelMapReverse[nodeId]);
+        // alert('Please Add resoruce to ' + containerLabelMapReverse[nodeId]);
         return; // Don't expand if no children
       }
     }
@@ -328,6 +337,7 @@ export default function BasicFlow() {
               id: node._id,
               type: node.type === ServiceType.VPC || node.type === ServiceType.SUBNET ? 'bigSquare' : 'circle',
               position,
+              draggable: false, // Ensure dynamic nodes are undraggable
               data: {
                 label: node.name,
                 icon: getIconForType(node.type),
@@ -404,6 +414,12 @@ export default function BasicFlow() {
       }
     });
 
+
+
+    dynamicNodes = dynamicNodes.map((node: Node) => ({
+      ...node,
+      draggable: false, // Ensure all dynamic nodes are undraggable
+    }));
 
 
     dynamicNodes = dynamicNodes.map((node: Node) => {
@@ -501,9 +517,9 @@ export default function BasicFlow() {
 
     const dynamicEdges: Edge[] = [];
     projectData
-      .filter((node: any) => node.connnectedTo)
+      .filter((node: any) => node.connectedTo)
       .forEach((node: any) => (
-        node.connnectedTo.forEach((connectedNode: string) => {
+        node.connectedTo.forEach((connectedNode: string) => {
           dynamicEdges.push({
             id: `${node._id}-${connectedNode}`,
             source: node._id,
@@ -667,6 +683,15 @@ export default function BasicFlow() {
   }, [nodes, edges]);
 
 
+  const isNodeClicked = (nodeId: string) => {
+    return openNodes.includes(nodeId); // Check if the node is already clicked
+  };
+
+  useImperativeHandle(ref, () => ({
+    onNodeClick,
+    isNodeClicked, // Expose the method
+  }));
+
   return (
     <div style={{ width: '100%', height: '100%' }} ref={reactFlowWrapper}>
       <ReactFlow
@@ -692,4 +717,8 @@ export default function BasicFlow() {
       </ReactFlow>
     </div>
   );
-}
+});
+
+export default BasicFlow;
+
+

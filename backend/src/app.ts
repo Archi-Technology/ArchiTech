@@ -52,15 +52,14 @@ const appPromise: Promise<Application> = new Promise(async (resolve, reject) => 
     app.use('/api/resource', resourceRouter);
     app.use('/api/terraform', terraformRouter);
 
-    app.use('/api/aws', awsRouter);
-    app.use("/api/azure", azureRouter);
 
   app.use('/api', authMiddleware);
   app.use('/api/auth', authRouter);
   app.use('/api/user', userRouter);
   app.use('/api/chat', chatRouter);
-  app.use('/aws', awsRouter);
-  app.use("/azure", azureRouter);
+  app.use('/api/projects', projectRouter);
+  app.use('/api/aws', awsRouter);
+  app.use("/api/azure", azureRouter);
 
   try {
     await mongoose.connect(config.MONGO_URI as string);

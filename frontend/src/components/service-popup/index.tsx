@@ -7,11 +7,18 @@ import { getAllAvailableObjectStorageClasses } from '../../utils/Mappers/objectS
 import { getAllAvailableOSNames } from '../../utils/Mappers/osMapper';
 import { getAllAvailableLocations } from '../../utils/Mappers/regionMapper';
 import { getAllAvailableInstanceCategories } from '../../utils/Mappers/typeMapper';
+import ResourceModal from '../resource-modal'; // Import the ResourceModal component
+import MultipleSelectChip from './multi-select'; // Import the MultipleSelectChip component
+import {IBaseService} from '../../interfaces/canvas'; // Import the interface for base service
+import { getAllAvailableVMInstanceCategories } from '../../utils/Mappers/vmInstanceTypeMapper';
+
+import type { JSX } from 'react';
+
+
 import {
   askOptimalChoices,
   parseGeminiRecommendation,
 } from '../../utils/recommendation';
-import ResourceModal from '../price-modal/index';
 import { Button } from '../ui/button/button';
 import "./index.scss";// Adjust the import path as needed
 import { CloudProvider } from '../../interfaces/canvas';
@@ -52,10 +59,27 @@ const projectId = sessionStorage.getItem('selectedProjectId');
 
 interface ServicePopupProps {
   service: { name: string; icon: JSX.Element };
+  // onConfirm: (
+  //   resourceInfo: {
+  //     instanceType?: string;
+  //     vmInstanceType?: string;
+  //     region?: string;
+  //     os?: string;
+  //     pricing?: any;
+  //     cloud?: string;
+  //     storageClass?: any;
+  //     lbType?: any;
+  //     dbInstanceType?: string;
+  //     engine?: any;
+  //   },
+  //   type: string,
+  //   selectedCloud: string,
+  // ) => Promise<void>;
   onConfirm: (selectedService: any) => Promise<void>;
   onCancel: () => void;
-  availableVPCs: any[];
-  availableSubnets: any[];
+  availableVPCs: IBaseService[];
+  availableSubnets: IBaseService[];
+  availableSource?: IBaseService[];
   pricingOptions: any[];
   instanceTypes?: { id: string; name: string }[];
   regions?: { id: string; name: string }[];
@@ -71,12 +95,15 @@ export default function ServicePopup({
   onConfirm,
   availableVPCs,
   availableSubnets,
+  availableSource,
   onCancel,
 }: ServicePopupProps) {
   const [selectedVPC, setSelectedVPC] = useState<string>('');
   const [selectedSubnet, setSelectedSubnet] = useState<string>('');
   const [selectedPricing, setSelectedPricing] = useState<string>('');
   const [selectedInstanceType, setSelectedInstanceType] = useState<string>('');
+  const [selectedVmInstanceType, setSelectedVmInstanceType] =
+    useState<string>('');
   const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [selectedOS, setSelectedOS] = useState<string>('');
   const [selectedName, setSelectedName] = useState<string>('');
@@ -85,6 +112,7 @@ export default function ServicePopup({
   const [selectedDBInstanceType, setSelectedDBInstanceType] =
     useState<string>('');
   const [selectedDBEngine, setSelectedDBEngine] = useState<string>('');
+  const [selectedRedundancy, setSelectedRedundancy] = useState<string>('');
   const [recommendation, setRecommendation] = useState<string>('');
   const [selectedCloudProvider, setSelectedCloudProvider] = useState<CloudProvider | ''>('');
   const [currentPage, setCurrentPage] = useState<'form' | 'price-comparison'>(
@@ -94,6 +122,9 @@ export default function ServicePopup({
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [showValidation, setShowValidation] = useState(false);
   const [shakingFields, setShakingFields] = useState<string[]>([]);
+
+  const [selectedConnections, setSelectedConnections] = useState<string[]>([]);
+  console.log('availableSourceCheck', availableSource);
 
   useEffect(() => {
     setRecommendation(
@@ -131,7 +162,7 @@ export default function ServicePopup({
     const fieldsToShake: string[] = [];
 
     if (service.name === 'Virtual Machine') {
-      if (!selectedInstanceType) {
+      if (!selectedVmInstanceType) {
         errors.instanceType = 'Please select an instance type';
         fieldsToShake.push('instanceType');
       }
@@ -216,7 +247,7 @@ export default function ServicePopup({
       const data = {
         service: service.name,
         ...(service.name === 'Virtual Machine' && {
-          instanceType: selectedInstanceType,
+          vmInstanceType: selectedVmInstanceType,
           region: selectedRegion,
           os: selectedOS,
         }),
@@ -230,15 +261,15 @@ export default function ServicePopup({
         }),
         ...(service.name === 'Database' && {
           region: selectedRegion,
-          dbInstanceType: selectedDBInstanceType,
-          engine: selectedDBEngine,
+          instanceType: selectedDBInstanceType,
+          databaseEngine: selectedDBEngine,
         }),
       };
 
       setFormData(data);
       if(service.name === 'Vpc' || service.name === 'Subnet') {
         const findCloudProvider = availableVPCs.find(vpc => vpc._id === selectedVPC)?.cloudProvider || CloudProvider.AZURE;
-        handleConfirm(selectedCloudProvider.trim() || findCloudProvider, 500); // Default pricing for VPC and Subnet
+        handleConfirm(selectedCloudProvider || findCloudProvider, 500); // Default pricing for VPC and Subnet
       } else {
 
         setCurrentPage('price-comparison');
@@ -246,8 +277,9 @@ export default function ServicePopup({
     }
   };
 
-  const handleConfirm = async(selectedCloud: CloudProvider = CloudProvider.AZURE, pricing?: any) => {
+  const handleConfirm = async(selectedCloud: CloudProvider, pricing: any) => {
     const data = prepereDataForSave();
+    console.log('handleConfirm selected connections', data.connectedTo);
     data.cloudProvider = selectedCloud;
      // Assuming cloud provider is passed as a parameter
     if (service.name === 'Virtual Machine') {
@@ -276,6 +308,8 @@ export default function ServicePopup({
         data.parentId = selectedVPC; // Assuming VPC is the parent for Subnet
         data.extraData.region = selectedRegion
       }
+
+      console.log('connected to', selectedConnections);
     await onConfirm(data);
   };
 
@@ -287,7 +321,7 @@ export default function ServicePopup({
         cloudProvider: CloudProvider.AZURE, // Assuming Azure as default, can be parameterized
         parentId: type != ServiceType.SUBNET && type != ServiceType.VPC ?  selectedSubnet : undefined,
         name: selectedName,
-        connnectedTo: [], // Assuming no connections for now, can be updated later
+        connectedTo: selectedConnections, // Assuming no connections for now, can be updated later
         extraData: {},
         projectId: projectId ? projectId : 'default-project-id', // Use sessionStorage or a default value
       };
@@ -304,12 +338,13 @@ export default function ServicePopup({
         data.extraData.dbEngine = selectedDBEngine;
       }
   
+      console.log('data.connected to', data.connectedTo  );
       return data;
-   },[selectedSubnet, service, projectId, selectedInstanceType, selectedOS, selectedStorageClass, selectedLBType, selectedDBInstanceType, selectedDBEngine, selectedName]);
+   },[selectedSubnet, service, projectId, selectedInstanceType, selectedOS, selectedStorageClass, selectedLBType, selectedDBInstanceType, selectedDBEngine, selectedName, selectedConnections]);
 
   const isFormValid = () => {
     if (service.name === 'Virtual Machine') {
-      return selectedInstanceType && selectedRegion && selectedOS;
+      return selectedVmInstanceType && selectedRegion && selectedOS;
     } else if (service.name === 'Object Storage') {
       return selectedRegion && selectedStorageClass;
     } else if (service.name === 'Load Balancer') {
@@ -346,7 +381,7 @@ export default function ServicePopup({
                   if (parsed) {
                     try {
                       if (service.name === 'Virtual Machine') {
-                        setSelectedInstanceType(parsed.type || '');
+                        setSelectedVmInstanceType(parsed.type || '');
                         setSelectedRegion(parsed.region || '');
                         setSelectedOS(parsed.os || '');
                       } else if (service.name === 'Object Storage') {
@@ -480,28 +515,38 @@ export default function ServicePopup({
                     
                   )
                 }
+
+                {
+                  service.name !== 'Vpc' && service.name !== 'Subnet' && (
+                    <MultipleSelectChip
+  availableSource={availableSource}
+  selectedConnections={selectedConnections}
+  setSelectedConnections={setSelectedConnections}
+/>
+                  )
+                }
             {service.name === 'Virtual Machine' && (
               
               <>
                 <div className="popup-selection">
                   <label>Instance Type:</label>
                   <select
-                    value={selectedInstanceType}
-                    onChange={(e) => setSelectedInstanceType(e.target.value)}
-                    className={`${showValidation && formErrors.instanceType ? 'error' : ''} ${
-                      shakingFields.includes('instanceType') ? 'shake' : ''
+                    value={selectedVmInstanceType}
+                    onChange={(e) => setSelectedVmInstanceType(e.target.value)}
+                    className={`text-center ${showValidation && formErrors.vmInstanceType ? 'error' : ''} ${
+                      shakingFields.includes('vmInstanceType') ? 'shake' : ''
                     }`}
                   >
                     <option value="">-- Select Instance Type --</option>
-                    {getAllAvailableInstanceCategories().map((type) => (
+                    {getAllAvailableVMInstanceCategories().map((type) => (
                       <option key={type} value={type}>
                         {type}
                       </option>
                     ))}
                   </select>
-                  {showValidation && formErrors.instanceType && (
+                  {showValidation && formErrors.vmInstanceType && (
                     <div className="error-message">
-                      {formErrors.instanceType}
+                      {formErrors.vmInstanceType}
                     </div>
                   )}
                 </div>
@@ -510,7 +555,7 @@ export default function ServicePopup({
                   <select
                     value={selectedRegion}
                     onChange={(e) => setSelectedRegion(e.target.value)}
-                    className={`${showValidation && formErrors.region ? 'error' : ''} ${
+                    className={`text-center ${showValidation && formErrors.region ? 'error' : ''} ${
                       shakingFields.includes('region') ? 'shake' : ''
                     }`}
                   >
@@ -530,7 +575,7 @@ export default function ServicePopup({
                   <select
                     value={selectedOS}
                     onChange={(e) => setSelectedOS(e.target.value)}
-                    className={`${showValidation && formErrors.os ? 'error' : ''} ${
+                    className={`text-center ${showValidation && formErrors.os ? 'error' : ''} ${
                       shakingFields.includes('os') ? 'shake' : ''
                     }`}
                   >
@@ -555,7 +600,7 @@ export default function ServicePopup({
                   <select
                     value={selectedRegion}
                     onChange={(e) => setSelectedRegion(e.target.value)}
-                    className={`${showValidation && formErrors.region ? 'error' : ''} ${
+                    className={`text-center ${showValidation && formErrors.region ? 'error' : ''} ${
                       shakingFields.includes('region') ? 'shake' : ''
                     }`}
                   >
@@ -575,7 +620,7 @@ export default function ServicePopup({
                   <select
                     value={selectedStorageClass}
                     onChange={(e) => setSelectedStorageClass(e.target.value)}
-                    className={`${showValidation && formErrors.storageClass ? 'error' : ''} ${
+                    className={`text-center ${showValidation && formErrors.storageClass ? 'error' : ''} ${
                       shakingFields.includes('storageClass') ? 'shake' : ''
                     }`}
                   >
@@ -602,7 +647,7 @@ export default function ServicePopup({
                   <select
                     value={selectedRegion}
                     onChange={(e) => setSelectedRegion(e.target.value)}
-                    className={`${showValidation && formErrors.region ? 'error' : ''} ${
+                    className={`text-center ${showValidation && formErrors.region ? 'error' : ''} ${
                       shakingFields.includes('region') ? 'shake' : ''
                     }`}
                   >
@@ -622,7 +667,7 @@ export default function ServicePopup({
                   <select
                     value={selectedLBType}
                     onChange={(e) => setSelectedLBType(e.target.value)}
-                    className={`${showValidation && formErrors.lbType ? 'error' : ''} ${
+                    className={`text-center ${showValidation && formErrors.lbType ? 'error' : ''} ${
                       shakingFields.includes('lbType') ? 'shake' : ''
                     }`}
                   >
@@ -647,7 +692,7 @@ export default function ServicePopup({
                   <select
                     value={selectedRegion}
                     onChange={(e) => setSelectedRegion(e.target.value)}
-                    className={`${showValidation && formErrors.region ? 'error' : ''} ${
+                    className={`text-center ${showValidation && formErrors.region ? 'error' : ''} ${
                       shakingFields.includes('region') ? 'shake' : ''
                     }`}
                   >
@@ -667,7 +712,7 @@ export default function ServicePopup({
                   <select
                     value={selectedDBInstanceType}
                     onChange={(e) => setSelectedDBInstanceType(e.target.value)}
-                    className={`${showValidation && formErrors.dbInstanceType ? 'error' : ''} ${
+                    className={`text-center ${showValidation && formErrors.dbInstanceType ? 'error' : ''} ${
                       shakingFields.includes('dbInstanceType') ? 'shake' : ''
                     }`}
                   >
@@ -689,7 +734,7 @@ export default function ServicePopup({
                   <select
                     value={selectedDBEngine}
                     onChange={(e) => setSelectedDBEngine(e.target.value)}
-                    className={`${showValidation && formErrors.dbEngine ? 'error' : ''} ${
+                    className={`text-center ${showValidation && formErrors.dbEngine ? 'error' : ''} ${
                       shakingFields.includes('dbEngine') ? 'shake' : ''
                     }`}
                   >
@@ -750,8 +795,10 @@ export default function ServicePopup({
           >
             <ResourceModal
               isOpen={currentPage === 'price-comparison'}
-              onClose={() => setCurrentPage('form')}
-              onSubmit={handleConfirm}
+              onClose={() => {
+                setCurrentPage('form');
+              }}
+              onConfirm={handleConfirm}
               selectedResourceName={service.name}
               resourceParams={formData}
             />

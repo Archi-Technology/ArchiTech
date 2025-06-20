@@ -21,7 +21,24 @@ class ChatController {
   constructor() {
     this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
   }
-
+  async getUserContext(req: Request, res: Response) {
+    try {
+      const userId = exractUserIdFromToken(req);
+      if (!userId) {
+        return res.status(400).json({ message: "No userId provided" });
+      }
+      const userContext = await UserContextModel.findOne({
+        userId: new mongoose.Types.ObjectId(userId),
+      }).exec();
+      if (!userContext) {
+        return res.status(404).json({ message: "User context not found" });
+      }
+      res.status(200).json(userContext);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+  
   async askQuestion(req: Request, res: Response) {
     const { question } = req.body;
     const userId = exractUserIdFromToken(req);
@@ -59,6 +76,7 @@ Main users location: ${userContext.regions || "N/A"}
 Os dependecies: ${userContext.osDependencies || "N/A"}
 Software dependencies: ${userContext.softwareDependencies || "N/A"}
 Budget considerations: ${userContext.budgetConsiderations || "N/A"}
+General Description: ${userContext.generalDescription || "N/A"}
 
 Question:
 ${question}

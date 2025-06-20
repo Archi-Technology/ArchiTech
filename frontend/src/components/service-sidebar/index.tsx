@@ -1,26 +1,35 @@
 import { useEffect, useState } from 'react';
 import subnetIcon from '../../assets/canvas/network-wired-svgrepo-com.svg';
 import vpcIcon from '../../assets/canvas/cloud-svgrepo-com.svg';
+import './index.scss';
+import virtualMachineIcon from '../../assets/canvas/virtualmachine.png';
+import objectStorageIcon from '../../assets/canvas/objectstorage.png';
 import databaseIcon from '../../assets/canvas/database.png';
 import loadBalancerIcon from '../../assets/canvas/loadbalancer.png';
-import objectStorageIcon from '../../assets/canvas/objectstorage.png';
-import virtualMachineIcon from '../../assets/canvas/virtualmachine.png';
-import './index.scss';
 
 import { useCanvas } from '../../contexts/canvasContext'; // Import canvas context
-import ServicePopup, { ServiceType } from '../service-popup'; // Import the popup component
+import { ServiceType } from '../service-popup'; // Import the popup component
 import { get } from 'react-hook-form';
-import { getProjectSubnets, getProjectVpcs } from '../../services/projectService';
+import {IBaseService} from '../../interfaces/canvas'; // Import the interface for base service
+import { getProjectResources } from '../../services/projectService';
 import { createResource, generateTerraform, IResource } from '../../services/resourceService';
 import { useTerraform } from '../../contexts/terraformContext';
+import { CloudProvider } from '../../interfaces/canvas';
+import ServicePopup from '../service-popup'; // Import the popup component
+import BasicFlow from '../diagram-canvas'; // Import the canvas component
 
-export default function ServiceSidebar() {
+// Define a type for the ref that includes onNodeClick and isNodeClicked
+type BasicFlowRef = {
+  onNodeClick: (event: any, node: any) => void;
+  isNodeClicked: (nodeId: string) => boolean;
+};
+
+export default function ServiceSidebar({ canvasRef }: { canvasRef: React.RefObject<BasicFlowRef> }) {
   const [activeTab, setActiveTab] = useState('catalog');
   const {updateTerraformCode, setLoading} = useTerraform();
   const { addNodeToCanvas } = useCanvas(); // Access the function to add nodes to the canvas
   const [selectedService, setSelectedService] = useState<Service | null>(null); // Track the selected service
-  const [availableVPCs, setAvailableVPCs] = useState<string[]>([]); // State for available VPCs
-  const [availableSubnets, setAvailableSubnets] = useState<string[]>([]); // State for available subnets
+  const [availableResources, setAvailableResources] = useState<IBaseService[]>([]); // State for available VPCs
   const handleServiceClick = (service: Service) => {
     setSelectedService(service); // Open the popup with the selected service
   };
@@ -40,17 +49,30 @@ export default function ServiceSidebar() {
              // Close the popup
         }
         setSelectedService(null);
+        if (selectedService) {
+          if (canvasRef.current) {
+            const nodeId = data.cloudProvider === CloudProvider.AZURE ? '1' : data.cloudProvider === CloudProvider.GCP ? '2' : '3';
+    
+    
+            // Check if the node is already clicked
+            // if (canvasRef.current.isNodeClicked(nodeId)) {
+            //   console.log(`Node ${nodeId} is already clicked.`);
+            // } else {
+              canvasRef.current.onNodeClick({}, { id: nodeId } as any); // Simulate a node click
+            // }
+          }
+    
+          setSelectedService(null); // Close the popup
+        }
         setLoading(true);
-        const terraformCode = await generateTerraform(newResource._id);
+        const terraformCode = await generateTerraform(newResource?._id);
         setLoading(false);
         updateTerraformCode(terraformCode);
-        if(data.type === ServiceType.VPC || data.type === ServiceType.SUBNET) {
-        const vpcs = await getProjectVpcs(); // Replace with actual function to fetch VPCs
-        const subnets = await getProjectSubnets(); // Replace with actual function to fetch subnets
+        const resources = await getProjectResources(); // Replace with actual function to fetch VPCs
+        // // Replace with actual function to fetch subnets
 
-        setAvailableVPCs(vpcs); // Assuming vpc has a name property
-        setAvailableSubnets(subnets);
-        }
+        setAvailableResources(resources); // Assuming vpc has a name property
+        console.log('availableResources', resources);  
     };
   // const handlePopupConfirm = ({
   //   vpc,
@@ -69,38 +91,39 @@ export default function ServiceSidebar() {
     setSelectedService(null); // Close the popup without adding a node
   };
 
+  const availableVPCs = availableResources.filter((resource) => resource.type === ServiceType.VPC);
+  const availableSubnets = availableResources.filter((resource) => resource.type === ServiceType.SUBNET);
+  const availableSources = availableResources.filter((resource) => resource.type !== ServiceType.VPC && resource.type !== ServiceType.SUBNET);
+  console.log('availableSources', availableSources);
   useEffect(() => { 
     // This effect can be used to fetch initial data or perform side effects
     const  getProjectVpcsAndSubnets = async () => { 
       try {
         // Fetch available VPCs and subnets from the backend or context
-        const vpcs = await getProjectVpcs(); // Replace with actual function to fetch VPCs
-        const subnets = await getProjectSubnets(); // Replace with actual function to fetch subnets
+        const resources = await getProjectResources(); // Replace with actual function to fetch VPCs
+        // const subnets = await getProjectSubnets(); // Replace with actual function to fetch subnets
 
-        setAvailableVPCs(vpcs); // Assuming vpc has a name property
-        setAvailableSubnets(subnets); // Assuming subnet has a name property
+        setAvailableResources(resources); // Assuming vpc has a name property
+        // setAvailableSubnets(subnets); // Assuming subnet has a name property
       } catch (error) {
         console.error('Error fetching VPCs and subnets:', error);
       }
     }
 
     getProjectVpcsAndSubnets(); // Call the function to fetch VPCs and subnets
-  }, [setAvailableVPCs, setAvailableSubnets]); // Empty dependency array to run only once on mount
+  }, [setAvailableResources]); // Empty dependency array to run only once on mount
   return (
     <div className="sidebar">
-      <div className="search-container">
-        <div className="search-input-wrapper">
-          <span className="search-icon">🔍</span>
-          <input
-            type="text"
-            placeholder="Search resources..."
-            className="search-input"
-          />
-        </div>
-      </div>
-
       <div className="tabs">
-        <h3 style={{ textAlign: 'center' }}>Catalog</h3>
+        <h3
+          style={{
+            textAlign: 'center',
+            marginTop: '20px',
+            marginBottom: '20px',
+          }}
+        >
+          Catalog
+        </h3>
 
         <div className="tab-content">
           {activeTab === 'catalog' ? (
@@ -124,7 +147,8 @@ export default function ServiceSidebar() {
           onConfirm={handlePopupConfirm}
           onCancel={handlePopupCancel}
           availableVPCs={availableVPCs} // TODO: Replace with actual VPCs
-          availableSubnets={availableSubnets} // TODO: Replace with actual subnets
+          availableSubnets={availableSubnets}
+          availableSource={availableSources} // TODO: Replace with actual subnets
           pricingOptions={[]} // TODO: Replace with actual pricing options
         />
       )}

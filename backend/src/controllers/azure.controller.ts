@@ -10,12 +10,11 @@ export class AzureController {
 
   async getBlobPricing(req: Request, res: Response) {
     try {
-      const { region, storageTier, redundancy, dataStoredGB } = req.query;
+      const { region, storageTier, redundancy } = req.query;
 
-      if (!region || !storageTier || !redundancy || !dataStoredGB) {
+      if (!region || !storageTier || !redundancy) {
         return res.status(400).json({
-          error:
-            "Missing required parameters: region, storageTier, redundancy, dataStoredGB",
+          error: "Missing required parameters: region, storageTier, redundancy",
         });
       }
 
@@ -23,13 +22,15 @@ export class AzureController {
         region: region as string,
         storageTier: storageTier as string,
         redundancy: redundancy as string,
-        dataStoredGB: Number(dataStoredGB),
       });
-
+      price.id = 0;
+      price.provider = "azure";
       if (price) {
-        return res.status(200).json(price);
+        res.status(200).json([price]);
       } else {
-        return res.status(500).json({ error: "Failed to fetch pricing data." });
+        res
+          .status(400)
+          .json({ message: "No Blob available", provider: "azure" });
       }
     } catch (error: any) {
       console.error("Error fetching Azure Blob pricing:", error);
@@ -54,9 +55,9 @@ export class AzureController {
       });
 
       if (price) {
-        return res.status(200).json(price);
+        res.status(200).json(price);
       } else {
-        return res.status(500).json({ error: "Failed to fetch VM pricing." });
+        res.status(400).json({ message: "No VM available", provider: "azure" });
       }
     } catch (error) {
       console.error("Error fetching Azure VM pricing:", error);
@@ -65,9 +66,9 @@ export class AzureController {
   }
 
   async getLoadBalancerPricing(req: Request, res: Response) {
-    const { region, type } = req.query;
+    const { region, lbType } = req.query;
 
-    if (!region || !type) {
+    if (!region || !lbType) {
       return res.status(400).json({
         error: "Missing required parameters: region, loadBalancerType",
       });
@@ -75,38 +76,37 @@ export class AzureController {
 
     const price = await this.service.getLoadBalancerPrice(
       region as string,
-      type as string
+      lbType as string
     );
+    price.id = 0;
+    price.provider = "azure";
 
     if (price) {
-      return res.status(200).json(price);
+      res.status(200).json([price]);
     } else {
-      return res
-        .status(404)
-        .json({ error: "No pricing data found for specified parameters." });
+      res.status(400).json({ message: "No LB available", provider: "azure" });
     }
   }
 
   async getSqlDbPricing(req: Request, res: Response) {
     try {
-      const { region, skuName, productName } = req.query;
+      const { region, skuName } = req.query;
 
-      if (!region || !skuName || !productName) {
+      if (!region || !skuName) {
         return res
           .status(400)
-          .json({ error: "region, skuName, and productName are required." });
+          .json({ error: "region and skuName are required." });
       }
 
       const result = await this.service.getSqlDbPricing({
         region: region as string,
         skuName: skuName as string,
-        productName: productName as string,
       });
 
       if (result) {
-        return res.status(200).json(result);
+        res.status(200).json([result]);
       } else {
-        return res.status(404).json({ error: "No pricing found." });
+        res.status(400).json([{ message: "No SQL available", provider: "azure" }]);
       }
     } catch (e) {
       console.error("Error:", e);

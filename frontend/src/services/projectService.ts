@@ -1,4 +1,5 @@
 import {AxiosInstence} from './axios/AxiosInstance';
+import { IProjectArtchitecture } from '../interfaces/canvas';
 import useSWR from 'swr';
 const projectVpcKey = 'projectVpcs'; // Key for caching project VPCs
 const projectSubnetsKey = 'projectSubnets'; // Key for caching project subnets
@@ -27,6 +28,11 @@ export const useGetProjectSubnets = (userid: string | null) =>
   );
 export const getProjectVpcs = async () => {
   const response = await AxiosInstence.get(`/projects/${projectId}/vpcs/`);
+  return response.data;
+};
+
+export const getProjectResources = async () => { // Fetch project ID from session storage
+    const response:IProjectArtchitecture = await AxiosInstence.get(`/projects/artchitecture/${projectId}`,);
   return response.data;
 };
 

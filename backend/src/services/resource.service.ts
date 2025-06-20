@@ -59,8 +59,8 @@ export class ResourceService extends BaseService<IResource> {
     return a
 }
 
-    async createResource(projectId: string, name: string, type: ServiceType, parentId: string | null, cloudProvider: CloudProvider,extraData: any = {}): Promise<IResource> {
-        const project = new this.resourceBaseService.model({ projectId: new mongoose.Types.ObjectId(projectId), name, type, parentId, connectedTo: [], cloudProvider, extraData: extraData });
+    async createResource(projectId: string, name: string, type: ServiceType, parentId: string | null, cloudProvider: CloudProvider, connectedTo: string[],extraData: any = {}): Promise<IResource> {
+        const project = new this.resourceBaseService.model({ projectId: new mongoose.Types.ObjectId(projectId), name, type, parentId, connectedTo: connectedTo , cloudProvider, extraData: extraData });
         return await project.save();
       }
 }

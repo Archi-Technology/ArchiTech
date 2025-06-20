@@ -9,7 +9,7 @@ export interface IResource {
     name: string;
     type: ServiceType;
     parentId?: string;
-    connnectedTo: string[];
+    connectedTo: string[];
     cloudProvider: CloudProvider;
     extraData: any;
   }
@@ -37,5 +37,6 @@ export const generateTerraform = async (resourceId: string) => {
     } catch(e) {
         console.log('failed to create resource ', resourceId)
         console.log('failed to save resource ', e)
+        return 'failed to generate terraform for this resource'
     }
 };

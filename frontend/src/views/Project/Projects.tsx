@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -14,13 +14,18 @@ import {
   IconButton,
   TextField,
 } from '@mui/material';
-import FolderOpenIcon from '@mui/icons-material/FolderOpen';
-import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { getAllProjects, createProject, updateProject, deleteProject } from '../../services/projectService';
-import { createVPC } from '../../services/canvasService';
+import Player from 'react-lottie-player';
+import createAnimation from '../../assets/lotties/create.json';
+import openAnimation from '../../assets/lotties/open.json';
+import {
+  getAllProjects,
+  createProject,
+  updateProject,
+  deleteProject,
+} from '../../services/projectService';
 
 interface Project {
   _id: string;
@@ -35,6 +40,9 @@ export default function Projects() {
   const [editMode, setEditMode] = useState<string | null>(null);
   const [newProjectName, setNewProjectName] = useState('');
   const navigate = useNavigate();
+
+  const createRef = useRef<any>(null);
+  const openRef = useRef<any>(null);
 
   const fetchProjects = async () => {
     try {
@@ -61,7 +69,11 @@ export default function Projects() {
 
   const handleEditProject = async (projectId: string, newName: string) => {
     try {
-      await updateProject(projectId, newName, projects.find(p => p._id === projectId)?.data || {});
+      await updateProject(
+        projectId,
+        newName,
+        projects.find((p) => p._id === projectId)?.data || {}
+      );
       setEditMode(null);
       await fetchProjects();
     } catch (err) {
@@ -89,99 +101,137 @@ export default function Projects() {
     });
   };
 
+  useEffect(() => {
+    const handleCloseParentModal = () => setOpenDialog(false);
+
+    document.addEventListener("closeParentModal", handleCloseParentModal);
+    return () => document.removeEventListener("closeParentModal", handleCloseParentModal);
+  }, []);
+  const paperStyle = {
+    p: 4,
+    textAlign: 'center',
+    cursor: 'pointer',
+    border: '2px solid transparent',
+    transition: '0.3s',
+    backgroundColor: '#ffffff',
+    '&:hover': {
+      borderColor: '#3C82F7',
+      backgroundColor: 'rgba(60, 130, 247, 0.08)',
+      boxShadow: '0 0 0 4px rgba(60, 130, 247, 0.15)',
+      '& .hoverTitle': {
+        color: '#3C82F7',
+      },
+    },
+  };
+
+  const titleStyle = {
+    color: 'black',
+    fontWeight: 'bold',
+    transition: '0.3s',
+  };
+
+  const descriptionStyle = {
+    color: 'text.secondary',
+    transition: '0.3s',
+  };
+
   return (
-    <Box
-      sx={{
-        bgcolor: '#0d0d0d',
-        color: '#fff',
-        minHeight: '100vh',
-        py: 6,
-        backgroundImage:
-          'radial-gradient(#444 1px, transparent 1px), radial-gradient(#444 1px, transparent 1px)',
-        backgroundSize: '28px 28px',
-        backgroundPosition: '0 0, 14px 14px',
-      }}
-    >
+    <Box sx={{ bgcolor: '#fff', minHeight: '100vh', py: 6 }}>
       <Container>
-        <Grid container spacing={4} mb={4}>
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+          align="center"
+          gutterBottom
+          sx={{ color: 'black' }}
+        >
+          Manage Your Architecture Projects
+        </Typography>
+
+        <Grid container spacing={4} mb={6}>
           <Grid item xs={12} md={6}>
-            <Paper elevation={3} sx={{ p: 4, bgcolor: '#1a1a1a' }}>
-              <Box display="flex" alignItems="center" mb={1}>
-                <FolderOpenIcon sx={{ mr: 1, color: '#fff' }} />
-                <Typography variant="subtitle1" fontWeight="bold" color="white">
-                  Continue Existing Project
-                </Typography>
-              </Box>
-              <Typography variant="body2" color="gray" gutterBottom>
+            <Paper
+              elevation={3}
+              sx={paperStyle}
+              onClick={() => setOpenDialog(true)}
+              onMouseEnter={() => openRef.current?.goToAndPlay(0)}
+            >
+              <Player
+                ref={openRef}
+                animationData={openAnimation}
+                loop={false}
+                play={false}
+                style={{ width: 80, height: 80, margin: '0 auto' }}
+              />
+              <Typography
+                variant="subtitle1"
+                mt={1}
+                className="hoverTitle"
+                sx={titleStyle}
+              >
+                Continue Existing Project
+              </Typography>
+              <Typography variant="body2" sx={descriptionStyle}>
                 Resume work on your cloud architecture designs.
               </Typography>
-              <Typography variant="caption" color="gray">
-                Access your ongoing projects and pick up where you left off.
-              </Typography>
-              <Box mt={3}>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  sx={{ bgcolor: '#fff', color: '#000' }}
-                  onClick={() => setOpenDialog(true)}
-                >
-                  View Existing Projects
-                </Button>
-              </Box>
             </Paper>
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <Paper elevation={3} sx={{ p: 4, bgcolor: '#1a1a1a' }}>
-              <Box display="flex" alignItems="center" mb={1}>
-                <AddIcon sx={{ mr: 1, color: '#fff' }} />
-                <Typography variant="subtitle1" fontWeight="bold" color="white">
-                  Create New Project
-                </Typography>
-              </Box>
-              <Typography variant="body2" color="gray" gutterBottom>
+            <Paper
+              elevation={3}
+              sx={paperStyle}
+              onClick={handleCreateProject}
+              onMouseEnter={() => createRef.current?.goToAndPlay(0)}
+            >
+              <Player
+                ref={createRef}
+                animationData={createAnimation}
+                loop={false}
+                play={false}
+                style={{ width: 80, height: 80, margin: '0 auto' }}
+              />
+              <Typography
+                variant="subtitle1"
+                mt={1}
+                className="hoverTitle"
+                sx={titleStyle}
+              >
+                Create New Project
+              </Typography>
+              <Typography variant="body2" sx={descriptionStyle}>
                 Start a fresh cloud architecture design.
               </Typography>
-              <Typography variant="caption" color="gray">
-                Begin a new project from scratch or use a template.
-              </Typography>
-              <Box mt={3}>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  sx={{ bgcolor: '#fff', color: '#000' }}
-                  onClick={handleCreateProject}
-                >
-                  Create New Project
-                </Button>
-              </Box>
             </Paper>
           </Grid>
         </Grid>
 
         {projects.length > 0 && (
           <>
-            <Typography variant="subtitle1" mb={2} color="white">
+            <Typography variant="h5" fontWeight="bold" sx={{ color: 'black', mb: 3 }}>
               Recent Projects
             </Typography>
-            <Grid container spacing={3}>
-              {projects.map((project) => (
+            <Grid container spacing={4}>
+              {projects.slice(0, 3).map((project) => (
                 <Grid item xs={12} sm={6} md={4} key={project._id}>
-                  <Paper sx={{ bgcolor: '#1a1a1a', p: 3 }}>
-                    <Box display="flex" alignItems="center" mb={1}>
-                      <FolderOpenIcon sx={{ mr: 1, color: '#fff' }} />
-                      <Typography fontWeight="bold" color="white">
-                        {project.name}
-                      </Typography>
-                    </Box>
-                    <Typography variant="body2" color="gray">
+                  <Paper
+                    sx={{
+                      ...paperStyle,
+                      p: 3,
+                      textAlign: 'left',
+                    }}
+                    onClick={() => navigate(`/home?projectId=${project._id}`)}
+                  >
+                    <Typography
+                      variant="subtitle1"
+                      className="hoverTitle"
+                      sx={titleStyle}
+                    >
+                      {project.name}
+                    </Typography>
+                    <Typography variant="body2" sx={descriptionStyle}>
                       Last edited: {formatDate(project.lastEdited)}
                     </Typography>
-                    <Box mt={2}>
-                      <Button fullWidth variant="contained" sx={{ bgcolor: '#fff', color: '#000' }}>
-                        Open Project
-                      </Button>
-                    </Box>
                   </Paper>
                 </Grid>
               ))}
@@ -189,12 +239,7 @@ export default function Projects() {
           </>
         )}
 
-        <Dialog
-          open={openDialog}
-          onClose={() => setOpenDialog(false)}
-          maxWidth="md"
-          fullWidth
-        >
+        <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="md" fullWidth>
           <DialogTitle>
             <Box display="flex" justifyContent="space-between" alignItems="center">
               <Typography variant="h6">Your Projects</Typography>
@@ -207,10 +252,9 @@ export default function Projects() {
             <Grid container spacing={2}>
               {projects.map((project) => (
                 <Grid item xs={12} key={project._id}>
-                  <Paper sx={{ p: 2, bgcolor: '#1a1a1a' }}>
+                  <Paper sx={{ p: 2 }}>
                     <Box display="flex" justifyContent="space-between" alignItems="center">
                       <Box display="flex" alignItems="center" flex={1}>
-                        <FolderOpenIcon sx={{ mr: 1, color: '#fff' }} />
                         {editMode === project._id ? (
                           <TextField
                             value={newProjectName}
@@ -229,10 +273,9 @@ export default function Projects() {
                                 handleEditProject(project._id, newProjectName);
                               }
                             }}
-                            sx={{ input: { color: '#fff' } }}
                           />
                         ) : (
-                          <Typography color="white">{project.name}</Typography>
+                          <Typography>{project.name}</Typography>
                         )}
                       </Box>
                       <Box>
@@ -242,14 +285,12 @@ export default function Projects() {
                             setNewProjectName(project.name);
                           }}
                           size="small"
-                          sx={{ color: '#fff' }}
                         >
                           <EditIcon />
                         </IconButton>
                         <IconButton
                           onClick={() => handleDeleteProject(project._id)}
                           size="small"
-                          sx={{ color: '#fff' }}
                         >
                           <DeleteIcon />
                         </IconButton>
@@ -267,7 +308,7 @@ export default function Projects() {
                         </Button>
                       </Box>
                     </Box>
-                    <Typography variant="caption" color="gray" display="block" mt={1}>
+                    <Typography variant="caption" color="text.secondary" display="block" mt={1}>
                       Last edited: {formatDate(project.lastEdited)}
                     </Typography>
                   </Paper>

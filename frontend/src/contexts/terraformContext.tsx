@@ -11,7 +11,7 @@ interface TerraformContextProps {
 const TerraformContext = createContext<TerraformContextProps | undefined>(undefined);
 
 export const TerraformProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [terraformCode, setTerraformCode] = useState<string>("");
+  const [terraformCode, setTerraformCode] = useState<string>("click on a service to generate \n Terraform code");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const updateTerraformCode = (newCode: string) => {

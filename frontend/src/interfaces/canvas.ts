@@ -17,7 +17,7 @@ export interface IBaseService {
     type: ServiceType;
     parentId: string | null;
     cloudProvider: CloudProvider;
-    connnectedTo: string[];
+    connectedTo: string[];
     extraData: JSON | null;
     price?: number | null;
 }

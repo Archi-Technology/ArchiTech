@@ -56,6 +56,7 @@ class TerraformController {
         ],
       });
 
+      console.log(terraformPrompt)
       // Ask the model the current question
       const result = await chat.sendMessage(terraformPrompt);
       const answer = result.response.text() || "failed to generate terraform.";

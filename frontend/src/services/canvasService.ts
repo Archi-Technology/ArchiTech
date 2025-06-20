@@ -43,7 +43,7 @@ export const fetchProjectData = async () => {
   //       type: ServiceType.VPC,
   //       parentId: null,
   //       cloudProvider: CloudProvider.AZURE,
-  //       connnectedTo: [],
+  //       connectedTo: [],
   //       extraData: null
   //     },
   //     {
@@ -53,7 +53,7 @@ export const fetchProjectData = async () => {
   //       type: ServiceType.VPC,
   //       parentId: null,
   //       cloudProvider: CloudProvider.AZURE,
-  //       connnectedTo: [],
+  //       connectedTo: [],
   //       extraData: null
   //     },
   //     {
@@ -63,7 +63,7 @@ export const fetchProjectData = async () => {
   //       type: ServiceType.Subnet,
   //       parentId: '8',
   //       cloudProvider: CloudProvider.AZURE,
-  //       connnectedTo: [],
+  //       connectedTo: [],
   //       extraData: null
   //     },
   //     {
@@ -73,7 +73,7 @@ export const fetchProjectData = async () => {
   //       type: ServiceType.VM,
   //       parentId: '20',
   //       cloudProvider: CloudProvider.AZURE,
-  //       connnectedTo: ['14'],
+  //       connectedTo: ['14'],
   //       extraData: null,
   //       price: 200
   //     },
@@ -84,7 +84,7 @@ export const fetchProjectData = async () => {
   //       type: ServiceType.Subnet,
   //       parentId: '7',
   //       cloudProvider: CloudProvider.AZURE,
-  //       connnectedTo: [],
+  //       connectedTo: [],
   //       extraData: null,
   //       price: 50
   //     },
@@ -95,7 +95,7 @@ export const fetchProjectData = async () => {
   //       type: ServiceType.VM,
   //       parentId: '9',
   //       cloudProvider: CloudProvider.AZURE,
-  //       connnectedTo: ['18'],
+  //       connectedTo: ['18'],
   //       extraData: null,
   //       price: 200
   //     },
@@ -106,7 +106,7 @@ export const fetchProjectData = async () => {
   //       type: ServiceType.VM,
   //       parentId: '9',
   //       cloudProvider: CloudProvider.AZURE,
-  //       connnectedTo: [],
+  //       connectedTo: [],
   //       extraData: null,
   //       price: 210
   //     },
@@ -117,7 +117,7 @@ export const fetchProjectData = async () => {
   //       type: ServiceType.VPC,
   //       parentId: '2',
   //       cloudProvider: CloudProvider.GCP,
-  //       connnectedTo: [],
+  //       connectedTo: [],
   //       extraData: null,
   //       price: 160
   //     },
@@ -128,7 +128,7 @@ export const fetchProjectData = async () => {
   //       type: ServiceType.Subnet,
   //       parentId: '12',
   //       cloudProvider: CloudProvider.GCP,
-  //       connnectedTo: [],
+  //       connectedTo: [],
   //       extraData: null,
   //       price: 60
   //     },
@@ -139,7 +139,7 @@ export const fetchProjectData = async () => {
   //       type: ServiceType.DATABASE,
   //       parentId: '13',
   //       cloudProvider: CloudProvider.GCP,
-  //       connnectedTo: [],
+  //       connectedTo: [],
   //       extraData: null,
   //       price: 220
   //     },
@@ -150,7 +150,7 @@ export const fetchProjectData = async () => {
   //       type: ServiceType.OBJECT_STORAGE,
   //       parentId: '2',
   //       cloudProvider: CloudProvider.GCP,
-  //       connnectedTo: [],
+  //       connectedTo: [],
   //       extraData: null,
   //       price: 70
   //     },
@@ -161,7 +161,7 @@ export const fetchProjectData = async () => {
   //       type: ServiceType.OBJECT_STORAGE,
   //       parentId: '1',
   //       cloudProvider: CloudProvider.AZURE,
-  //       connnectedTo: [],
+  //       connectedTo: [],
   //       extraData: null,
   //       price: 80
   //     },
@@ -172,7 +172,7 @@ export const fetchProjectData = async () => {
   //       type: ServiceType.OBJECT_STORAGE,
   //       parentId: '3',
   //       cloudProvider: CloudProvider.AWS,
-  //       connnectedTo: [],
+  //       connectedTo: [],
   //       extraData: null,
   //       price: 90
   //     },
@@ -183,7 +183,7 @@ export const fetchProjectData = async () => {
   //       type: ServiceType.OBJECT_STORAGE,
   //       parentId: null,
   //       cloudProvider: CloudProvider.AWS,
-  //       connnectedTo: [],
+  //       connectedTo: [],
   //       extraData: null,
   //       price: 100
   //     },
