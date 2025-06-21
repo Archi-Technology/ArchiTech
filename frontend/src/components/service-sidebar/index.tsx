@@ -76,7 +76,6 @@ export default function ServiceSidebar({ canvasRef }: { canvasRef: React.RefObje
         // // Replace with actual function to fetch subnets
 
         setAvailableResources(resources); // Assuming vpc has a name property
-        console.log('availableResources', resources);  
     };
   // const handlePopupConfirm = ({
   //   vpc,

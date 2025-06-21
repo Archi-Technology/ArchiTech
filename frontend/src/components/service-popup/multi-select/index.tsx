@@ -19,8 +19,6 @@ export default function MultipleSelectChip({
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  console.log("Available Source in multi:", availableSource);
-
   // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

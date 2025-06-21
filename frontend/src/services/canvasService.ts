@@ -4,7 +4,6 @@ import {  CloudProvider } from '../interfaces/canvas';
 import { ServiceType } from '../components/service-popup';
 export const createVPC = async (name: string, cloud: string, cidr: string) => {
   const projectId = sessionStorage.getItem('selectedProjectId'); // Fetch project ID from session storage
-  console.log('createVPC Project ID:', projectId);
   const response = await AxiosInstence.post('/canvas/vpc', {
     name,
     data: {
@@ -19,7 +18,6 @@ export const createVPC = async (name: string, cloud: string, cidr: string) => {
 export const createSubnet = async (name: string, vpc: string, cloud: string, cidr: string) => {
   // Simulate a delay of 1 second
   const projectId = sessionStorage.getItem('selectedProjectId'); // Fetch project ID from session storage
-  console.log(' createSubnet Project ID:', projectId);
   const response = await AxiosInstence.post('/canvas/subnet', {
     name,
     data: {
