@@ -60,8 +60,10 @@ export default function Projects() {
   const handleCreateProject = async () => {
     try {
 
-      await createProject('New Project');
-      navigate('/home');
+      const newProject = await createProject('New Project');
+      sessionStorage.setItem('selectedProjectId', newProject._id);
+      console.log('project component Project ID:', newProject._id);
+      navigate(`/home?projectId=${newProject._id}`);
     } catch (err) {
       console.error('Error creating project', err);
     }
@@ -220,7 +222,10 @@ export default function Projects() {
                       p: 3,
                       textAlign: 'left',
                     }}
-                    onClick={() => navigate(`/home?projectId=${project._id}`)}
+                    onClick={() => {
+                      sessionStorage.setItem('selectedProjectId', project._id);
+                      navigate(`/home?projectId=${project._id}`)}
+                    }
                   >
                     <Typography
                       variant="subtitle1"
@@ -298,6 +303,7 @@ export default function Projects() {
                           variant="contained"
                           size="small"
                           onClick={() => {
+                            console.log('exist project id:', project._id);
                             sessionStorage.setItem('selectedProjectId', project._id); // Save project ID in session storage
                             setOpenDialog(false);
                             navigate(`/home?projectId=${project._id}`);

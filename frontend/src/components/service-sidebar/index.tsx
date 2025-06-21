@@ -30,6 +30,10 @@ export default function ServiceSidebar({ canvasRef }: { canvasRef: React.RefObje
   const { addNodeToCanvas } = useCanvas(); // Access the function to add nodes to the canvas
   const [selectedService, setSelectedService] = useState<Service | null>(null); // Track the selected service
   const [availableResources, setAvailableResources] = useState<IBaseService[]>([]); // State for available VPCs
+  const projectId = sessionStorage.getItem('selectedProjectId');
+  if (!projectId) {
+    return <></>
+  }
   const handleServiceClick = (service: Service) => {
     setSelectedService(service); // Open the popup with the selected service
   };
@@ -68,7 +72,7 @@ export default function ServiceSidebar({ canvasRef }: { canvasRef: React.RefObje
         const terraformCode = await generateTerraform(newResource?._id);
         setLoading(false);
         updateTerraformCode(terraformCode);
-        const resources = await getProjectResources(); // Replace with actual function to fetch VPCs
+        const resources = await getProjectResources(projectId); // Replace with actual function to fetch VPCs
         // // Replace with actual function to fetch subnets
 
         setAvailableResources(resources); // Assuming vpc has a name property
@@ -100,7 +104,7 @@ export default function ServiceSidebar({ canvasRef }: { canvasRef: React.RefObje
     const  getProjectVpcsAndSubnets = async () => { 
       try {
         // Fetch available VPCs and subnets from the backend or context
-        const resources = await getProjectResources(); // Replace with actual function to fetch VPCs
+        const resources = await getProjectResources(projectId); // Replace with actual function to fetch VPCs
         // const subnets = await getProjectSubnets(); // Replace with actual function to fetch subnets
 
         setAvailableResources(resources); // Assuming vpc has a name property
@@ -111,7 +115,7 @@ export default function ServiceSidebar({ canvasRef }: { canvasRef: React.RefObje
     }
 
     getProjectVpcsAndSubnets(); // Call the function to fetch VPCs and subnets
-  }, [setAvailableResources]); // Empty dependency array to run only once on mount
+  }, [setAvailableResources, projectId]); // Empty dependency array to run only once on mount
   return (
     <div className="sidebar">
       <div className="tabs">

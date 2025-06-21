@@ -4,34 +4,12 @@ import useSWR from 'swr';
 const projectVpcKey = 'projectVpcs'; // Key for caching project VPCs
 const projectSubnetsKey = 'projectSubnets'; // Key for caching project subnets
 
-const projectId = sessionStorage.getItem('selectedProjectId'); // Fetch project ID from session storage
 export const getAllProjects = async () => {
   const response = await AxiosInstence.get('/projects');
   return response.data;
 };
 
-export const getProjectSubnets = async () => {
-  const response = await AxiosInstence.get(`/projects/${projectId}/subnets`);
-  return response.data;
-};
-
-export const useGetProjectSubnets = (userid: string | null) =>
-  useSWR<any>(
-    projectSubnetsKey,
-    () => getProjectSubnets(),
-  );
-
-  export const useGetProjectVpcs = (userid: string | null) =>
-  useSWR<any>(
-    projectVpcKey,
-    () => getProjectVpcs(),
-  );
-export const getProjectVpcs = async () => {
-  const response = await AxiosInstence.get(`/projects/${projectId}/vpcs/`);
-  return response.data;
-};
-
-export const getProjectResources = async () => { // Fetch project ID from session storage
+export const getProjectResources = async (projectId: string) => { // Fetch project ID from session storage
     const response:IProjectArtchitecture = await AxiosInstence.get(`/projects/artchitecture/${projectId}`,);
   return response.data;
 };

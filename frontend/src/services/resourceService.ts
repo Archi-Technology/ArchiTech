@@ -2,8 +2,7 @@ import { ServiceType } from '../components/service-popup';
 import { CloudProvider } from '../interfaces/canvas';
 import {AxiosInstence} from './axios/AxiosInstance';
 
-
-const projectId = sessionStorage.getItem('selectedProjectId'); // Fetch project ID from session storage
+// Fetch project ID from session storage
 export interface IResource {
     projectId: string;
     name: string;

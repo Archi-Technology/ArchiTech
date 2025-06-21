@@ -55,24 +55,23 @@ function mapServiceNameToServiceType(serviceName: string): ServiceType  {
   }
 }
 
-const projectId = sessionStorage.getItem('selectedProjectId');
 
 interface ServicePopupProps {
   service: { name: string; icon: JSX.Element };
   // onConfirm: (
-  //   resourceInfo: {
-  //     instanceType?: string;
-  //     vmInstanceType?: string;
-  //     region?: string;
-  //     os?: string;
-  //     pricing?: any;
-  //     cloud?: string;
-  //     storageClass?: any;
-  //     lbType?: any;
-  //     dbInstanceType?: string;
-  //     engine?: any;
-  //   },
-  //   type: string,
+    //   resourceInfo: {
+      //     instanceType?: string;
+      //     vmInstanceType?: string;
+      //     region?: string;
+      //     os?: string;
+      //     pricing?: any;
+      //     cloud?: string;
+      //     storageClass?: any;
+      //     lbType?: any;
+      //     dbInstanceType?: string;
+      //     engine?: any;
+      //   },
+      //   type: string,
   //   selectedCloud: string,
   // ) => Promise<void>;
   onConfirm: (selectedService: any) => Promise<void>;
@@ -103,14 +102,14 @@ export default function ServicePopup({
   const [selectedPricing, setSelectedPricing] = useState<string>('');
   const [selectedInstanceType, setSelectedInstanceType] = useState<string>('');
   const [selectedVmInstanceType, setSelectedVmInstanceType] =
-    useState<string>('');
+  useState<string>('');
   const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [selectedOS, setSelectedOS] = useState<string>('');
   const [selectedName, setSelectedName] = useState<string>('');
   const [selectedStorageClass, setSelectedStorageClass] = useState<string>('');
   const [selectedLBType, setSelectedLBType] = useState<string>('');
   const [selectedDBInstanceType, setSelectedDBInstanceType] =
-    useState<string>('');
+  useState<string>('');
   const [selectedDBEngine, setSelectedDBEngine] = useState<string>('');
   const [selectedRedundancy, setSelectedRedundancy] = useState<string>('');
   const [recommendation, setRecommendation] = useState<string>('');
@@ -122,10 +121,11 @@ export default function ServicePopup({
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [showValidation, setShowValidation] = useState(false);
   const [shakingFields, setShakingFields] = useState<string[]>([]);
-
+  
   const [selectedConnections, setSelectedConnections] = useState<string[]>([]);
-  console.log('availableSourceCheck', availableSource);
-
+  const projectId = sessionStorage.getItem('selectedProjectId');
+  console.log('service popup Project ID:', projectId);
+  
   useEffect(() => {
     setRecommendation(
       `Based on your app context, click here to get optimal cost and performance for "${service.name}".`,

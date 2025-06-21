@@ -203,6 +203,7 @@ const BasicFlow = forwardRef((_, ref) => {
     } else {
 
     const projectId = sessionStorage.getItem('selectedProjectId');
+    console.log('canvas diagram Project ID:', projectId);
     if (!projectId) return;
 
     const projectData = await fetchProjectData();

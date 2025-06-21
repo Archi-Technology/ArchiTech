@@ -60,9 +60,67 @@ export class ResourceService extends BaseService<IResource> {
 }
 
     async createResource(projectId: string, name: string, type: ServiceType, parentId: string | null, cloudProvider: CloudProvider, connectedTo: string[],extraData: any = {}): Promise<IResource> {
-        const project = new this.resourceBaseService.model({ projectId: new mongoose.Types.ObjectId(projectId), name, type, parentId, connectedTo: connectedTo , cloudProvider, extraData: extraData });
-        return await project.save();
+        const isFixNeeded = await this.checkIfFixNeeded(cloudProvider, type, parentId);
+        if (isFixNeeded && parentId) {
+          const defaultVpc = await this.createDefaultVPC(projectId, cloudProvider, extraData);
+          const defaultSubnet = await this.createDefaultSubnet(projectId, (defaultVpc._id as string).toString() as string, cloudProvider, extraData);
+          const project = new this.resourceBaseService.model({ 
+            projectId: new mongoose.Types.ObjectId(projectId), 
+            name, 
+            type, 
+            parentId: defaultSubnet._id, 
+            connectedTo: connectedTo, 
+            cloudProvider, 
+            extraData: extraData 
+          });
+          return await project.save();
+        } else {
+          const project = new this.resourceBaseService.model({ projectId: new mongoose.Types.ObjectId(projectId), name, type, parentId, connectedTo: connectedTo , cloudProvider, extraData: extraData });
+          return await project.save();
+        }     
       }
+
+      async checkIfFixNeeded (cloudProvider: string, type: ServiceType, parentId: string | null) {
+        if(!parentId ) return false
+
+        const parentNode = await this.resourceBaseService.getById(parentId);
+        const parentCloud = parentNode?.cloudProvider;
+        if (!parentNode || parentCloud !== cloudProvider) {
+          return true; // Fix needed if parent node is not found or cloud providers do not match
+        } 
+        return false; // No fix needed if parent node exists and cloud providers match
+      }
+
+      async createDefaultResource(projectId: string, name: string, type: ServiceType, parentId: string | null, cloudProvider: CloudProvider, extraData:any): Promise<IResource> {
+        const resource = new this.resourceBaseService.model({ 
+          projectId: new mongoose.Types.ObjectId(projectId), 
+          name, 
+          type, 
+          parentId, 
+          connectedTo: [], 
+          cloudProvider, 
+          extraData: extraData
+        });
+        return await resource.save();
+      }
+
+      async createDefaultVPC(projectId: string, cloudProvider: CloudProvider, extraData:any): Promise<IResource> {
+        const defaultVpcIfExist = await this.resourceBaseService.getByFilter({ projectId, type: ServiceType.VPC, cloudProvider, name: `${cloudProvider}-defaultVPC` });
+        if (defaultVpcIfExist.length > 0) {
+          return defaultVpcIfExist[0]; // Return the existing default VPC if it exists
+        } 
+        return this.createDefaultResource(projectId, `${cloudProvider}-defaultVPC`, ServiceType.VPC, null, cloudProvider, extraData);
+      }
+
+      async createDefaultSubnet(projectId: string, vpcId: string, cloudProvider: CloudProvider, extraData:any): Promise<IResource> {
+        const defaultSubnetIfExist = await this.resourceBaseService.getByFilter({ projectId, type: ServiceType.SUBNET, cloudProvider, name: `${cloudProvider}-defaultSubnet`, parentId: vpcId });
+        if (defaultSubnetIfExist.length > 0) {
+          return defaultSubnetIfExist[0]; // Return the existing default Subnet if it exists
+        }
+        return this.createDefaultResource(projectId, `${cloudProvider}-defaultSubnet`, ServiceType.SUBNET, vpcId, cloudProvider, extraData);
+      }
+
+
 }
 
 export interface IVpcAndSubnet {  
