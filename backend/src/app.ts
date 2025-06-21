@@ -16,6 +16,7 @@ import { chatRouter } from './routes/chat.route';
 import { awsRouter } from './routes/aws.route';
 import { azureRouter } from './routes/azure.route';
 import { resourceRouter } from "./routes/resource.route";
+import { dashboardRouter } from "./routes/dashboard.route";
 import { terraformRouter } from "./routes/terraform.route";
 
 
@@ -60,6 +61,7 @@ const appPromise: Promise<Application> = new Promise(async (resolve, reject) => 
   app.use('/api/projects', projectRouter);
   app.use('/api/aws', awsRouter);
   app.use("/api/azure", azureRouter);
+  app.use('/api/dashboard', dashboardRouter);
 
   try {
     await mongoose.connect(config.MONGO_URI as string);

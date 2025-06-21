@@ -211,6 +211,22 @@ authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODNjNGYxO
     "resourceId": "6840391ab63d5c24c257ede3"
 }
 
+###
+GET http://localhost:5000/api/dashboard/provider-distribution/68555417d8c72f3279d3555b
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODNjNGYxOTM3YTBmZmZhZjczZTQxNjEiLCJpYXQiOjE3NTA1MTM1MDYsImV4cCI6MTc1MDUxNzEwNn0.apsbhp9vDc0X3QpfCh7lSYzN4ec5L0cMMc55KUQt44E
+
+###
+GET http://localhost:5000/api/dashboard/type-distribution/68555417d8c72f3279d3555b
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODNjNGYxOTM3YTBmZmZhZjczZTQxNjEiLCJpYXQiOjE3NTA1MTM1MDYsImV4cCI6MTc1MDUxNzEwNn0.apsbhp9vDc0X3QpfCh7lSYzN4ec5L0cMMc55KUQt44E
+
+###
+GET http://localhost:5000/api/dashboard/total-price/68555417d8c72f3279d3555b
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODNjNGYxOTM3YTBmZmZhZjczZTQxNjEiLCJpYXQiOjE3NTA1MTczNjcsImV4cCI6MTc1MDUyMDk2N30.mfzPlyeC78R5W5SbO7WajqctBx6y6jzJ3hlyNzbKlFM
+
+###
+GET http://localhost:5000/api/dashboard/region-distribution/68555417d8c72f3279d3555b
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODNjNGYxOTM3YTBmZmZhZjczZTQxNjEiLCJpYXQiOjE3NTA1MTczNjcsImV4cCI6MTc1MDUyMDk2N30.mfzPlyeC78R5W5SbO7WajqctBx6y6jzJ3hlyNzbKlFM
+
 
 
 

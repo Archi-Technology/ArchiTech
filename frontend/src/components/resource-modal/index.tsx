@@ -221,8 +221,8 @@ export default function ResourceModal({
                 if (selectedResource !== null) {
                   const selectedResourceDetails = resources.find((resource) => resource.id === selectedResource);
                   const selectedCloud = (selectedResourceDetails?.provider || CloudProvider.AWS).toLocaleUpperCase() as CloudProvider;
-
-                  onConfirm(selectedCloud, '10$'); // Pass the selected cloud provider
+                  const price = selectedResourceName == 'Object Storage' ? selectedResourceDetails?.pricePerGbPerMonth || 10 : selectedResourceDetails?.pricePerHour || 10; 
+                  onConfirm(selectedCloud, price); // Pass the selected cloud provider
                   document.dispatchEvent(new Event("closeParentModal")); // Trigger parent modal close
                 }
               }}
