@@ -29,7 +29,10 @@ import databaseIcon from '../../assets/canvas/database-svgrepo-com.svg';
 import { ContactlessOutlined } from '@mui/icons-material';
 import { useCanvas } from "../../contexts/canvasContext"; // Import canvas context
 import { fetchProjectData } from '../../services/canvasService'; // Import fetchProjectData
-import { ServiceType, IBaseService } from '../../interfaces/canvas'; // Import ServiceType
+import { IBaseService } from '../../interfaces/canvas'; // Import ServiceType
+import { useTerraform } from '../../contexts/terraformContext';
+import { generateTerraform } from '../../services/resourceService';
+import { ServiceType } from '../service-popup';
 
 const nodeTypes = {
   circle: CircleNode,
@@ -96,6 +99,7 @@ const BasicFlow = forwardRef((_, ref) => {
     defaultNodes.map((node) => ({ ...node, draggable: false })) // Make all nodes undraggable
   );
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const {updateTerraformCode, setLoading} = useTerraform(); // Access the Terraform context to update code
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
   const reactFlowInstance = useRef<ReactFlowInstance | null>(null);
   const { registerAddNodeFunction } = useCanvas(); // Access the function to register node addition
@@ -145,13 +149,13 @@ const BasicFlow = forwardRef((_, ref) => {
     switch (type) {
       case ServiceType.VPC:
         return vpcIcon;
-      case ServiceType.Subnet:
+      case ServiceType.SUBNET:
         return subnetIcon;
       case ServiceType.VM:
         return vmIcon;
       case ServiceType.OBJECT_STORAGE:
         return bucketIcon;
-      case ServiceType.Databases:
+      case ServiceType.DATABASE:
         return databaseIcon;
 
       default:
@@ -183,15 +187,23 @@ const BasicFlow = forwardRef((_, ref) => {
     );
 
     const nodeId = node.id;
+    console.log('Node clicked:', nodeId);
     const canvasWidth = reactFlowWrapper.current?.clientWidth || 0;
     const canvasCenterX = canvasWidth / 2;
     const cloudBoxWidth = canvasWidth * 0.8;
     const cloudBoxHeight = 700;
     const startOfBox = canvasCenterX - cloudBoxWidth / 2;
 
-    if (!['1', '2', '3'].includes(nodeId)) return;
+    if (!['1', '2', '3'].includes(nodeId)) {
+      if(node.id === '4') return
+      setLoading(true);
+      const terraformCode = await generateTerraform(nodeId);
+      updateTerraformCode(terraformCode);
+      setLoading(false);
+    } else {
 
     const projectId = sessionStorage.getItem('selectedProjectId');
+    console.log('canvas diagram Project ID:', projectId);
     if (!projectId) return;
 
     const projectData = await fetchProjectData();
@@ -231,7 +243,7 @@ const BasicFlow = forwardRef((_, ref) => {
         bucketsCount[node.cloudProvider] = (bucketsCount[node.cloudProvider] || 0) + 1;
       }
 
-      if (node.type === ServiceType.Subnet && node.parentId) {
+      if (node.type === ServiceType.SUBNET && node.parentId) {
         subnetCounts[node.parentId] = (subnetCounts[node.parentId] || 0) + 1;
       }
 
@@ -252,7 +264,7 @@ const BasicFlow = forwardRef((_, ref) => {
       if (node.type === ServiceType.VPC) {
         if (!vpcGroups[node.cloudProvider]) vpcGroups[node.cloudProvider] = [];
         vpcGroups[node.cloudProvider].push(node);
-      } else if (node.type === ServiceType.Subnet) {
+      } else if (node.type === ServiceType.SUBNET) {
         if (!subnetGroups[node.parentId]) subnetGroups[node.parentId] = [];
         subnetGroups[node.parentId].push(node);
       } else if (node.type === ServiceType.OBJECT_STORAGE) {
@@ -324,7 +336,7 @@ const BasicFlow = forwardRef((_, ref) => {
           dynamicNodes.push(
             {
               id: node._id,
-              type: node.type === ServiceType.VPC || node.type === ServiceType.Subnet ? 'bigSquare' : 'circle',
+              type: node.type === ServiceType.VPC || node.type === ServiceType.SUBNET ? 'bigSquare' : 'circle',
               position,
               draggable: false, // Ensure dynamic nodes are undraggable
               data: {
@@ -345,7 +357,7 @@ const BasicFlow = forwardRef((_, ref) => {
 
           dynamicNodes.push({
             id: node._id,
-            type: node.type === ServiceType.Subnet ? 'bigSquare' : 'circle',
+            type: node.type === ServiceType.SUBNET ? 'bigSquare' : 'circle',
             position,
             data: {
               label: node.name,
@@ -506,9 +518,9 @@ const BasicFlow = forwardRef((_, ref) => {
 
     const dynamicEdges: Edge[] = [];
     projectData
-      .filter((node: any) => node.connnectedTo)
+      .filter((node: any) => node.connectedTo)
       .forEach((node: any) => (
-        node.connnectedTo.forEach((connectedNode: string) => {
+        node.connectedTo.forEach((connectedNode: string) => {
           dynamicEdges.push({
             id: `${node._id}-${connectedNode}`,
             source: node._id,
@@ -648,8 +660,7 @@ const BasicFlow = forwardRef((_, ref) => {
       }
     }, 10);
 
-
-
+  }
   };
 
   const nColor = (id: string) => {

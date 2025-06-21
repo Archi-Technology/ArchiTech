@@ -15,6 +15,7 @@ content-type: application/json
 
 {
     "username": "daniel2234",
+    "email": "dnaielgmail34.com",
     "password": "daniel34"
 }
 
@@ -157,27 +158,27 @@ authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODI3NTdiY
 ###
 POST   http://localhost:5000/api/resource/create
 content-type: application/json
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODI3NTdiY2I3ZGY4MmU4OWQ2MjJiNjciLCJpYXQiOjE3NDc0OTUyNzUsImV4cCI6MTc0NzQ5ODg3NX0.qylJbCIUdnRci0IJIFQnEw_x6fTbUGnvveH_i9pAyMs
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODNjNGYxOTM3YTBmZmZhZjczZTQxNjEiLCJpYXQiOjE3NDkwNjI4OTAsImV4cCI6MTc0OTA2NjQ5MH0.JUwMk5xIymAfZoHMAUQpjhkJbW_-O7crA5vhpr__qDM
 
 {
-    "projectId": "68275a5c12fe52a1179804f3",
-    "name": "first vpc",
+    "projectId": "683c70c0d28f367f410ac66d",
+    "name": "second vpc",
     "type": "Vpc",
     "parentId": null,
-    "cloudProvider": "AWS"
+    "cloudProvider": "AZURE"
 }
 
 ###
 POST   http://localhost:5000/api/resource/create
 content-type: application/json
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODI3NTdiY2I3ZGY4MmU4OWQ2MjJiNjciLCJpYXQiOjE3NDc0OTUyNzUsImV4cCI6MTc0NzQ5ODg3NX0.qylJbCIUdnRci0IJIFQnEw_x6fTbUGnvveH_i9pAyMs
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODNjNGYxOTM3YTBmZmZhZjczZTQxNjEiLCJpYXQiOjE3NDkwNjI4OTAsImV4cCI6MTc0OTA2NjQ5MH0.JUwMk5xIymAfZoHMAUQpjhkJbW_-O7crA5vhpr__qDM
 
 {
-    "projectId": "68275a5c12fe52a1179804f3",
+    "projectId": "683c70c0d28f367f410ac66d",
     "name": "subnet",
     "type": "Subnet",
-    "parentId": "6828aa5b7842ea449b818caa",
-    "cloudProvider": "AWS"
+    "parentId": "68409528ff62462cda3b319d",
+    "cloudProvider": "AZURE"
 }
 
 ###
@@ -198,6 +199,17 @@ authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODI3NTdiY
 GET  http://localhost:5000/api/projects/artchitecture/68275a5c12fe52a1179804f3
 authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODI3NTdiY2I3ZGY4MmU4OWQ2MjJiNjciLCJpYXQiOjE3NDc0OTUyNzUsImV4cCI6MTc0NzQ5ODg3NX0.qylJbCIUdnRci0IJIFQnEw_x6fTbUGnvveH_i9pAyMs
 
+
+
+
+###
+POST   http://localhost:5000/api/terraform
+content-type: application/json
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODNjNGYxOTM3YTBmZmZhZjczZTQxNjEiLCJpYXQiOjE3NDkwMzgyOTYsImV4cCI6MTc0OTA0MTg5Nn0.gJFNHrepTKx0JPTBjUoBvNkJsamN3AOkQ44PK-QkGs0
+
+{
+    "resourceId": "6840391ab63d5c24c257ede3"
+}
 
 
 

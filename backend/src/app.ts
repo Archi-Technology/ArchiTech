@@ -16,6 +16,7 @@ import { chatRouter } from './routes/chat.route';
 import { awsRouter } from './routes/aws.route';
 import { azureRouter } from './routes/azure.route';
 import { resourceRouter } from "./routes/resource.route";
+import { terraformRouter } from "./routes/terraform.route";
 
 
 const appPromise: Promise<Application> = new Promise(async (resolve, reject) => {
@@ -41,7 +42,15 @@ const appPromise: Promise<Application> = new Promise(async (resolve, reject) => 
     fs.mkdirSync(uploadsPath, { recursive: true });
   }
 
-  app.use(cors());
+    app.use(cors());
+  
+    app.use('/api', authMiddleware);
+    app.use('/api/auth', authRouter);
+    app.use('/api/user', userRouter);
+    app.use('/api/chat', chatRouter);
+    app.use('/api/projects', projectRouter);
+    app.use('/api/resource', resourceRouter);
+    app.use('/api/terraform', terraformRouter);
 
 
   app.use('/api', authMiddleware);
