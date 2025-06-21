@@ -15,6 +15,7 @@ import { getProjectResources } from '../../services/projectService';
 import { createResource, generateTerraform, IResource } from '../../services/resourceService';
 import { useTerraform } from '../../contexts/terraformContext';
 import { CloudProvider } from '../../interfaces/canvas';
+import ServicePopupNew from '../service-popup-new';
 import ServicePopup from '../service-popup'; // Import the popup component
 import BasicFlow from '../diagram-canvas'; // Import the canvas component
 
@@ -145,7 +146,7 @@ export default function ServiceSidebar({ canvasRef }: { canvasRef: React.RefObje
         </div>
       </div>
       {selectedService && (
-        <ServicePopup
+        <ServicePopupNew
           service={selectedService}
           onConfirm={handlePopupConfirm}
           onCancel={handlePopupCancel}
