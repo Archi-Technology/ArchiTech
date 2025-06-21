@@ -76,6 +76,24 @@ export default function OldDashboard() {
       latency: 22,
       status: "healthy",
     },
+    {
+        name: "ca-central-1",
+        percentage: 5,
+        color: "#84cc16",
+        cost: 249.09,
+        resources: 6,
+        latency: 22,
+        status: "healthy",
+      },
+      {
+        name: "ca-central-1",
+        percentage: 5,
+        color: "#84cc16",
+        cost: 249.09,
+        resources: 6,
+        latency: 22,
+        status: "healthy",
+      },
     { name: "ap-south-1", percentage: 5, color: "#f97316", cost: 249.09, resources: 6, latency: 48, status: "warning" },
     { name: "eu-north-1", percentage: 4, color: "#ec4899", cost: 199.27, resources: 5, latency: 35, status: "healthy" },
     { name: "sa-east-1", percentage: 4, color: "#6366f1", cost: 199.27, resources: 5, latency: 65, status: "critical" },
@@ -209,7 +227,7 @@ export default function OldDashboard() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-6-fix">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
