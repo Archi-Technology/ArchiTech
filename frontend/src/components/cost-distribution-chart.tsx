@@ -66,12 +66,12 @@ export function CostDistributionChart() {
       <CardHeader
         title={
           <Typography variant="h6" fontWeight={600} color="primary">
-            Cloud Provider Cost Distribution
+            Cloud Provider Resource Distribution
           </Typography>
         }
         subheader={
           <Typography variant="body2" color="text.secondary">
-            Breakdown of costs by cloud provider
+            Breakdown of resources by cloud provider
           </Typography>
         }
       />

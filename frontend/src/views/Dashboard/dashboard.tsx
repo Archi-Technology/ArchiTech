@@ -24,10 +24,10 @@ export default function Dashboard() {
   return (
     <Box display="flex" height="100vh" bgcolor={theme.palette.grey[100]}>
       {/* <TechBackground /> */}
-      <Sidebar />
+      {/* <Sidebar /> */}
 
       <Box flex={1} display="flex" flexDirection="column" overflow="hidden">
-        <Header />
+        {/* <Header /> */}
 
         <Box component="main" flex={1} overflow="auto" p={3}>
           <Typography variant="h5" fontWeight={600} mb={2}>

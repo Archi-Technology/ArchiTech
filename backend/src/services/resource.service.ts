@@ -62,8 +62,8 @@ export class ResourceService extends BaseService<IResource> {
     async createResource(projectId: string, name: string, type: ServiceType, parentId: string | null, cloudProvider: CloudProvider, connectedTo: string[],extraData: any = {}): Promise<IResource> {
         const isFixNeeded = await this.checkIfFixNeeded(cloudProvider, type, parentId);
         if (isFixNeeded && parentId) {
-          const defaultVpc = await this.createDefaultVPC(projectId, cloudProvider, extraData);
-          const defaultSubnet = await this.createDefaultSubnet(projectId, (defaultVpc._id as string).toString() as string, cloudProvider, extraData);
+          const defaultVpc = await this.createDefaultVPC(projectId, cloudProvider, {region: extraData.region});
+          const defaultSubnet = await this.createDefaultSubnet(projectId, (defaultVpc._id as string).toString() as string, cloudProvider, {region: extraData.region});
           const project = new this.resourceBaseService.model({ 
             projectId: new mongoose.Types.ObjectId(projectId), 
             name, 
