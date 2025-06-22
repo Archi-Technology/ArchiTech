@@ -22,7 +22,7 @@ export default function Dashboard() {
   const theme = useTheme();
 
   return (
-    <Box display="flex" height="100vh" bgcolor={theme.palette.grey[100]}>
+    <Box display="flex" height="92vh" bgcolor={theme.palette.grey[100]}>
       {/* <TechBackground /> */}
       {/* <Sidebar /> */}
 
