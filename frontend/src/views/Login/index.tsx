@@ -1,5 +1,5 @@
 'use client';
-
+import './index.scss';
 import type React from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -16,10 +16,14 @@ import {
   registerUser,
 } from '../../services/userService';
 import { EnterMode } from './EnterMode';
-import './index.scss';
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
 import { Box, Button, TextField, Typography, Divider } from '@mui/material';
 import { type CredentialResponse, GoogleLogin } from '@react-oauth/google';
+import InputAdornment from '@mui/material/InputAdornment';
+import EmailIcon from '@mui/icons-material/Email';
+import PersonIcon from '@mui/icons-material/Person';
+import LockIcon from '@mui/icons-material/Lock';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 type FormInputs = {
   username: string;
@@ -80,7 +84,9 @@ export const LoginCard: React.FC<IProp> = ({
     <div className="login-card">
       <div className="header">
         <span className="title">
-          {enterMode === EneterModes.LOGIN ? 'Log in to your account' : 'Register an account'}
+          {enterMode === EneterModes.LOGIN
+            ? 'Log in to your account'
+            : 'Register an account'}
         </span>
         <span className="desc">
           {enterMode === EneterModes.LOGIN
@@ -116,37 +122,82 @@ export const LoginCard: React.FC<IProp> = ({
         </Divider>
 
         <Box sx={{ width: '100%' }}>
-          <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-          />
           <form onSubmit={handleSubmit(onSubmit)}>
-            {/* Conditionally Render Email Field */}
+            {/* Email Field (always shown) */}
+            <Controller
+              name="email"
+              control={control}
+              rules={{
+                required: 'Email is required',
+                pattern: {
+                  value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                  message: 'Invalid email address',
+                },
+              }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  placeholder="Email"
+                  variant="outlined"
+                  type="email"
+                  fullWidth
+                  margin="normal"
+                  error={!!errors.email}
+                  helperText={errors.email?.message}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            pl: 0.5,
+                          }}
+                        >
+                          <EmailIcon color="action" fontSize="medium" />
+                        </Box>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              )}
+            />
+
+            {/* Username Field (only for register) */}
             {isRegisterMode && (
               <Controller
-                name="email"
+                name="username"
                 control={control}
                 rules={{
-                  required: 'Email is required',
-                  pattern: {
-                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                    message: 'Invalid email address',
+                  required: 'Username is required',
+                  minLength: {
+                    value: 4,
+                    message: 'Username must be at least 4 characters',
                   },
                 }}
                 render={({ field }) => (
                   <TextField
                     {...field}
-                    placeholder="Enter your email address"
+                    type='username'
+                    placeholder="Username"
                     variant="outlined"
                     fullWidth
                     margin="normal"
-                    error={!!errors.email}
-                    helperText={errors.email?.message}
+                    error={!!errors.username}
+                    helperText={errors.username?.message}
                     InputProps={{
                       startAdornment: (
-                        <Box sx={{ mr: 1, color: 'text.secondary' }}>
-                          <i className="fas fa-envelope"></i>
-                        </Box>
+                        <InputAdornment position="start">
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              pl: 0.5,
+                            }}
+                          >
+                            <PersonIcon color="action" fontSize="medium" />
+                          </Box>
+                        </InputAdornment>
                       ),
                     }}
                   />
@@ -154,55 +205,7 @@ export const LoginCard: React.FC<IProp> = ({
               />
             )}
 
-            <Controller
-              name={isRegisterMode ? 'username' : 'email'}
-              control={control}
-              rules={{
-                required: isRegisterMode
-                  ? 'Username is required'
-                  : 'Email is required',
-                minLength: isRegisterMode
-                  ? {
-                      value: 4,
-                      message: 'Username must be at least 4 characters',
-                    }
-                  : undefined,
-                pattern: !isRegisterMode
-                  ? {
-                      value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                      message: 'Invalid email address',
-                    }
-                  : undefined,
-              }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  placeholder={
-                    isRegisterMode
-                      ? 'Enter your username'
-                      : 'Enter your email address'
-                  }
-                  variant="outlined"
-                  fullWidth
-                  margin="normal"
-                  error={isRegisterMode ? !!errors.username : !!errors.email}
-                  helperText={
-                    isRegisterMode
-                      ? errors.username?.message
-                      : errors.email?.message
-                  }
-                  InputProps={{
-                    startAdornment: (
-                      <Box sx={{ mr: 1, color: 'text.secondary' }}>
-                        <i className="fas fa-envelope"></i>
-                      </Box>
-                    ),
-                  }}
-                />
-              )}
-            />
-
-            {/* Password Field */}
+            {/* Password Field (always shown) */}
             <Controller
               name="password"
               control={control}
@@ -216,7 +219,7 @@ export const LoginCard: React.FC<IProp> = ({
               render={({ field }) => (
                 <TextField
                   {...field}
-                  placeholder="Enter your password"
+                  placeholder="Password"
                   type="password"
                   variant="outlined"
                   fullWidth
@@ -225,9 +228,17 @@ export const LoginCard: React.FC<IProp> = ({
                   helperText={errors.password?.message}
                   InputProps={{
                     startAdornment: (
-                      <Box sx={{ mr: 1, color: 'text.secondary' }}>
-                        <i className="fas fa-lock"></i>
-                      </Box>
+                      <InputAdornment position="start">
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            pl: 0.5,
+                          }}
+                        >
+                          <LockIcon color="action" fontSize="medium" />
+                        </Box>
+                      </InputAdornment>
                     ),
                   }}
                 />
