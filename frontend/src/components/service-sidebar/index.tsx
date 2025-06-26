@@ -220,9 +220,9 @@ const services: Service[] = [
     ),
   },
   {
-    name: 'Network',
+    name: 'Vpc',
     icon: (
-      <img src={vpcIcon} alt="Network" className="service-icon-img" />
+      <img src={vpcIcon} alt="Vpc" className="service-icon-img" />
     ),
   },
   {
