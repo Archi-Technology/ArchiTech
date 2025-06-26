@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { Box, Typography, Paper, LinearProgress, Divider } from "@mui/material";
 import { getTotalPrice } from "../../services/dashboardService";
 
-export default function CostCalculator() {
+export default function CostCalculator({ projectId }: { projectId: string }) {
   const [costData, setCostData] = useState({
     AWS: 0,
     AZURE: 0,
@@ -11,7 +11,6 @@ export default function CostCalculator() {
   });
 
   useEffect(() => {
-    const projectId = sessionStorage.getItem("selectedProjectId");
     if (!projectId) return;
     getTotalPrice(projectId).then((data) => {
       setCostData({
@@ -21,7 +20,7 @@ export default function CostCalculator() {
         total: data.total ?? 0,
       });
     });
-  }, []);
+  }, [projectId]);
 
   const distribution = useMemo(() => {
     const awsPercent = costData.total ? ((costData.AWS / costData.total) * 100).toFixed(2) : "0.00";

@@ -11,7 +11,7 @@ import {
 import { Database, Server, Zap } from "lucide-react";
 import { getTypeDistribution } from "../services/dashboardService";
 
-export function ResourceDistribution() {
+export function ResourceDistribution({ projectId }: { projectId: string }) {
   const theme = useTheme();
   const [distribution, setDistribution] = useState({
     Storage: 0,
@@ -20,7 +20,6 @@ export function ResourceDistribution() {
   });
 
   useEffect(() => {
-    const projectId = sessionStorage.getItem("selectedProjectId");
     if (!projectId) return;
     getTypeDistribution(projectId).then((data) => {
       setDistribution({
@@ -29,7 +28,7 @@ export function ResourceDistribution() {
         Network: data.network ?? 0,
       });
     });
-  }, []);
+  }, [projectId]);
 
   const resources = [
     { name: "Storage", value: distribution.Storage, icon: Database, color: "#0070F3" },
