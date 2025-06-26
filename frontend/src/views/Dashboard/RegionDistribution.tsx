@@ -19,17 +19,16 @@ interface ResourceDistributionByRegion {
   [region: string]: { count: number; percent: number };
 }
 
-export default function RegionDistribution() {
+export default function RegionDistribution({ projectId }: { projectId: string }) {
   const theme = useTheme();
   const [regionDistribution, setRegionDistribution] = useState<ResourceDistributionByRegion>({});
 
   useEffect(() => {
-    const projectId = sessionStorage.getItem("selectedProjectId");
     if (!projectId) return;
     getRegionDistribution(projectId).then((data) => {
       setRegionDistribution(data);
     });
-  }, []);
+  }, [projectId]);
 
   const regionKeys = Object.keys(regionDistribution);
 

@@ -29,12 +29,11 @@ interface ResourceDistributionByProvider {
 
 
 
-export function CostDistributionChart() {
+export function CostDistributionChart({ projectId }: { projectId: string }) {
   const theme = useTheme();
   const [data, setData] = useState<{ name: string; value: number; color: string }[]>([]);
 
   // Get projectId from sessionStorage
-  const projectId = sessionStorage.getItem('selectedProjectId');
 
   useEffect(() => {
     if (!projectId) return;
