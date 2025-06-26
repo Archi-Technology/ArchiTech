@@ -17,6 +17,7 @@ import { TerminalCard } from '../../components/terminal-card';
 import { Cpu, HardDrive, Activity, DollarSign } from 'lucide-react';
 import  CostCalculator  from './CostCalculator';
 import RegionDistribution from "./RegionDistribution"; // Add this import
+import ProjectSelector from '../../components/project-selector';
 
 export default function Dashboard() {
   const theme = useTheme();
