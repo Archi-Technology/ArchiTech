@@ -1,14 +1,18 @@
-import React, { useCallback, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button, Box } from "@mui/material";
+'use client';
 
-import { CloudAssistantPopup } from "../cloud-assistant";
-import CodePanel from "../code-panel";
-import DiagramCanvas from "../diagram-canvas";
-import NeededAssistantCheck from "../neededAssistantCheck";
-import ServiceSidebar from "../service-sidebar";
-import Chat from "../Chat";
-import "./index.scss"
+import type React from 'react';
+import { useCallback, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button, Box } from '@mui/material';
+
+import { CloudAssistantPopup } from '../cloud-assistant';
+import CodePanel from '../code-panel';
+import DiagramCanvas from '../diagram-canvas';
+import NeededAssistantCheck from '../neededAssistantCheck';
+import ServiceSidebar from '../service-sidebar';
+import Chat from '../Chat';
+import './index.scss';
+
 // Define a type for the ref that matches BasicFlowRef
 type DiagramCanvasRef = {
   onNodeClick: (event: any, node: any) => void;
@@ -19,7 +23,6 @@ export const Feed: React.FC = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const canvasRef = useRef<DiagramCanvasRef | null>(null);
   const navigate = useNavigate();
-
 
   const openPopup = useCallback(() => {
     setIsPopupOpen(true);
@@ -33,7 +36,11 @@ export const Feed: React.FC = () => {
     <div className="container">
       {/* כפתור מעבר לדשבורד */}
       <Box p={2}>
-        <Button variant="contained" color="primary" onClick={() => navigate("/dashboard")}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => navigate('/dashboard')}
+        >
           Go to Dashboard
         </Button>
       </Box>
@@ -52,11 +59,17 @@ export const Feed: React.FC = () => {
         <div className="codePanel">
           <CodePanel />
         </div>
-
-        <div className="aiChatPanel">
-          <Chat />
-        </div>
       </div>
+      {/* Chat positioned at bottom right */}
+      <div style={{
+        position: 'fixed',
+        bottom: 24,
+        right: 24,
+        zIndex: 1300
+      }}>
+        <Chat />
+      </div>
+
 
       <NeededAssistantCheck openPopup={openPopup} />
       {isPopupOpen && <CloudAssistantPopup onClose={closePopup} />}
