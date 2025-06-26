@@ -102,11 +102,11 @@
 .popup-selection select, input[type="text"] {
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #d1d5db;
   border-radius: 0.25rem;
   font-size: 0.875rem;
   margin-bottom: 0.2rem; /* Added margin for spacing */
-  text-align: center; /* Center text in select dropdowns */
+  text-align: left; /* Center text in select dropdowns */
   appearance: none;
 }
 
@@ -384,7 +384,8 @@
 }
 
 .form-input::placeholder {
-  color: #9ca3af;
+  // color: #9ca3af;
+  color: #000 !important;
 }
 
 .form-input.error {
@@ -729,7 +730,8 @@
 }
 
 .multi-select-input::placeholder {
-  color: #9ca3af;
+  // color: #9ca3af;
+  color: #000 !important;
 }
 
 .multi-select-arrow {

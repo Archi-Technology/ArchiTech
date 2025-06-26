@@ -152,7 +152,7 @@ const [searchTerm, setSearchTerm] = useState("")
         }
 
         .multi-select-input::placeholder {
-          color: #9ca3af;
+          color: #000 !important;
         }
 
         .multi-select-arrow {
@@ -241,7 +241,7 @@ const [searchTerm, setSearchTerm] = useState("")
         }
 
         .placeholder-text-new {
-          color: #9ca3af;
+          color: black;
           font-size: 1rem;
           user-select: none;
           font-size: 0.9rem;
