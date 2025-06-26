@@ -23,11 +23,11 @@ const Navbar: React.FC = () => {
           <Link to="/home">
             <button className="navButton">Home</button>
           </Link>
-          <Link to="/projects">
-            <button className="navButton">Projects</button>
-          </Link>
           <Link to="/dashboard">
             <button className="navButton">Dashboard</button>
+          </Link>
+          <Link to="/projects">
+            <button className="navButton">Projects</button>
           </Link>
         </div>
         {/* <div className="appTitle">AWS 3 tier web app with a database</div> */}
