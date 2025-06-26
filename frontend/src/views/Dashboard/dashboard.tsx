@@ -23,11 +23,13 @@ import { Cpu, HardDrive, Activity, DollarSign } from "lucide-react";
 import CostCalculator from "./CostCalculator";
 import RegionDistribution from "./RegionDistribution";
 import { getAllProjects } from "../../services/projectService";
+import { useTerraform } from "../../contexts/terraformContext";
 
 export default function Dashboard() {
   const theme = useTheme();
   const [projects, setProjects] = useState<{ _id: string; name: string }[]>([]);
   const [selectedProjectId, setSelectedProjectId] = useState<string>("");
+  const {resetTerraformCode} = useTerraform();
 
   useEffect(() => {
     getAllProjects().then((data) => {
@@ -69,7 +71,9 @@ export default function Dashboard() {
                 labelId="project-select-label"
                 value={selectedProjectId}
                 label="Select Project"
-                onChange={(e) => setSelectedProjectId(e.target.value)}
+                onChange={(e) => {setSelectedProjectId(e.target.value)
+                  resetTerraformCode();
+                }}
               >
                 {projects.map((project) => (
                   <MenuItem key={project._id} value={project._id}>
