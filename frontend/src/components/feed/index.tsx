@@ -34,17 +34,6 @@ export const Feed: React.FC = () => {
 
   return (
     <div className="container">
-      {/* כפתור מעבר לדשבורד */}
-      <Box p={2}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => navigate('/dashboard')}
-        >
-          Go to Dashboard
-        </Button>
-      </Box>
-
       {/* Main content area */}
       <div className="mainContent">
         {/* Left sidebar with services */}
@@ -61,15 +50,16 @@ export const Feed: React.FC = () => {
         </div>
       </div>
       {/* Chat positioned at bottom right */}
-      <div style={{
-        position: 'fixed',
-        bottom: 24,
-        right: 24,
-        zIndex: 1300
-      }}>
+      <div
+        style={{
+          position: 'fixed',
+          bottom: 24,
+          right: 24,
+          zIndex: 1300,
+        }}
+      >
         <Chat />
       </div>
-
 
       <NeededAssistantCheck openPopup={openPopup} />
       {isPopupOpen && <CloudAssistantPopup onClose={closePopup} />}

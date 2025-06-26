@@ -20,8 +20,14 @@ const Navbar: React.FC = () => {
             style={{ width: 64, height: 64 }}
           />
           <div className="appName">ArchiTech</div>
+          <Link to="/home">
+            <button className="navButton">Home</button>
+          </Link>
           <Link to="/projects">
             <button className="navButton">Projects</button>
+          </Link>
+          <Link to="/dashboard">
+            <button className="navButton">Dashboard</button>
           </Link>
         </div>
         {/* <div className="appTitle">AWS 3 tier web app with a database</div> */}
