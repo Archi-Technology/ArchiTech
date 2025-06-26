@@ -6,14 +6,19 @@ import {
   Typography,
   Button,
   Paper,
+  Chip,
   Container,
+  Avatar,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   IconButton,
+  Divider,
   TextField,
 } from '@mui/material';
+import FolderIcon from '@mui/icons-material/Folder';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -59,7 +64,6 @@ export default function Projects() {
 
   const handleCreateProject = async () => {
     try {
-
       const newProject = await createProject('New Project');
       sessionStorage.setItem('selectedProjectId', newProject._id);
       navigate(`/home?projectId=${newProject._id}`);
@@ -73,7 +77,7 @@ export default function Projects() {
       await updateProject(
         projectId,
         newName,
-        projects.find((p) => p._id === projectId)?.data || {}
+        projects.find((p) => p._id === projectId)?.data || {},
       );
       setEditMode(null);
       await fetchProjects();
@@ -105,8 +109,9 @@ export default function Projects() {
   useEffect(() => {
     const handleCloseParentModal = () => setOpenDialog(false);
 
-    document.addEventListener("closeParentModal", handleCloseParentModal);
-    return () => document.removeEventListener("closeParentModal", handleCloseParentModal);
+    document.addEventListener('closeParentModal', handleCloseParentModal);
+    return () =>
+      document.removeEventListener('closeParentModal', handleCloseParentModal);
   }, []);
   const paperStyle = {
     p: 4,
@@ -139,15 +144,28 @@ export default function Projects() {
   return (
     <Box sx={{ bgcolor: '#fff', minHeight: '100vh', py: 6 }}>
       <Container>
-        <Typography
-          variant="h4"
-          fontWeight="bold"
-          align="center"
-          gutterBottom
-          sx={{ color: 'black' }}
-        >
-          Manage Your Architecture Projects
-        </Typography>
+        <Box textAlign="center" mb={6}>
+          <Typography
+            variant="h3"
+            fontWeight="bold"
+            sx={{
+              color: '#4c8bf5',
+              mb: 2,
+              background: 'linear-gradient(135deg, #4c8bf5 0%, #6ba3f7 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
+            Architecture Projects
+          </Typography>
+          <Typography
+            variant="h6"
+            sx={{ color: '#64748b', maxWidth: 600, mx: 'auto' }}
+          >
+            Design, manage, and deploy your cloud infrastructure with ease
+          </Typography>
+        </Box>
 
         <Grid container spacing={4} mb={6}>
           <Grid item xs={12} md={6}>
@@ -209,9 +227,24 @@ export default function Projects() {
 
         {projects.length > 0 && (
           <>
-            <Typography variant="h5" fontWeight="bold" sx={{ color: 'black', mb: 3 }}>
-              Recent Projects
+            <Typography
+              variant="h5"
+              fontWeight="bold"
+              sx={{ color: 'black', mb: 3 }}
+            >
+              Recent Projects{' '}
+              <Chip
+                label={`${projects.length} total`}
+                size="small"
+                sx={{
+                  ml: 2,
+                  backgroundColor: '#4c8bf5',
+                  color: 'white',
+                  fontWeight: 'bold',
+                }}
+              />
             </Typography>
+
             <Grid container spacing={4}>
               {projects.slice(0, 3).map((project) => (
                 <Grid item xs={12} sm={6} md={4} key={project._id}>
@@ -223,16 +256,28 @@ export default function Projects() {
                     }}
                     onClick={() => {
                       sessionStorage.setItem('selectedProjectId', project._id);
-                      navigate(`/home?projectId=${project._id}`)}
-                    }
+                      navigate(`/home?projectId=${project._id}`);
+                    }}
                   >
-                    <Typography
-                      variant="subtitle1"
-                      className="hoverTitle"
-                      sx={titleStyle}
-                    >
-                      {project.name}
-                    </Typography>
+                    <Box display="flex" alignItems="center" mb={2}>
+                      <Avatar
+                        sx={{
+                          backgroundColor: '#4c8bf5',
+                          width: 40,
+                          height: 40,
+                          mr: 2,
+                        }}
+                      >
+                        <FolderIcon />
+                      </Avatar>
+                      <Typography
+                        variant="h6"
+                        className="hoverTitle"
+                        sx={{ ...titleStyle, fontSize: '1.1rem' }}
+                      >
+                        {project.name}
+                      </Typography>
+                    </Box>
                     <Typography variant="body2" sx={descriptionStyle}>
                       Last edited: {formatDate(project.lastEdited)}
                     </Typography>
@@ -243,85 +288,238 @@ export default function Projects() {
           </>
         )}
 
-        <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="md" fullWidth>
-          <DialogTitle>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Typography variant="h6">Your Projects</Typography>
-              <IconButton onClick={() => setOpenDialog(false)}>
+        <Dialog
+          open={openDialog}
+          onClose={() => setOpenDialog(false)}
+          maxWidth="md"
+          fullWidth
+          PaperProps={{
+            sx: {
+              borderRadius: 3,
+              background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 100%)',
+            },
+          }}
+        >
+          <DialogTitle sx={{ pb: 1 }}>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Box>
+                <Typography
+                  variant="h5"
+                  fontWeight="bold"
+                  sx={{
+                    color: '#4c8bf5',
+                    background:
+                      'linear-gradient(135deg, #4c8bf5 0%, #6ba3f7 100%)',
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}
+                >
+                  Your Projects
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#64748b', mt: 0.5 }}>
+                  Manage and organize your architecture projects
+                </Typography>
+              </Box>
+              <IconButton
+                onClick={() => setOpenDialog(false)}
+                sx={{
+                  backgroundColor: '#f1f5f9',
+                  '&:hover': { backgroundColor: '#e2e8f0' },
+                }}
+              >
                 <CloseIcon />
               </IconButton>
             </Box>
           </DialogTitle>
-          <DialogContent dividers>
-            <Grid container spacing={2}>
-              {projects.map((project) => (
+
+          <Divider sx={{ borderColor: '#e2e8f0' }} />
+
+          <DialogContent sx={{ py: 3 }}>
+            <Grid container spacing={3}>
+              {projects.map((project, index) => (
                 <Grid item xs={12} key={project._id}>
-                  <Paper sx={{ p: 2 }}>
-                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 3,
+                      border: '1px solid #e2e8f0',
+                      borderRadius: 2,
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        borderColor: '#4c8bf5',
+                        backgroundColor: '#f8faff',
+                        boxShadow: '0 2px 12px rgba(76, 139, 245, 0.1)',
+                      },
+                    }}
+                  >
+                    <Box
+                      display="flex"
+                      justifyContent="space-between"
+                      alignItems="center"
+                    >
                       <Box display="flex" alignItems="center" flex={1}>
-                        {editMode === project._id ? (
-                          <TextField
-                            value={newProjectName}
-                            onChange={(e) => setNewProjectName(e.target.value)}
-                            size="small"
-                            fullWidth
-                            autoFocus
-                            onBlur={() => {
-                              if (newProjectName.trim()) {
-                                handleEditProject(project._id, newProjectName);
+                        <Avatar
+                          sx={{
+                            backgroundColor: '#4c8bf5',
+                            width: 48,
+                            height: 48,
+                            mr: 3,
+                          }}
+                        >
+                          <FolderIcon />
+                        </Avatar>
+                        <Box flex={1}>
+                          {editMode === project._id ? (
+                            <TextField
+                              value={newProjectName}
+                              onChange={(e) =>
+                                setNewProjectName(e.target.value)
                               }
-                              setEditMode(null);
-                            }}
-                            onKeyPress={(e) => {
-                              if (e.key === 'Enter' && newProjectName.trim()) {
-                                handleEditProject(project._id, newProjectName);
-                              }
-                            }}
-                          />
-                        ) : (
-                          <Typography>{project.name}</Typography>
-                        )}
+                              size="small"
+                              fullWidth
+                              autoFocus
+                              sx={{
+                                '& .MuiOutlinedInput-root': {
+                                  '&.Mui-focused fieldset': {
+                                    borderColor: '#4c8bf5',
+                                  },
+                                },
+                              }}
+                              onBlur={() => {
+                                if (newProjectName.trim()) {
+                                  handleEditProject(
+                                    project._id,
+                                    newProjectName,
+                                  );
+                                }
+                                setEditMode(null);
+                              }}
+                              onKeyPress={(e) => {
+                                if (
+                                  e.key === 'Enter' &&
+                                  newProjectName.trim()
+                                ) {
+                                  handleEditProject(
+                                    project._id,
+                                    newProjectName,
+                                  );
+                                }
+                              }}
+                            />
+                          ) : (
+                            <Box>
+                              <Typography
+                                variant="h6"
+                                sx={{
+                                  color: '#1e293b',
+                                  fontWeight: 600,
+                                  mb: 0.5,
+                                }}
+                              >
+                                {project.name}
+                              </Typography>
+                              <Box display="flex" alignItems="center">
+                                <AccessTimeIcon
+                                  sx={{
+                                    fontSize: 14,
+                                    color: '#64748b',
+                                    mr: 0.5,
+                                  }}
+                                />
+                                <Typography
+                                  variant="caption"
+                                  sx={{ color: '#64748b' }}
+                                >
+                                  Last edited: {formatDate(project.lastEdited)}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          )}
+                        </Box>
                       </Box>
-                      <Box>
+
+                      <Box display="flex" alignItems="center" gap={1}>
                         <IconButton
                           onClick={() => {
                             setEditMode(project._id);
                             setNewProjectName(project.name);
                           }}
                           size="small"
+                          sx={{
+                            backgroundColor: '#f1f5f9',
+                            '&:hover': {
+                              backgroundColor: '#4c8bf5',
+                              color: 'white',
+                            },
+                          }}
                         >
-                          <EditIcon />
+                          <EditIcon fontSize="small" />
                         </IconButton>
+
                         <IconButton
                           onClick={() => handleDeleteProject(project._id)}
                           size="small"
+                          sx={{
+                            backgroundColor: '#f1f5f9',
+                            '&:hover': {
+                              backgroundColor: '#ef4444',
+                              color: 'white',
+                            },
+                          }}
                         >
-                          <DeleteIcon />
+                          <DeleteIcon fontSize="small" />
                         </IconButton>
+
                         <Button
                           variant="contained"
-                          size="small"
+                          size="medium"
                           onClick={() => {
-                            sessionStorage.setItem('selectedProjectId', project._id); // Save project ID in session storage
+                            sessionStorage.setItem(
+                              'selectedProjectId',
+                              project._id,
+                            );
                             setOpenDialog(false);
                             navigate(`/home?projectId=${project._id}`);
                           }}
-                          sx={{ ml: 1 }}
+                          sx={{
+                            ml: 1,
+                            backgroundColor: '#4c8bf5',
+                            '&:hover': { backgroundColor: '#3b7ce8' },
+                            borderRadius: 2,
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            px: 3,
+                          }}
                         >
-                          Open
+                          Open Project
                         </Button>
                       </Box>
                     </Box>
-                    <Typography variant="caption" color="text.secondary" display="block" mt={1}>
-                      Last edited: {formatDate(project.lastEdited)}
-                    </Typography>
                   </Paper>
                 </Grid>
               ))}
             </Grid>
           </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setOpenDialog(false)}>Close</Button>
+
+          <Divider sx={{ borderColor: '#e2e8f0' }} />
+
+          <DialogActions sx={{ p: 3 }}>
+            <Button
+              onClick={() => setOpenDialog(false)}
+              sx={{
+                color: '#64748b',
+                '&:hover': { backgroundColor: '#f1f5f9' },
+                textTransform: 'none',
+                fontWeight: 600,
+              }}
+            >
+              Close
+            </Button>
           </DialogActions>
         </Dialog>
       </Container>
