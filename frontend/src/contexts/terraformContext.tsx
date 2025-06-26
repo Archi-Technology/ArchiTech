@@ -23,7 +23,7 @@ export const TerraformProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }
 
   const resetTerraformCode = () => {
-    setTerraformCode("");
+    setTerraformCode("click on a service to generate \n Terraform code");
   };
 
   return (
