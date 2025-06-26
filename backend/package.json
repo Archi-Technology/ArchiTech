@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "build": "tsc && npm run copy-files-for-test",
-    "start": "node dist/server.js",
+    "build": "tsc",
+    "start": " node ./dist/app.js && pm2 restart ecosystem.config.js --env production",
     "dev": "nodemon src/server.ts",
     "test": "jest --coverage --forceExit --runInBand",
     "copy-files-for-test": "copyfiles -u 3 src/tests/data/ChatGPT_logo.png dist/tests/data"

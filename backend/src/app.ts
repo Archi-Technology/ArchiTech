@@ -69,6 +69,16 @@ const appPromise: Promise<Application> = new Promise(async (resolve, reject) => 
         description:
           "This is ArchiTech API.",
       },
+      servers: [
+        {
+          url: 'https://10.10.248.96',
+          description: "Development server",
+        },
+        {
+          url: `http://localhost:${config.PORT}`,
+          description: "Production server",
+        }
+      ],
     },
     apis: ["./src/routes/*.ts"],
   };
