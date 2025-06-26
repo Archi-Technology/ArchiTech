@@ -31,6 +31,7 @@ import {
   updateProject,
   deleteProject,
 } from '../../services/projectService';
+import { useTerraform } from '../../contexts/terraformContext';
 
 interface Project {
   _id: string;
@@ -44,6 +45,7 @@ export default function Projects() {
   const [openDialog, setOpenDialog] = useState(false);
   const [editMode, setEditMode] = useState<string | null>(null);
   const [newProjectName, setNewProjectName] = useState('');
+  const {resetTerraformCode} = useTerraform();
   const navigate = useNavigate();
 
   const createRef = useRef<any>(null);
@@ -66,7 +68,9 @@ export default function Projects() {
     try {
       const newProject = await createProject('New Project');
       sessionStorage.setItem('selectedProjectId', newProject._id);
+       // Clear Terraform code on new project creation
       navigate(`/home?projectId=${newProject._id}`);
+      resetTerraformCode();
     } catch (err) {
       console.error('Error creating project', err);
     }
@@ -256,6 +260,7 @@ export default function Projects() {
                     }}
                     onClick={() => {
                       sessionStorage.setItem('selectedProjectId', project._id);
+                      resetTerraformCode();
                       navigate(`/home?projectId=${project._id}`);
                     }}
                   >
@@ -484,6 +489,7 @@ export default function Projects() {
                               project._id,
                             );
                             setOpenDialog(false);
+                            resetTerraformCode();
                             navigate(`/home?projectId=${project._id}`);
                           }}
                           sx={{
