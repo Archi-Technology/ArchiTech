@@ -52,6 +52,13 @@ const appPromise: Promise<Application> = new Promise(async (resolve, reject) => 
   app.use('/api/aws', awsRouter);
   app.use("/api/azure", azureRouter);
 
+  app.use(express.static("front-static"));
+  const frontPath = path.join(__dirname, "..", "front-static");
+  
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(frontPath, "index.html"));
+  });
+
   try {
     await mongoose.connect(config.MONGO_URI as string);
     console.log("MongoDB connected");
