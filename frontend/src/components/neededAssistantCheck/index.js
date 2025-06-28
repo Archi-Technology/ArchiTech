@@ -1,19 +1,17 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const jsx_runtime_1 = require("react/jsx-runtime");
-const react_1 = require("react");
-const userService_1 = require("../../services/userService");
+import { Fragment as _Fragment, jsx as _jsx } from "react/jsx-runtime";
+import { useEffect } from 'react';
+import { checkUserContext } from '../../services/userService';
 const NeededAssistantCheck = ({ openPopup }) => {
-    (0, react_1.useEffect)(() => {
+    useEffect(() => {
         const checkAssistant = async () => {
-            const isNeeded = await (0, userService_1.checkUserContext)();
+            const isNeeded = await checkUserContext();
             if (isNeeded) {
                 openPopup();
             }
         };
         checkAssistant();
     }, []);
-    return ((0, jsx_runtime_1.jsx)(jsx_runtime_1.Fragment, {}));
+    return (_jsx(_Fragment, {}));
 };
-exports.default = NeededAssistantCheck;
+export default NeededAssistantCheck;
 //# sourceMappingURL=index.js.map

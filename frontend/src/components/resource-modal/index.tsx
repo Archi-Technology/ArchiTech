@@ -2,7 +2,7 @@
 
 import type React from 'react';
 import { useState, useEffect, useCallback } from 'react';
-import { AxiosInstence } from '../../services/axios/AxiosInstance';
+import apiService from '../../services/axios/AxiosInstance';
 import { getTranslationParams } from '../../utils/translate';
 import { getResourceSuggestion } from '../../utils/recommendation';
 import type { ResourceOption } from '../../types/resource-types';
@@ -93,11 +93,11 @@ export default function ResourceModal({
             );
 
             const [awsRes, azureRes] = await Promise.all([
-              AxiosInstence.get(`/aws/cost/${awsName}`, {
+              apiService.apiClient.get(`/aws/cost/${awsName}`, {
                 params: awsParams,
                 validateStatus: (status) => status === 200 || status === 400,
               }),
-              AxiosInstence.get(`/azure/cost/${azureName}`, {
+              apiService.apiClient.get(`/azure/cost/${azureName}`, {
                 params: azureParams,
                 validateStatus: (status) => status === 200 || status === 400,
               }),

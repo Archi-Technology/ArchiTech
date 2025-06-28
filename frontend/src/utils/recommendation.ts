@@ -1,4 +1,4 @@
-import { AxiosInstence } from '../services/axios/AxiosInstance';
+import  apiService from '../services/axios/AxiosInstance';
 import { IGenericResponse } from '../interfaces/user';
 
 import {
@@ -81,7 +81,7 @@ export async function askOptimalChoices(serviceName: string) {
   }
 
   try {
-    const response = await AxiosInstence.post<IGenericResponse>('/chat', {
+    const response = await apiService.apiClient.post<IGenericResponse>('/chat', {
       question,
     });
 
@@ -115,7 +115,7 @@ export async function getResourceSuggestion(serviceName: string): Promise<IGener
   }
 
   try {
-    const response = await AxiosInstence.post<IGenericResponse>('/chat', {
+    const response = await apiService.apiClient.post<IGenericResponse>('/chat', {
       question,
     });
 

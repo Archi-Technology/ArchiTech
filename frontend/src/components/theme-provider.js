@@ -1,10 +1,7 @@
 'use client';
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ThemeProvider = ThemeProvider;
-const jsx_runtime_1 = require("react/jsx-runtime");
-const next_themes_1 = require("next-themes");
-function ThemeProvider({ children, ...props }) {
-    return (0, jsx_runtime_1.jsx)(next_themes_1.ThemeProvider, { ...props, children: children });
+import { jsx as _jsx } from "react/jsx-runtime";
+import { ThemeProvider as NextThemesProvider, } from 'next-themes';
+export function ThemeProvider({ children, ...props }) {
+    return _jsx(NextThemesProvider, { ...props, children: children });
 }
 //# sourceMappingURL=theme-provider.js.map

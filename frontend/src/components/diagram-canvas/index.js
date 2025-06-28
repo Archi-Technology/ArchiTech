@@ -1,65 +1,27 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const jsx_runtime_1 = require("react/jsx-runtime");
-const react_1 = require("react");
-require("./index.scss");
-const reactflow_1 = __importStar(require("reactflow"));
-require("reactflow/dist/style.css");
-const container_node_1 = __importDefault(require("../canvas/container/container-node"));
-const circle_node_1 = __importDefault(require("../canvas/circle-node/circle-node"));
-const earth_1 = __importDefault(require("../canvas/earth/earth"));
-const azure_svgrepo_com_svg_1 = __importDefault(require("../../assets/canvas/azure-svgrepo-com.svg"));
-const gcp_svgrepo_com_svg_1 = __importDefault(require("../../assets/canvas/gcp-svgrepo-com.svg"));
-const aws_svgrepo_com_svg_1 = __importDefault(require("../../assets/canvas/aws-svgrepo-com.svg"));
-const planet_earth_svg_1 = __importDefault(require("../../assets/canvas/planet-earth.svg"));
-const cloud_svgrepo_com_svg_1 = __importDefault(require("../../assets/canvas/cloud-svgrepo-com.svg"));
-const vm_svgrepo_com_svg_1 = __importDefault(require("../../assets/canvas/vm-svgrepo-com.svg"));
-const bucket_svgrepo_com_svg_1 = __importDefault(require("../../assets/canvas/bucket-svgrepo-com.svg"));
-const network_wired_svgrepo_com_svg_1 = __importDefault(require("../../assets/canvas/network-wired-svgrepo-com.svg"));
-const database_svgrepo_com_svg_1 = __importDefault(require("../../assets/canvas/database-svgrepo-com.svg"));
-const canvasContext_1 = require("../../contexts/canvasContext"); // Import canvas context
-const canvasService_1 = require("../../services/canvasService"); // Import fetchProjectData
-const canvas_1 = require("../../interfaces/canvas"); // Import ServiceType
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import './index.scss';
+import ReactFlow, { MiniMap, Controls, Background, useNodesState, useEdgesState, addEdge, } from 'reactflow';
+import 'reactflow/dist/style.css';
+import ContainerNode from '../canvas/container/container-node';
+import CircleNode from '../canvas/circle-node/circle-node';
+import EarthNode from '../canvas/earth/earth';
+import azureIcon from '../../assets/canvas/azure-svgrepo-com.svg';
+import gcpIcon from '../../assets/canvas/gcp-svgrepo-com.svg';
+import awsIcon from '../../assets/canvas/aws-svgrepo-com.svg';
+import earth from '../../assets/canvas/planet-earth.svg';
+import vpcIcon from '../../assets/canvas/cloud-svgrepo-com.svg';
+import vmIcon from '../../assets/canvas/vm-svgrepo-com.svg';
+import bucketIcon from '../../assets/canvas/bucket-svgrepo-com.svg';
+import subnetIcon from '../../assets/canvas/network-wired-svgrepo-com.svg';
+import databaseIcon from '../../assets/canvas/database-svgrepo-com.svg';
+import { useCanvas } from "../../contexts/canvasContext"; // Import canvas context
+import { fetchProjectData } from '../../services/canvasService'; // Import fetchProjectData
+import { ServiceType } from '../../interfaces/canvas'; // Import ServiceType
 const nodeTypes = {
-    circle: circle_node_1.default,
-    earth: earth_1.default,
-    bigSquare: container_node_1.default,
+    circle: CircleNode,
+    earth: EarthNode,
+    bigSquare: ContainerNode,
 };
 const defaultNodes = [
     {
@@ -70,7 +32,7 @@ const defaultNodes = [
         data: {
             label: 'Internet',
             color: 'rgb(246,133,0)',
-            imageSrc: planet_earth_svg_1.default,
+            imageSrc: earth,
         },
     },
     {
@@ -81,7 +43,7 @@ const defaultNodes = [
         data: {
             label: 'Azure',
             color: 'rgb(67,196,237)',
-            imageSrc: azure_svgrepo_com_svg_1.default,
+            imageSrc: azureIcon,
         },
     },
     {
@@ -92,7 +54,7 @@ const defaultNodes = [
         data: {
             label: 'GCP',
             color: 'rgb(103,155,253)',
-            imageSrc: gcp_svgrepo_com_svg_1.default,
+            imageSrc: gcpIcon,
         },
     },
     {
@@ -103,7 +65,7 @@ const defaultNodes = [
         data: {
             label: 'AWS',
             color: 'rgb(246,133,0)',
-            imageSrc: aws_svgrepo_com_svg_1.default,
+            imageSrc: awsIcon,
         },
     },
 ];
@@ -112,16 +74,16 @@ const initialEdges = [
     { id: 'e2-3', source: '4', target: '2', animated: true, type: 'smoothstep', style: { stroke: '#555', strokeWidth: 2 } },
     { id: 'e3-4', source: '4', target: '3', animated: true, type: 'smoothstep', style: { stroke: '#555', strokeWidth: 2 } },
 ];
-const BasicFlow = (0, react_1.forwardRef)((_, ref) => {
-    const [expandedNodeId, setExpandedNodeId] = (0, react_1.useState)(null);
-    const [nodes, setNodes, onNodesChange] = (0, reactflow_1.useNodesState)(defaultNodes.map((node) => ({ ...node, draggable: false })) // Make all nodes undraggable
+const BasicFlow = forwardRef((_, ref) => {
+    const [expandedNodeId, setExpandedNodeId] = useState(null);
+    const [nodes, setNodes, onNodesChange] = useNodesState(defaultNodes.map((node) => ({ ...node, draggable: false })) // Make all nodes undraggable
     );
-    const [edges, setEdges, onEdgesChange] = (0, reactflow_1.useEdgesState)(initialEdges);
-    const reactFlowWrapper = (0, react_1.useRef)(null);
-    const reactFlowInstance = (0, react_1.useRef)(null);
-    const { registerAddNodeFunction } = (0, canvasContext_1.useCanvas)(); // Access the function to register node addition
-    const [openNodes, setOpenNodes] = (0, react_1.useState)([]); // State for clicked nodes
-    const onConnect = (connection) => setEdges((eds) => (0, reactflow_1.addEdge)({
+    const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+    const reactFlowWrapper = useRef(null);
+    const reactFlowInstance = useRef(null);
+    const { registerAddNodeFunction } = useCanvas(); // Access the function to register node addition
+    const [openNodes, setOpenNodes] = useState([]); // State for clicked nodes
+    const onConnect = (connection) => setEdges((eds) => addEdge({
         ...connection,
         animated: true,
         type: 'smoothstep',
@@ -138,24 +100,24 @@ const BasicFlow = (0, react_1.forwardRef)((_, ref) => {
         '3': 'AWS',
     };
     const iconMap = {
-        '1': azure_svgrepo_com_svg_1.default,
-        '2': gcp_svgrepo_com_svg_1.default,
-        '3': aws_svgrepo_com_svg_1.default,
+        '1': azureIcon,
+        '2': gcpIcon,
+        '3': awsIcon,
     };
     const getIconForType = (type) => {
         switch (type) {
-            case canvas_1.ServiceType.VPC:
-                return cloud_svgrepo_com_svg_1.default;
-            case canvas_1.ServiceType.Subnet:
-                return network_wired_svgrepo_com_svg_1.default;
-            case canvas_1.ServiceType.VM:
-                return vm_svgrepo_com_svg_1.default;
-            case canvas_1.ServiceType.OBJECT_STORAGE:
-                return bucket_svgrepo_com_svg_1.default;
-            case canvas_1.ServiceType.Databases:
-                return database_svgrepo_com_svg_1.default;
+            case ServiceType.VPC:
+                return vpcIcon;
+            case ServiceType.Subnet:
+                return subnetIcon;
+            case ServiceType.VM:
+                return vmIcon;
+            case ServiceType.OBJECT_STORAGE:
+                return bucketIcon;
+            case ServiceType.Databases:
+                return databaseIcon;
             default:
-                return cloud_svgrepo_com_svg_1.default;
+                return vpcIcon;
         }
     };
     const getColorForCloud = (cloudProvider) => {
@@ -184,7 +146,7 @@ const BasicFlow = (0, react_1.forwardRef)((_, ref) => {
         const projectId = sessionStorage.getItem('selectedProjectId');
         if (!projectId)
             return;
-        const projectData = await (0, canvasService_1.fetchProjectData)();
+        const projectData = await fetchProjectData();
         const hasChildren = projectData.some((item) => item.cloudProvider === containerLabelMapReverse[nodeId]);
         let newOpenNodes = [...openNodes];
         if (openNodes.includes(nodeId)) {
@@ -210,13 +172,13 @@ const BasicFlow = (0, react_1.forwardRef)((_, ref) => {
         const subnetCounts = {};
         const childCounts = {};
         projectData.forEach((node) => {
-            if (node.type === canvas_1.ServiceType.VPC) {
+            if (node.type === ServiceType.VPC) {
                 vpcCounts[node.cloudProvider] = (vpcCounts[node.cloudProvider] || 0) + 1;
             }
-            if (node.type === canvas_1.ServiceType.OBJECT_STORAGE) {
+            if (node.type === ServiceType.OBJECT_STORAGE) {
                 bucketsCount[node.cloudProvider] = (bucketsCount[node.cloudProvider] || 0) + 1;
             }
-            if (node.type === canvas_1.ServiceType.Subnet && node.parentId) {
+            if (node.type === ServiceType.Subnet && node.parentId) {
                 subnetCounts[node.parentId] = (subnetCounts[node.parentId] || 0) + 1;
             }
             if (node.parentId) {
@@ -230,17 +192,17 @@ const BasicFlow = (0, react_1.forwardRef)((_, ref) => {
         const subnetGroups = {};
         const childGroups = {};
         projectData.forEach((node) => {
-            if (node.type === canvas_1.ServiceType.VPC) {
+            if (node.type === ServiceType.VPC) {
                 if (!vpcGroups[node.cloudProvider])
                     vpcGroups[node.cloudProvider] = [];
                 vpcGroups[node.cloudProvider].push(node);
             }
-            else if (node.type === canvas_1.ServiceType.Subnet) {
+            else if (node.type === ServiceType.Subnet) {
                 if (!subnetGroups[node.parentId])
                     subnetGroups[node.parentId] = [];
                 subnetGroups[node.parentId].push(node);
             }
-            else if (node.type === canvas_1.ServiceType.OBJECT_STORAGE) {
+            else if (node.type === ServiceType.OBJECT_STORAGE) {
                 if (!bucketsGroups[node.cloudProvider])
                     bucketsGroups[node.cloudProvider] = [];
                 bucketsGroups[node.cloudProvider].push(node);
@@ -260,7 +222,7 @@ const BasicFlow = (0, react_1.forwardRef)((_, ref) => {
         // Helper to get VPC node id for parent lookup
         const vpcIdMap = {};
         projectData.forEach((node) => {
-            if (node.type === canvas_1.ServiceType.VPC) {
+            if (node.type === ServiceType.VPC) {
                 vpcIdMap[node._id] = node.cloudProvider;
             }
         });
@@ -270,7 +232,7 @@ const BasicFlow = (0, react_1.forwardRef)((_, ref) => {
             if (newOpenNodes.includes(containerLabelMap[node.cloudProvider])) {
                 let width = 0, height = 0;
                 let position = { x: 0, y: 0 };
-                if (node.type === canvas_1.ServiceType.VPC) {
+                if (node.type === ServiceType.VPC) {
                     const count = vpcCounts[node.cloudProvider] || 1;
                     if (bucketsCount[node.cloudProvider] >= 1) {
                         width = cloudBoxWidth / count - 10 - (150 / count);
@@ -290,7 +252,7 @@ const BasicFlow = (0, react_1.forwardRef)((_, ref) => {
                         y: 35,
                     };
                     let parentNode = node.parentId;
-                    if (node.type === canvas_1.ServiceType.VPC) {
+                    if (node.type === ServiceType.VPC) {
                         if (node.cloudProvider === 'AZURE')
                             parentNode = '1';
                         else if (node.cloudProvider === 'GCP')
@@ -300,7 +262,7 @@ const BasicFlow = (0, react_1.forwardRef)((_, ref) => {
                     }
                     dynamicNodes.push({
                         id: node._id,
-                        type: node.type === canvas_1.ServiceType.VPC || node.type === canvas_1.ServiceType.Subnet ? 'bigSquare' : 'circle',
+                        type: node.type === ServiceType.VPC || node.type === ServiceType.Subnet ? 'bigSquare' : 'circle',
                         position,
                         draggable: false, // Ensure dynamic nodes are undraggable
                         data: {
@@ -315,11 +277,11 @@ const BasicFlow = (0, react_1.forwardRef)((_, ref) => {
                         extent: 'parent',
                     });
                 }
-                else if (node.type !== canvas_1.ServiceType.OBJECT_STORAGE) {
+                else if (node.type !== ServiceType.OBJECT_STORAGE) {
                     let parentNode = node.parentId;
                     dynamicNodes.push({
                         id: node._id,
-                        type: node.type === canvas_1.ServiceType.Subnet ? 'bigSquare' : 'circle',
+                        type: node.type === ServiceType.Subnet ? 'bigSquare' : 'circle',
                         position,
                         data: {
                             label: node.name,
@@ -419,7 +381,7 @@ const BasicFlow = (0, react_1.forwardRef)((_, ref) => {
             }
         });
         dynamicNodes = dynamicNodes.map((node) => {
-            if (node.type !== 'bigSquare' && node.data.icon !== getIconForType(canvas_1.ServiceType.OBJECT_STORAGE)) {
+            if (node.type !== 'bigSquare' && node.data.icon !== getIconForType(ServiceType.OBJECT_STORAGE)) {
                 let width = 0, height = 0;
                 let position = { x: 0, y: 0 };
                 // Find parent VPC node
@@ -528,17 +490,17 @@ const BasicFlow = (0, react_1.forwardRef)((_, ref) => {
                 }
                 let icon, label, color;
                 if (n.id === '1') {
-                    icon = azure_svgrepo_com_svg_1.default;
+                    icon = azureIcon;
                     label = 'Azure';
                     color = 'rgb(67,196,237)';
                 }
                 else if (n.id === '2') {
-                    icon = gcp_svgrepo_com_svg_1.default;
+                    icon = gcpIcon;
                     label = 'GCP';
                     color = 'rgb(103,155,253)';
                 }
                 else {
-                    icon = aws_svgrepo_com_svg_1.default;
+                    icon = awsIcon;
                     label = 'AWS';
                     color = 'rgb(246,133,0)';
                 }
@@ -606,7 +568,7 @@ const BasicFlow = (0, react_1.forwardRef)((_, ref) => {
                 return '#ccc';
         }
     };
-    (0, react_1.useEffect)(() => {
+    useEffect(() => {
         if (reactFlowInstance.current) {
             reactFlowInstance.current.fitView({ padding: 0.2 });
             reactFlowInstance.current.zoomTo(0.50);
@@ -615,15 +577,15 @@ const BasicFlow = (0, react_1.forwardRef)((_, ref) => {
     const isNodeClicked = (nodeId) => {
         return openNodes.includes(nodeId); // Check if the node is already clicked
     };
-    (0, react_1.useImperativeHandle)(ref, () => ({
+    useImperativeHandle(ref, () => ({
         onNodeClick,
         isNodeClicked, // Expose the method
     }));
-    return ((0, jsx_runtime_1.jsx)("div", { style: { width: '100%', height: '100%' }, ref: reactFlowWrapper, children: (0, jsx_runtime_1.jsxs)(reactflow_1.default, { nodes: nodes, edges: edges, nodeTypes: nodeTypes, onNodesChange: onNodesChange, onEdgesChange: onEdgesChange, onConnect: onConnect, onNodeClick: onNodeClick, fitView: false, minZoom: 0.1, maxZoom: 1.5, onInit: (instance) => {
+    return (_jsx("div", { style: { width: '100%', height: '100%' }, ref: reactFlowWrapper, children: _jsxs(ReactFlow, { nodes: nodes, edges: edges, nodeTypes: nodeTypes, onNodesChange: onNodesChange, onEdgesChange: onEdgesChange, onConnect: onConnect, onNodeClick: onNodeClick, fitView: false, minZoom: 0.1, maxZoom: 1.5, onInit: (instance) => {
                 reactFlowInstance.current = instance;
                 instance.fitView({ padding: 0.1 });
                 instance.zoomTo(0.55);
-            }, children: [(0, jsx_runtime_1.jsx)(reactflow_1.MiniMap, {}), (0, jsx_runtime_1.jsx)(reactflow_1.Controls, {}), (0, jsx_runtime_1.jsx)(reactflow_1.Background, {})] }) }));
+            }, children: [_jsx(MiniMap, {}), _jsx(Controls, {}), _jsx(Background, {})] }) }));
 });
-exports.default = BasicFlow;
+export default BasicFlow;
 //# sourceMappingURL=index.js.map

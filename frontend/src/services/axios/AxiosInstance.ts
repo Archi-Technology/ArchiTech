@@ -2,15 +2,15 @@ import axios, { AxiosInstance, AxiosResponse } from "axios";
 import useSWR from "swr";
 import { refreshTokenName, removeAuthTokens, updateTokens } from "../../utils/functions/localstorage";
 
-const baseURL = 'http://localhost:5000';
-
+const backend_url = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+console.log(import.meta.env.VITE_BACKEND_URL0)
 class ApiService {
     private static instance: ApiService;
     public apiClient: AxiosInstance;
 
     private constructor() {
         this.apiClient = axios.create({
-            baseURL: `${baseURL}/api`,
+            baseURL: `${backend_url}/api`,
         });
         this.initializeInterceptors();
     }
@@ -41,7 +41,7 @@ class ApiService {
 
                     const refreshToken = localStorage.getItem(refreshTokenName);
                     try {
-                        const { data } = await axios.post(`${baseURL}/api/auth/refresh`, {}, {
+                        const { data } = await axios.post(`${backend_url}/api/auth/refresh`, {}, {
                             headers: {
                                 Authorization: `Bearer ${refreshToken}`
                             }

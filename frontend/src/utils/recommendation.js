@@ -1,22 +1,17 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.askOptimalChoices = askOptimalChoices;
-exports.getResourceSuggestion = getResourceSuggestion;
-exports.parseGeminiRecommendation = parseGeminiRecommendation;
-const AxiosInstance_1 = require("../services/axios/AxiosInstance");
-const regionMapper_1 = require("../utils/Mappers/regionMapper");
-const typeMapper_1 = require("../utils/Mappers/typeMapper");
-const osMapper_1 = require("../utils/Mappers/osMapper");
-const objectStorageMapper_1 = require("../utils/Mappers/objectStorageMapper");
-const loadBalancerMapper_1 = require("../utils/Mappers/loadBalancerMapper");
-const dbInstanceTypeMapper_1 = require("../utils/Mappers/dbInstanceTypeMapper");
-const dbEngineMapper_1 = require("../utils/Mappers/dbEngineMapper");
-async function askOptimalChoices(serviceName) {
+import apiService from '../services/axios/AxiosInstance';
+import { getAllAvailableLocations, } from '../utils/Mappers/regionMapper';
+import { getAllAvailableInstanceCategories, } from '../utils/Mappers/typeMapper';
+import { getAllAvailableOSNames, } from '../utils/Mappers/osMapper';
+import { getAllAvailableObjectStorageClasses, } from '../utils/Mappers/objectStorageMapper';
+import { getAllAvailableLoadBalancerTypes, } from '../utils/Mappers/loadBalancerMapper';
+import { getAllAvailableDBInstanceTypes, } from '../utils/Mappers/dbInstanceTypeMapper';
+import { getAllAvailableDBEngineNames, } from '../utils/Mappers/dbEngineMapper';
+export async function askOptimalChoices(serviceName) {
     let question = '';
     if (serviceName === 'Virtual Machine') {
-        const instanceCategories = (0, typeMapper_1.getAllAvailableInstanceCategories)();
-        const locations = (0, regionMapper_1.getAllAvailableLocations)();
-        const osNames = (0, osMapper_1.getAllAvailableOSNames)();
+        const instanceCategories = getAllAvailableInstanceCategories();
+        const locations = getAllAvailableLocations();
+        const osNames = getAllAvailableOSNames();
         question = `Given my user context, what are the optimal instance type, region, and OS for a virtual machine?
     I want to pick one as you see best from the following:
     instance categories: ${instanceCategories}
@@ -25,8 +20,8 @@ async function askOptimalChoices(serviceName) {
     Please return the answer only as JSON, for example: {"type": "...", "region": "...", "os": "..."}`;
     }
     else if (serviceName === 'Object Storage') {
-        const locations = (0, regionMapper_1.getAllAvailableLocations)();
-        const storageClasses = (0, objectStorageMapper_1.getAllAvailableObjectStorageClasses)();
+        const locations = getAllAvailableLocations();
+        const storageClasses = getAllAvailableObjectStorageClasses();
         question = `Given my user context, what are the optimal region and storage class for a Object storage?
     I want to pick one as you see best from the following:
     regions: ${locations}
@@ -34,8 +29,8 @@ async function askOptimalChoices(serviceName) {
     Please return the answer only as JSON, for example: {"region": "...", "storageClass": "..."}`;
     }
     else if (serviceName === 'Load Balancer') {
-        const loadBalancerTypes = (0, loadBalancerMapper_1.getAllAvailableLoadBalancerTypes)();
-        const locations = (0, regionMapper_1.getAllAvailableLocations)();
+        const loadBalancerTypes = getAllAvailableLoadBalancerTypes();
+        const locations = getAllAvailableLocations();
         question = `Given my user context, what are the optimal region and storage class for a load balancer?
     I want to pick one as you see best from the following:
     regions: ${locations}
@@ -43,9 +38,9 @@ async function askOptimalChoices(serviceName) {
     Please return the answer only as JSON, for example: {"region": "...", "lbType": "..."}`;
     }
     else if (serviceName === 'Database') {
-        const locations = (0, regionMapper_1.getAllAvailableLocations)();
-        const dbInstanceTypes = (0, dbInstanceTypeMapper_1.getAllAvailableDBInstanceTypes)();
-        const dbEngines = (0, dbEngineMapper_1.getAllAvailableDBEngineNames)();
+        const locations = getAllAvailableLocations();
+        const dbInstanceTypes = getAllAvailableDBInstanceTypes();
+        const dbEngines = getAllAvailableDBEngineNames();
         question = `Given my user context, what are the optimal region and storage class for a Database?
     I want to pick one as you see best from the following:
     regions: ${locations}
@@ -54,7 +49,7 @@ async function askOptimalChoices(serviceName) {
     Please return the answer only in JSON, for example: {"region": "...", "dbType": "...", "dbEngine": "..."}`;
     }
     try {
-        const response = await AxiosInstance_1.AxiosInstence.post('/chat', {
+        const response = await apiService.apiClient.post('/chat', {
             question,
         });
         return response.data;
@@ -64,7 +59,7 @@ async function askOptimalChoices(serviceName) {
         return null;
     }
 }
-async function getResourceSuggestion(serviceName) {
+export async function getResourceSuggestion(serviceName) {
     let question = '';
     if (serviceName === 'Virtual Machine') {
         question = `Given my user context, what is the best Virtual Machine instance according to the context: Spot, Reserved, or On-Demand? Explain why.
@@ -89,7 +84,7 @@ async function getResourceSuggestion(serviceName) {
     Please no more than 3 sentences.`;
     }
     try {
-        const response = await AxiosInstance_1.AxiosInstence.post('/chat', {
+        const response = await apiService.apiClient.post('/chat', {
             question,
         });
         return response.data;
@@ -99,7 +94,7 @@ async function getResourceSuggestion(serviceName) {
         return null;
     }
 }
-function parseGeminiRecommendation(rawOutput) {
+export function parseGeminiRecommendation(rawOutput) {
     try {
         // Remove Markdown code block formatting
         const cleanedJson = rawOutput

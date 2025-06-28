@@ -1,11 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const jsx_runtime_1 = require("react/jsx-runtime");
-const reactflow_1 = require("reactflow");
-require("./index.css");
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { Handle, Position } from 'reactflow';
+import "./index.css";
 const CircleNode = ({ data }) => {
     const { imageSrc, label, color, price } = data;
-    return ((0, jsx_runtime_1.jsxs)("div", { className: "circle-node-wrapper", children: [(0, jsx_runtime_1.jsx)(reactflow_1.Handle, { type: "target", position: reactflow_1.Position.Top }), (0, jsx_runtime_1.jsx)("div", { className: "circle-node", style: { backgroundColor: color || '#ccc' }, children: imageSrc && (0, jsx_runtime_1.jsx)("img", { src: imageSrc, alt: "node", className: "circle-image" }) }), (0, jsx_runtime_1.jsx)("div", { className: "circle-label", children: label }), price && (0, jsx_runtime_1.jsxs)("div", { className: "circle-price", style: { color: 'green' }, children: ["$", price] }), (0, jsx_runtime_1.jsx)(reactflow_1.Handle, { type: "source", position: reactflow_1.Position.Bottom })] }));
+    return (_jsxs("div", { className: "circle-node-wrapper", children: [_jsx(Handle, { type: "target", position: Position.Top }), _jsx("div", { className: "circle-node", style: { backgroundColor: color || '#ccc' }, children: imageSrc && _jsx("img", { src: imageSrc, alt: "node", className: "circle-image" }) }), _jsx("div", { className: "circle-label", children: label }), price && _jsxs("div", { className: "circle-price", style: { color: 'green' }, children: ["$", price] }), _jsx(Handle, { type: "source", position: Position.Bottom })] }));
 };
-exports.default = CircleNode;
+export default CircleNode;
 //# sourceMappingURL=circle-node.js.map

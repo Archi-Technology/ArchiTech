@@ -1,11 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const jsx_runtime_1 = require("react/jsx-runtime");
-const reactflow_1 = require("reactflow");
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { Handle, Position } from 'reactflow';
 const ContainerNode = ({ data, title = "Azure", icon }) => {
     const width = data?.width ?? 100;
     const height = data?.height ?? 100;
-    return ((0, jsx_runtime_1.jsxs)("div", { style: {
+    return (_jsxs("div", { style: {
             width: `${width}px`,
             height: `${height}px`,
             border: '3px solid #ccc',
@@ -15,7 +13,7 @@ const ContainerNode = ({ data, title = "Azure", icon }) => {
             transition: 'width 0.5s ease, height 0.5s ease',
             boxSizing: 'border-box',
             overflow: 'visible',
-        }, children: [(0, jsx_runtime_1.jsx)(reactflow_1.Handle, { type: "target", position: reactflow_1.Position.Top, style: { left: '50%', transform: 'translateX(-50%)' } }), (0, jsx_runtime_1.jsx)("div", { style: {
+        }, children: [_jsx(Handle, { type: "target", position: Position.Top, style: { left: '50%', transform: 'translateX(-50%)' } }), _jsx("div", { style: {
                     position: 'absolute',
                     top: -10,
                     left: 25,
@@ -23,7 +21,7 @@ const ContainerNode = ({ data, title = "Azure", icon }) => {
                     height: 24,
                     backgroundColor: 'rgb(241,245,249)',
                     zIndex: 1,
-                } }), (0, jsx_runtime_1.jsxs)("div", { style: {
+                } }), _jsxs("div", { style: {
                     position: 'absolute',
                     top: -16,
                     left: 45,
@@ -31,7 +29,7 @@ const ContainerNode = ({ data, title = "Azure", icon }) => {
                     alignItems: 'center',
                     gap: 6,
                     zIndex: 2,
-                }, children: [(0, jsx_runtime_1.jsx)("div", { style: {
+                }, children: [_jsx("div", { style: {
                             width: 22,
                             height: 22,
                             borderRadius: '50%',
@@ -40,15 +38,15 @@ const ContainerNode = ({ data, title = "Azure", icon }) => {
                             alignItems: 'center',
                             justifyContent: 'center',
                             overflow: 'hidden',
-                        }, children: (0, jsx_runtime_1.jsx)("img", { src: data.icon, alt: title, style: {
+                        }, children: _jsx("img", { src: data.icon, alt: title, style: {
                                 width: '16px',
                                 height: '16px',
                                 objectFit: 'contain',
-                            } }) }), (0, jsx_runtime_1.jsx)("span", { style: { fontWeight: 600, fontSize: 13, color: '#444' }, children: data.label })] }), (0, jsx_runtime_1.jsx)("div", { style: {
+                            } }) }), _jsx("span", { style: { fontWeight: 600, fontSize: 13, color: '#444' }, children: data.label })] }), _jsx("div", { style: {
                     textAlign: 'center',
                     paddingTop: 30,
                     fontWeight: 'bold',
                 } })] }));
 };
-exports.default = ContainerNode;
+export default ContainerNode;
 //# sourceMappingURL=container-node.js.map

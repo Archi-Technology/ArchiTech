@@ -1,1 +1,1 @@
-{"version":3,"file":"tech-background.js","sourceRoot":"","sources":["tech-background.tsx"],"names":[],"mappings":";;AAAA,wCAMC;;AAND,SAAgB,cAAc;IAC5B,OAAO,CACL,gCAAK,SAAS,EAAC,iDAAiD,YAC9D,gCAAK,SAAS,EAAC,oEAAoE,GAAO,GACtF,CACP,CAAA;AACH,CAAC"}
+{"version":3,"file":"tech-background.js","sourceRoot":"","sources":["tech-background.tsx"],"names":[],"mappings":";AAAA,MAAM,UAAU,cAAc;IAC5B,OAAO,CACL,cAAK,SAAS,EAAC,iDAAiD,YAC9D,cAAK,SAAS,EAAC,oEAAoE,GAAO,GACtF,CACP,CAAA;AACH,CAAC"}

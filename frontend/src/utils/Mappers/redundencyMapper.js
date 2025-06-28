@@ -1,8 +1,4 @@
-"use strict";
 // utils/redundencyMapper.ts
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllAvailableObjectStorageClasses = getAllAvailableObjectStorageClasses;
-exports.translateStorageClassToCloudRedundancy = translateStorageClassToCloudRedundancy;
 const storageClassRedundancyMap = [
     {
         name: 'Standard',
@@ -21,10 +17,10 @@ const storageClassRedundancyMap = [
         azure: ['GZRS'],
     },
 ];
-function getAllAvailableObjectStorageClasses() {
+export function getAllAvailableObjectStorageClasses() {
     return storageClassRedundancyMap.map((entry) => entry.name);
 }
-function translateStorageClassToCloudRedundancy(storageClassName, provider) {
+export function translateStorageClassToCloudRedundancy(storageClassName, provider) {
     const entry = storageClassRedundancyMap.find((s) => s.name === storageClassName);
     if (!entry)
         return [];

@@ -1,43 +1,37 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = Projects;
-const jsx_runtime_1 = require("react/jsx-runtime");
-const react_1 = require("react");
-const react_router_dom_1 = require("react-router-dom");
-const material_1 = require("@mui/material");
-const Close_1 = __importDefault(require("@mui/icons-material/Close"));
-const Edit_1 = __importDefault(require("@mui/icons-material/Edit"));
-const Delete_1 = __importDefault(require("@mui/icons-material/Delete"));
-const react_lottie_player_1 = __importDefault(require("react-lottie-player"));
-const create_json_1 = __importDefault(require("../../assets/lotties/create.json"));
-const open_json_1 = __importDefault(require("../../assets/lotties/open.json"));
-const projectService_1 = require("../../services/projectService");
-function Projects() {
-    const [projects, setProjects] = (0, react_1.useState)([]);
-    const [openDialog, setOpenDialog] = (0, react_1.useState)(false);
-    const [editMode, setEditMode] = (0, react_1.useState)(null);
-    const [newProjectName, setNewProjectName] = (0, react_1.useState)('');
-    const navigate = (0, react_router_dom_1.useNavigate)();
-    const createRef = (0, react_1.useRef)(null);
-    const openRef = (0, react_1.useRef)(null);
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
+import { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Box, Grid, Typography, Button, Paper, Container, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, TextField, } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Player from 'react-lottie-player';
+import createAnimation from '../../assets/lotties/create.json';
+import openAnimation from '../../assets/lotties/open.json';
+import { getAllProjects, createProject, updateProject, deleteProject, } from '../../services/projectService';
+export default function Projects() {
+    const [projects, setProjects] = useState([]);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [editMode, setEditMode] = useState(null);
+    const [newProjectName, setNewProjectName] = useState('');
+    const navigate = useNavigate();
+    const createRef = useRef(null);
+    const openRef = useRef(null);
     const fetchProjects = async () => {
         try {
-            const data = await (0, projectService_1.getAllProjects)();
+            const data = await getAllProjects();
             setProjects(data);
         }
         catch (err) {
             console.error('Error fetching projects', err);
         }
     };
-    (0, react_1.useEffect)(() => {
+    useEffect(() => {
         fetchProjects();
     }, []);
     const handleCreateProject = async () => {
         try {
-            await (0, projectService_1.createProject)('New Project');
+            await createProject('New Project');
             navigate('/home');
         }
         catch (err) {
@@ -46,7 +40,7 @@ function Projects() {
     };
     const handleEditProject = async (projectId, newName) => {
         try {
-            await (0, projectService_1.updateProject)(projectId, newName, projects.find((p) => p._id === projectId)?.data || {});
+            await updateProject(projectId, newName, projects.find((p) => p._id === projectId)?.data || {});
             setEditMode(null);
             await fetchProjects();
         }
@@ -57,7 +51,7 @@ function Projects() {
     const handleDeleteProject = async (projectId) => {
         if (window.confirm('Are you sure you want to delete this project?')) {
             try {
-                await (0, projectService_1.deleteProject)(projectId);
+                await deleteProject(projectId);
                 await fetchProjects();
             }
             catch (err) {
@@ -74,7 +68,7 @@ function Projects() {
             day: 'numeric',
         });
     };
-    (0, react_1.useEffect)(() => {
+    useEffect(() => {
         const handleCloseParentModal = () => setOpenDialog(false);
         document.addEventListener("closeParentModal", handleCloseParentModal);
         return () => document.removeEventListener("closeParentModal", handleCloseParentModal);
@@ -104,11 +98,11 @@ function Projects() {
         color: 'text.secondary',
         transition: '0.3s',
     };
-    return ((0, jsx_runtime_1.jsx)(material_1.Box, { sx: { bgcolor: '#fff', minHeight: '100vh', py: 6 }, children: (0, jsx_runtime_1.jsxs)(material_1.Container, { children: [(0, jsx_runtime_1.jsx)(material_1.Typography, { variant: "h4", fontWeight: "bold", align: "center", gutterBottom: true, sx: { color: 'black' }, children: "Manage Your Architecture Projects" }), (0, jsx_runtime_1.jsxs)(material_1.Grid, { container: true, spacing: 4, mb: 6, children: [(0, jsx_runtime_1.jsx)(material_1.Grid, { item: true, xs: 12, md: 6, children: (0, jsx_runtime_1.jsxs)(material_1.Paper, { elevation: 3, sx: paperStyle, onClick: () => setOpenDialog(true), onMouseEnter: () => openRef.current?.goToAndPlay(0), children: [(0, jsx_runtime_1.jsx)(react_lottie_player_1.default, { ref: openRef, animationData: open_json_1.default, loop: false, play: false, style: { width: 80, height: 80, margin: '0 auto' } }), (0, jsx_runtime_1.jsx)(material_1.Typography, { variant: "subtitle1", mt: 1, className: "hoverTitle", sx: titleStyle, children: "Continue Existing Project" }), (0, jsx_runtime_1.jsx)(material_1.Typography, { variant: "body2", sx: descriptionStyle, children: "Resume work on your cloud architecture designs." })] }) }), (0, jsx_runtime_1.jsx)(material_1.Grid, { item: true, xs: 12, md: 6, children: (0, jsx_runtime_1.jsxs)(material_1.Paper, { elevation: 3, sx: paperStyle, onClick: handleCreateProject, onMouseEnter: () => createRef.current?.goToAndPlay(0), children: [(0, jsx_runtime_1.jsx)(react_lottie_player_1.default, { ref: createRef, animationData: create_json_1.default, loop: false, play: false, style: { width: 80, height: 80, margin: '0 auto' } }), (0, jsx_runtime_1.jsx)(material_1.Typography, { variant: "subtitle1", mt: 1, className: "hoverTitle", sx: titleStyle, children: "Create New Project" }), (0, jsx_runtime_1.jsx)(material_1.Typography, { variant: "body2", sx: descriptionStyle, children: "Start a fresh cloud architecture design." })] }) })] }), projects.length > 0 && ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)(material_1.Typography, { variant: "h5", fontWeight: "bold", sx: { color: 'black', mb: 3 }, children: "Recent Projects" }), (0, jsx_runtime_1.jsx)(material_1.Grid, { container: true, spacing: 4, children: projects.slice(0, 3).map((project) => ((0, jsx_runtime_1.jsx)(material_1.Grid, { item: true, xs: 12, sm: 6, md: 4, children: (0, jsx_runtime_1.jsxs)(material_1.Paper, { sx: {
+    return (_jsx(Box, { sx: { bgcolor: '#fff', minHeight: '100vh', py: 6 }, children: _jsxs(Container, { children: [_jsx(Typography, { variant: "h4", fontWeight: "bold", align: "center", gutterBottom: true, sx: { color: 'black' }, children: "Manage Your Architecture Projects" }), _jsxs(Grid, { container: true, spacing: 4, mb: 6, children: [_jsx(Grid, { item: true, xs: 12, md: 6, children: _jsxs(Paper, { elevation: 3, sx: paperStyle, onClick: () => setOpenDialog(true), onMouseEnter: () => openRef.current?.goToAndPlay(0), children: [_jsx(Player, { ref: openRef, animationData: openAnimation, loop: false, play: false, style: { width: 80, height: 80, margin: '0 auto' } }), _jsx(Typography, { variant: "subtitle1", mt: 1, className: "hoverTitle", sx: titleStyle, children: "Continue Existing Project" }), _jsx(Typography, { variant: "body2", sx: descriptionStyle, children: "Resume work on your cloud architecture designs." })] }) }), _jsx(Grid, { item: true, xs: 12, md: 6, children: _jsxs(Paper, { elevation: 3, sx: paperStyle, onClick: handleCreateProject, onMouseEnter: () => createRef.current?.goToAndPlay(0), children: [_jsx(Player, { ref: createRef, animationData: createAnimation, loop: false, play: false, style: { width: 80, height: 80, margin: '0 auto' } }), _jsx(Typography, { variant: "subtitle1", mt: 1, className: "hoverTitle", sx: titleStyle, children: "Create New Project" }), _jsx(Typography, { variant: "body2", sx: descriptionStyle, children: "Start a fresh cloud architecture design." })] }) })] }), projects.length > 0 && (_jsxs(_Fragment, { children: [_jsx(Typography, { variant: "h5", fontWeight: "bold", sx: { color: 'black', mb: 3 }, children: "Recent Projects" }), _jsx(Grid, { container: true, spacing: 4, children: projects.slice(0, 3).map((project) => (_jsx(Grid, { item: true, xs: 12, sm: 6, md: 4, children: _jsxs(Paper, { sx: {
                                         ...paperStyle,
                                         p: 3,
                                         textAlign: 'left',
-                                    }, onClick: () => navigate(`/home?projectId=${project._id}`), children: [(0, jsx_runtime_1.jsx)(material_1.Typography, { variant: "subtitle1", className: "hoverTitle", sx: titleStyle, children: project.name }), (0, jsx_runtime_1.jsxs)(material_1.Typography, { variant: "body2", sx: descriptionStyle, children: ["Last edited: ", formatDate(project.lastEdited)] })] }) }, project._id))) })] })), (0, jsx_runtime_1.jsxs)(material_1.Dialog, { open: openDialog, onClose: () => setOpenDialog(false), maxWidth: "md", fullWidth: true, children: [(0, jsx_runtime_1.jsx)(material_1.DialogTitle, { children: (0, jsx_runtime_1.jsxs)(material_1.Box, { display: "flex", justifyContent: "space-between", alignItems: "center", children: [(0, jsx_runtime_1.jsx)(material_1.Typography, { variant: "h6", children: "Your Projects" }), (0, jsx_runtime_1.jsx)(material_1.IconButton, { onClick: () => setOpenDialog(false), children: (0, jsx_runtime_1.jsx)(Close_1.default, {}) })] }) }), (0, jsx_runtime_1.jsx)(material_1.DialogContent, { dividers: true, children: (0, jsx_runtime_1.jsx)(material_1.Grid, { container: true, spacing: 2, children: projects.map((project) => ((0, jsx_runtime_1.jsx)(material_1.Grid, { item: true, xs: 12, children: (0, jsx_runtime_1.jsxs)(material_1.Paper, { sx: { p: 2 }, children: [(0, jsx_runtime_1.jsxs)(material_1.Box, { display: "flex", justifyContent: "space-between", alignItems: "center", children: [(0, jsx_runtime_1.jsx)(material_1.Box, { display: "flex", alignItems: "center", flex: 1, children: editMode === project._id ? ((0, jsx_runtime_1.jsx)(material_1.TextField, { value: newProjectName, onChange: (e) => setNewProjectName(e.target.value), size: "small", fullWidth: true, autoFocus: true, onBlur: () => {
+                                    }, onClick: () => navigate(`/home?projectId=${project._id}`), children: [_jsx(Typography, { variant: "subtitle1", className: "hoverTitle", sx: titleStyle, children: project.name }), _jsxs(Typography, { variant: "body2", sx: descriptionStyle, children: ["Last edited: ", formatDate(project.lastEdited)] })] }) }, project._id))) })] })), _jsxs(Dialog, { open: openDialog, onClose: () => setOpenDialog(false), maxWidth: "md", fullWidth: true, children: [_jsx(DialogTitle, { children: _jsxs(Box, { display: "flex", justifyContent: "space-between", alignItems: "center", children: [_jsx(Typography, { variant: "h6", children: "Your Projects" }), _jsx(IconButton, { onClick: () => setOpenDialog(false), children: _jsx(CloseIcon, {}) })] }) }), _jsx(DialogContent, { dividers: true, children: _jsx(Grid, { container: true, spacing: 2, children: projects.map((project) => (_jsx(Grid, { item: true, xs: 12, children: _jsxs(Paper, { sx: { p: 2 }, children: [_jsxs(Box, { display: "flex", justifyContent: "space-between", alignItems: "center", children: [_jsx(Box, { display: "flex", alignItems: "center", flex: 1, children: editMode === project._id ? (_jsx(TextField, { value: newProjectName, onChange: (e) => setNewProjectName(e.target.value), size: "small", fullWidth: true, autoFocus: true, onBlur: () => {
                                                                 if (newProjectName.trim()) {
                                                                     handleEditProject(project._id, newProjectName);
                                                                 }
@@ -117,13 +111,13 @@ function Projects() {
                                                                 if (e.key === 'Enter' && newProjectName.trim()) {
                                                                     handleEditProject(project._id, newProjectName);
                                                                 }
-                                                            } })) : ((0, jsx_runtime_1.jsx)(material_1.Typography, { children: project.name })) }), (0, jsx_runtime_1.jsxs)(material_1.Box, { children: [(0, jsx_runtime_1.jsx)(material_1.IconButton, { onClick: () => {
+                                                            } })) : (_jsx(Typography, { children: project.name })) }), _jsxs(Box, { children: [_jsx(IconButton, { onClick: () => {
                                                                     setEditMode(project._id);
                                                                     setNewProjectName(project.name);
-                                                                }, size: "small", children: (0, jsx_runtime_1.jsx)(Edit_1.default, {}) }), (0, jsx_runtime_1.jsx)(material_1.IconButton, { onClick: () => handleDeleteProject(project._id), size: "small", children: (0, jsx_runtime_1.jsx)(Delete_1.default, {}) }), (0, jsx_runtime_1.jsx)(material_1.Button, { variant: "contained", size: "small", onClick: () => {
+                                                                }, size: "small", children: _jsx(EditIcon, {}) }), _jsx(IconButton, { onClick: () => handleDeleteProject(project._id), size: "small", children: _jsx(DeleteIcon, {}) }), _jsx(Button, { variant: "contained", size: "small", onClick: () => {
                                                                     sessionStorage.setItem('selectedProjectId', project._id); // Save project ID in session storage
                                                                     setOpenDialog(false);
                                                                     navigate(`/home?projectId=${project._id}`);
-                                                                }, sx: { ml: 1 }, children: "Open" })] })] }), (0, jsx_runtime_1.jsxs)(material_1.Typography, { variant: "caption", color: "text.secondary", display: "block", mt: 1, children: ["Last edited: ", formatDate(project.lastEdited)] })] }) }, project._id))) }) }), (0, jsx_runtime_1.jsx)(material_1.DialogActions, { children: (0, jsx_runtime_1.jsx)(material_1.Button, { onClick: () => setOpenDialog(false), children: "Close" }) })] })] }) }));
+                                                                }, sx: { ml: 1 }, children: "Open" })] })] }), _jsxs(Typography, { variant: "caption", color: "text.secondary", display: "block", mt: 1, children: ["Last edited: ", formatDate(project.lastEdited)] })] }) }, project._id))) }) }), _jsx(DialogActions, { children: _jsx(Button, { onClick: () => setOpenDialog(false), children: "Close" }) })] })] }) }));
 }
 //# sourceMappingURL=Projects.js.map

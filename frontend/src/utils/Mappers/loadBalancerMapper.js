@@ -1,8 +1,4 @@
-"use strict";
 // utils/loadBalancerMapper.ts
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllAvailableLoadBalancerTypes = getAllAvailableLoadBalancerTypes;
-exports.translateLoadBalancerTypeToCloudOptions = translateLoadBalancerTypeToCloudOptions;
 const loadBalancerTypeMap = [
     {
         name: 'Application',
@@ -20,10 +16,10 @@ const loadBalancerTypeMap = [
         azure: ['Gateway'],
     },
 ];
-function getAllAvailableLoadBalancerTypes() {
+export function getAllAvailableLoadBalancerTypes() {
     return loadBalancerTypeMap.map((entry) => entry.name);
 }
-function translateLoadBalancerTypeToCloudOptions(typeName, provider) {
+export function translateLoadBalancerTypeToCloudOptions(typeName, provider) {
     const entry = loadBalancerTypeMap.find((t) => t.name === typeName);
     if (!entry)
         return [];

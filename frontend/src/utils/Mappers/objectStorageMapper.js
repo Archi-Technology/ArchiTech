@@ -1,8 +1,4 @@
-"use strict";
 // utils/objectStorageMapper.ts
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllAvailableObjectStorageClasses = getAllAvailableObjectStorageClasses;
-exports.translateStorageClassToCloudOptions = translateStorageClassToCloudOptions;
 const storageClassMap = [
     {
         name: 'Standard',
@@ -25,10 +21,10 @@ const storageClassMap = [
         azure: ['Archive'],
     },
 ];
-function getAllAvailableObjectStorageClasses() {
+export function getAllAvailableObjectStorageClasses() {
     return storageClassMap.map((entry) => entry.name);
 }
-function translateStorageClassToCloudOptions(storageClassName, provider) {
+export function translateStorageClassToCloudOptions(storageClassName, provider) {
     const entry = storageClassMap.find((s) => s.name === storageClassName);
     if (!entry)
         return [];

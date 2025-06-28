@@ -1,22 +1,16 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = ServiceSidebar;
-const jsx_runtime_1 = require("react/jsx-runtime");
-require("./index.scss");
-const react_1 = require("react");
-const virtualmachine_png_1 = __importDefault(require("../../assets/canvas/virtualmachine.png"));
-const objectstorage_png_1 = __importDefault(require("../../assets/canvas/objectstorage.png"));
-const database_png_1 = __importDefault(require("../../assets/canvas/database.png"));
-const loadbalancer_png_1 = __importDefault(require("../../assets/canvas/loadbalancer.png"));
-const canvasContext_1 = require("../../contexts/canvasContext"); // Import canvas context
-const service_popup_1 = __importDefault(require("../service-popup")); // Import the popup component
-function ServiceSidebar({ canvasRef }) {
-    const [activeTab, setActiveTab] = (0, react_1.useState)('catalog');
-    const { addNodeToCanvas } = (0, canvasContext_1.useCanvas)(); // Access the function to add nodes to the canvas
-    const [selectedService, setSelectedService] = (0, react_1.useState)(null); // Track the selected service
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import './index.scss';
+import { useState } from 'react';
+import virtualMachineIcon from '../../assets/canvas/virtualmachine.png';
+import objectStorageIcon from '../../assets/canvas/objectstorage.png';
+import databaseIcon from '../../assets/canvas/database.png';
+import loadBalancerIcon from '../../assets/canvas/loadbalancer.png';
+import { useCanvas } from '../../contexts/canvasContext'; // Import canvas context
+import ServicePopup from '../service-popup'; // Import the popup component
+export default function ServiceSidebar({ canvasRef }) {
+    const [activeTab, setActiveTab] = useState('catalog');
+    const { addNodeToCanvas } = useCanvas(); // Access the function to add nodes to the canvas
+    const [selectedService, setSelectedService] = useState(null); // Track the selected service
     const handleServiceClick = (service) => {
         setSelectedService(service); // Open the popup with the selected service
     };
@@ -37,31 +31,31 @@ function ServiceSidebar({ canvasRef }) {
     const handlePopupCancel = () => {
         setSelectedService(null); // Close the popup without adding a node
     };
-    return ((0, jsx_runtime_1.jsxs)("div", { className: "sidebar", children: [(0, jsx_runtime_1.jsxs)("div", { className: "tabs", children: [(0, jsx_runtime_1.jsx)("h3", { style: {
+    return (_jsxs("div", { className: "sidebar", children: [_jsxs("div", { className: "tabs", children: [_jsx("h3", { style: {
                             textAlign: 'center',
                             marginTop: '20px',
                             marginBottom: '20px',
-                        }, children: "Catalog" }), (0, jsx_runtime_1.jsx)("div", { className: "tab-content", children: activeTab === 'catalog' ? ((0, jsx_runtime_1.jsx)("div", { className: "service-grid", children: services.map((service) => ((0, jsx_runtime_1.jsx)(ServiceCard, { ...service, onClick: () => handleServiceClick(service) }, service.name))) })) : ((0, jsx_runtime_1.jsx)("div", { className: "empty-state", children: "No modules available" })) })] }), selectedService && ((0, jsx_runtime_1.jsx)(service_popup_1.default, { service: selectedService, onConfirm: handlePopupConfirm, onCancel: handlePopupCancel, availableVPCs: [], availableSubnets: [], pricingOptions: [] }))] }));
+                        }, children: "Catalog" }), _jsx("div", { className: "tab-content", children: activeTab === 'catalog' ? (_jsx("div", { className: "service-grid", children: services.map((service) => (_jsx(ServiceCard, { ...service, onClick: () => handleServiceClick(service) }, service.name))) })) : (_jsx("div", { className: "empty-state", children: "No modules available" })) })] }), selectedService && (_jsx(ServicePopup, { service: selectedService, onConfirm: handlePopupConfirm, onCancel: handlePopupCancel, availableVPCs: [], availableSubnets: [], pricingOptions: [] }))] }));
 }
 function ServiceCard({ name, icon, onClick }) {
-    return ((0, jsx_runtime_1.jsxs)("div", { className: "service-card", onClick: onClick, children: [(0, jsx_runtime_1.jsx)("div", { className: "service-icon", children: icon }), (0, jsx_runtime_1.jsx)("div", { className: "service-name", children: name })] }));
+    return (_jsxs("div", { className: "service-card", onClick: onClick, children: [_jsx("div", { className: "service-icon", children: icon }), _jsx("div", { className: "service-name", children: name })] }));
 }
 const services = [
     {
         name: 'Virtual Machine',
-        icon: ((0, jsx_runtime_1.jsx)("img", { src: virtualmachine_png_1.default, alt: "Virtual Machine", className: "service-icon-img" })),
+        icon: (_jsx("img", { src: virtualMachineIcon, alt: "Virtual Machine", className: "service-icon-img" })),
     },
     {
         name: 'Object Storage',
-        icon: ((0, jsx_runtime_1.jsx)("img", { src: objectstorage_png_1.default, alt: "Object Storage", className: "service-icon-img" })),
+        icon: (_jsx("img", { src: objectStorageIcon, alt: "Object Storage", className: "service-icon-img" })),
     },
     {
         name: 'Load Balancer',
-        icon: ((0, jsx_runtime_1.jsx)("img", { src: loadbalancer_png_1.default, alt: "Load Balancer", className: "service-icon-img" })),
+        icon: (_jsx("img", { src: loadBalancerIcon, alt: "Load Balancer", className: "service-icon-img" })),
     },
     {
         name: 'Database',
-        icon: ((0, jsx_runtime_1.jsx)("img", { src: database_png_1.default, alt: "Database", className: "service-icon-img" })),
+        icon: (_jsx("img", { src: databaseIcon, alt: "Database", className: "service-icon-img" })),
     },
 ];
 //# sourceMappingURL=index.js.map

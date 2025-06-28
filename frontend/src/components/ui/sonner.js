@@ -1,13 +1,10 @@
 "use client";
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Toaster = void 0;
-const jsx_runtime_1 = require("react/jsx-runtime");
-const next_themes_1 = require("next-themes");
-const sonner_1 = require("sonner");
+import { jsx as _jsx } from "react/jsx-runtime";
+import { useTheme } from "next-themes";
+import { Toaster as Sonner } from "sonner";
 const Toaster = ({ ...props }) => {
-    const { theme = "system" } = (0, next_themes_1.useTheme)();
-    return ((0, jsx_runtime_1.jsx)(sonner_1.Toaster, { theme: theme, className: "toaster group", toastOptions: {
+    const { theme = "system" } = useTheme();
+    return (_jsx(Sonner, { theme: theme, className: "toaster group", toastOptions: {
             classNames: {
                 toast: "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",
                 description: "group-[.toast]:text-muted-foreground",
@@ -16,5 +13,5 @@ const Toaster = ({ ...props }) => {
             },
         }, ...props }));
 };
-exports.Toaster = Toaster;
+export { Toaster };
 //# sourceMappingURL=sonner.js.map

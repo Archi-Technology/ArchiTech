@@ -1,7 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.translateOSTypeToCloudOptions = translateOSTypeToCloudOptions;
-exports.getAllAvailableOSNames = getAllAvailableOSNames;
 const osMap = {
     Linux: {
         aws: ['Linux'],
@@ -44,11 +40,11 @@ const osMap = {
         azure: ['RockyEnterpriseSoftwareFoundation:RockyLinux:8_8:latest'],
     },
 };
-function translateOSTypeToCloudOptions(osName, cloud) {
+export function translateOSTypeToCloudOptions(osName, cloud) {
     const entry = Object.entries(osMap).find(([key]) => key.toLowerCase() === osName.toLowerCase());
     return entry?.[1]?.[cloud] ?? [];
 }
-function getAllAvailableOSNames() {
+export function getAllAvailableOSNames() {
     return Object.keys(osMap).sort((a, b) => a.localeCompare(b));
 }
 //# sourceMappingURL=osMapper.js.map

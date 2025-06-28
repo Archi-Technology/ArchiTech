@@ -1,16 +1,13 @@
 'use client';
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CloudAssistantPopup = CloudAssistantPopup;
-const jsx_runtime_1 = require("react/jsx-runtime");
-const react_1 = require("react");
-const button_1 = require("../ui/button/button");
-const input_1 = require("../ui/input/input");
-const label_1 = require("../ui/label/label");
-const radio_group_1 = require("../ui/radio-group/radio-group");
-require("./index.css");
-const userService_1 = require("../../services/userService");
-const textarea_1 = require("../ui/textarea/textarea");
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { useState } from 'react';
+import { Button } from '../ui/button/button';
+import { Input } from '../ui/input/input';
+import { Label } from '../ui/label/label';
+import { RadioGroup, RadioGroupItem } from '../ui/radio-group/radio-group';
+import './index.css';
+import { saveUserContext } from '../../services/userService';
+import { Textarea } from '../ui/textarea/textarea';
 const questions = [
     {
         id: 1,
@@ -92,9 +89,9 @@ const questions = [
         name: 'generalDescription',
     },
 ];
-function CloudAssistantPopup({ onClose }) {
-    const [currentQuestion, setCurrentQuestion] = (0, react_1.useState)(0);
-    const [answers, setAnswers] = (0, react_1.useState)({});
+export function CloudAssistantPopup({ onClose }) {
+    const [currentQuestion, setCurrentQuestion] = useState(0);
+    const [answers, setAnswers] = useState({});
     const handleNext = async () => {
         if (currentQuestion < questions.length - 1) {
             setCurrentQuestion(currentQuestion + 1);
@@ -102,7 +99,7 @@ function CloudAssistantPopup({ onClose }) {
         else {
             // Submit answers or perform final action
             console.log('All answers:', answers);
-            await (0, userService_1.saveUserContext)(answers);
+            await saveUserContext(answers);
             onClose();
         }
     };
@@ -132,6 +129,6 @@ function CloudAssistantPopup({ onClose }) {
         }
         return !value; // Disable if input/textarea is empty
     };
-    return ((0, jsx_runtime_1.jsxs)("div", { className: "popup-container", children: [(0, jsx_runtime_1.jsx)("div", { className: "popup-header", children: (0, jsx_runtime_1.jsxs)("div", { className: "popup-title", children: [(0, jsx_runtime_1.jsx)("div", { className: "popup-icon", children: (0, jsx_runtime_1.jsxs)("svg", { xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [(0, jsx_runtime_1.jsx)("rect", { x: "2", y: "4", width: "20", height: "16", rx: "2" }), (0, jsx_runtime_1.jsx)("path", { d: "M10 4v4" }), (0, jsx_runtime_1.jsx)("path", { d: "M2 8h20" }), (0, jsx_runtime_1.jsx)("path", { d: "M6 4v4" })] }) }), (0, jsx_runtime_1.jsx)("h2", { children: "Adam - Cloud Architecture Assistant" })] }) }), (0, jsx_runtime_1.jsxs)("div", { className: "popup-content", children: [(0, jsx_runtime_1.jsx)("h3", { className: "question-text", children: currentQuestionData.text }), currentQuestionData.type === 'input' && ((0, jsx_runtime_1.jsx)(input_1.Input, { value: getCurrentValue(), onChange: (e) => handleAnswerChange(e.target.value), placeholder: "Type your answer here", className: "text-input" })), currentQuestionData.type === 'textarea' && ((0, jsx_runtime_1.jsx)(textarea_1.Textarea, { value: getCurrentValue(), onChange: (e) => handleAnswerChange(e.target.value), placeholder: "Type your answer here", className: "text-input textarea" })), currentQuestionData.type === 'radio' && ((0, jsx_runtime_1.jsx)(radio_group_1.RadioGroup, { value: getCurrentValue(), onValueChange: handleAnswerChange, className: "radio-options", children: currentQuestionData.options?.map((option) => ((0, jsx_runtime_1.jsxs)("div", { className: `radio-option-container ${getCurrentValue() === option ? 'selected' : ''}`, onClick: () => handleAnswerChange(option), children: [(0, jsx_runtime_1.jsx)(radio_group_1.RadioGroupItem, { value: option, id: `option-${option}` }), (0, jsx_runtime_1.jsx)(label_1.Label, { htmlFor: `option-${option}`, className: "radio-label", children: option })] }, option))) }))] }), (0, jsx_runtime_1.jsxs)("div", { className: "popup-footer", children: [(0, jsx_runtime_1.jsx)(button_1.Button, { variant: "outline", onClick: currentQuestion === 0 ? onClose : handlePrevious, children: currentQuestion === 0 ? 'Close' : 'Back' }), (0, jsx_runtime_1.jsxs)("div", { className: "question-counter", children: ["Question ", currentQuestion + 1, " of ", questions.length] }), (0, jsx_runtime_1.jsx)(button_1.Button, { onClick: handleNext, disabled: isNextDisabled(), children: isLastQuestion ? 'Submit' : 'Next' })] })] }));
+    return (_jsxs("div", { className: "popup-container", children: [_jsx("div", { className: "popup-header", children: _jsxs("div", { className: "popup-title", children: [_jsx("div", { className: "popup-icon", children: _jsxs("svg", { xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [_jsx("rect", { x: "2", y: "4", width: "20", height: "16", rx: "2" }), _jsx("path", { d: "M10 4v4" }), _jsx("path", { d: "M2 8h20" }), _jsx("path", { d: "M6 4v4" })] }) }), _jsx("h2", { children: "Adam - Cloud Architecture Assistant" })] }) }), _jsxs("div", { className: "popup-content", children: [_jsx("h3", { className: "question-text", children: currentQuestionData.text }), currentQuestionData.type === 'input' && (_jsx(Input, { value: getCurrentValue(), onChange: (e) => handleAnswerChange(e.target.value), placeholder: "Type your answer here", className: "text-input" })), currentQuestionData.type === 'textarea' && (_jsx(Textarea, { value: getCurrentValue(), onChange: (e) => handleAnswerChange(e.target.value), placeholder: "Type your answer here", className: "text-input textarea" })), currentQuestionData.type === 'radio' && (_jsx(RadioGroup, { value: getCurrentValue(), onValueChange: handleAnswerChange, className: "radio-options", children: currentQuestionData.options?.map((option) => (_jsxs("div", { className: `radio-option-container ${getCurrentValue() === option ? 'selected' : ''}`, onClick: () => handleAnswerChange(option), children: [_jsx(RadioGroupItem, { value: option, id: `option-${option}` }), _jsx(Label, { htmlFor: `option-${option}`, className: "radio-label", children: option })] }, option))) }))] }), _jsxs("div", { className: "popup-footer", children: [_jsx(Button, { variant: "outline", onClick: currentQuestion === 0 ? onClose : handlePrevious, children: currentQuestion === 0 ? 'Close' : 'Back' }), _jsxs("div", { className: "question-counter", children: ["Question ", currentQuestion + 1, " of ", questions.length] }), _jsx(Button, { onClick: handleNext, disabled: isNextDisabled(), children: isLastQuestion ? 'Submit' : 'Next' })] })] }));
 }
 //# sourceMappingURL=index.js.map

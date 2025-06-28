@@ -1,7 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.translateVMInstanceTypeCategory = translateVMInstanceTypeCategory;
-exports.getAllAvailableVMInstanceCategories = getAllAvailableVMInstanceCategories;
 const instanceMap = {
     'General Purpose': {
         aws: ['m5a.12xlarge', 'm6i.xlarge', 'm6in.12xlarge', 'm7a.8xlarge'],
@@ -58,13 +54,13 @@ const instanceMap = {
         ],
     },
 };
-function translateVMInstanceTypeCategory(category, cloud) {
+export function translateVMInstanceTypeCategory(category, cloud) {
     const entry = instanceMap[category];
     if (!entry)
         return [];
     return entry[cloud] ?? [];
 }
-function getAllAvailableVMInstanceCategories() {
+export function getAllAvailableVMInstanceCategories() {
     return Object.keys(instanceMap).sort((a, b) => a.localeCompare(b));
 }
 //# sourceMappingURL=vmInstanceTypeMapper.js.map

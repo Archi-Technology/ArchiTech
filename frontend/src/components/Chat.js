@@ -1,14 +1,11 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = Chat;
-const jsx_runtime_1 = require("react/jsx-runtime");
-const react_1 = require("react");
-require("./Chat.css");
-const AxiosInstance_1 = require("../services/axios/AxiosInstance");
-function Chat() {
-    const [question, setQuestion] = (0, react_1.useState)('');
-    const [messages, setMessages] = (0, react_1.useState)([]);
-    const [visible, setVisible] = (0, react_1.useState)(false);
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
+import { useState } from 'react';
+import './Chat.css';
+import apiService from '../services/axios/AxiosInstance';
+export default function Chat() {
+    const [question, setQuestion] = useState('');
+    const [messages, setMessages] = useState([]);
+    const [visible, setVisible] = useState(false);
     const ask = async () => {
         if (!question.trim())
             return;
@@ -16,7 +13,7 @@ function Chat() {
         setMessages(newMessages);
         setQuestion('');
         try {
-            const res = await AxiosInstance_1.AxiosInstence.post('/chat', {
+            const res = await apiService.apiClient.post('/chat', {
                 question,
             });
             setMessages([
@@ -31,6 +28,6 @@ function Chat() {
             ]);
         }
     };
-    return ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)("button", { className: "toggle-chat-btn", style: { color: 'whtie', backgroundColor: 'black' }, onClick: () => setVisible(!visible), children: visible ? '✖ Close' : '💬 Ask' }), visible && ((0, jsx_runtime_1.jsxs)("div", { className: "chat-popup", children: [(0, jsx_runtime_1.jsx)("div", { className: "chat-messages", children: messages.map((msg, i) => ((0, jsx_runtime_1.jsx)("div", { className: `message ${msg.role}`, children: msg.content }, i))) }), (0, jsx_runtime_1.jsxs)("div", { className: "chat-input", children: [(0, jsx_runtime_1.jsx)("input", { value: question, onChange: (e) => setQuestion(e.target.value), placeholder: "Ask me anything...", onKeyDown: (e) => e.key === 'Enter' && ask() }), (0, jsx_runtime_1.jsx)("button", { style: { color: 'whtie', backgroundColor: 'black' }, onClick: ask, children: "send" })] })] }))] }));
+    return (_jsxs(_Fragment, { children: [_jsx("button", { className: "toggle-chat-btn", style: { color: 'whtie', backgroundColor: 'black' }, onClick: () => setVisible(!visible), children: visible ? '✖ Close' : '💬 Ask' }), visible && (_jsxs("div", { className: "chat-popup", children: [_jsx("div", { className: "chat-messages", children: messages.map((msg, i) => (_jsx("div", { className: `message ${msg.role}`, children: msg.content }, i))) }), _jsxs("div", { className: "chat-input", children: [_jsx("input", { value: question, onChange: (e) => setQuestion(e.target.value), placeholder: "Ask me anything...", onKeyDown: (e) => e.key === 'Enter' && ask() }), _jsx("button", { style: { color: 'whtie', backgroundColor: 'black' }, onClick: ask, children: "send" })] })] }))] }));
 }
 //# sourceMappingURL=Chat.js.map

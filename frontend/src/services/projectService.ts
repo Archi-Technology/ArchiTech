@@ -1,12 +1,12 @@
-import {AxiosInstence} from './axios/AxiosInstance';
+import apiService from './axios/AxiosInstance';
 
 export const getAllProjects = async () => {
-  const response = await AxiosInstence.get('/projects');
+  const response = await apiService.apiClient.get('/projects');
   return response.data;
 };
 
 export const createProject = async (name: string) => {
-  const response = await AxiosInstence.post('/projects', {
+  const response = await apiService.apiClient.post('/projects', {
     name,
     data: {}
   });
@@ -14,7 +14,7 @@ export const createProject = async (name: string) => {
 };
 
 export const updateProject = async (id: string, name: string, data: any) => {
-  const response = await AxiosInstence.put(`/projects/${id}`, {
+  const response = await apiService.apiClient.put(`/projects/${id}`, {
     name,
     data
   });
@@ -22,6 +22,6 @@ export const updateProject = async (id: string, name: string, data: any) => {
 };
 
 export const deleteProject = async (id: string) => {
-  const response = await AxiosInstence.delete(`/projects/${id}`);
+  const response = await apiService.apiClient.delete(`/projects/${id}`);
   return response.data;
 };

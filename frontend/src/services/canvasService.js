@@ -1,11 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchProjectData = exports.createSubnet = exports.createVPC = void 0;
-const AxiosInstance_1 = require("./axios/AxiosInstance");
-const canvas_1 = require("../interfaces/canvas");
-const createVPC = async (name, cloud, cidr) => {
+import apiService from './axios/AxiosInstance';
+import { ServiceType, CloudProvider } from '../interfaces/canvas';
+export const createVPC = async (name, cloud, cidr) => {
     const projectId = sessionStorage.getItem('selectedProjectId'); // Fetch project ID from session storage
-    const response = await AxiosInstance_1.AxiosInstence.post('/canvas/vpc', {
+    const response = await apiService.apiClient.post('/canvas/vpc', {
         name,
         data: {
             cloud,
@@ -15,11 +12,10 @@ const createVPC = async (name, cloud, cidr) => {
     });
     return response.data;
 };
-exports.createVPC = createVPC;
-const createSubnet = async (name, vpc, cloud, cidr) => {
+export const createSubnet = async (name, vpc, cloud, cidr) => {
     // Simulate a delay of 1 second
     const projectId = sessionStorage.getItem('selectedProjectId'); // Fetch project ID from session storage
-    const response = await AxiosInstance_1.AxiosInstence.post('/canvas/subnet', {
+    const response = await apiService.apiClient.post('/canvas/subnet', {
         name,
         data: {
             vpc,
@@ -30,8 +26,7 @@ const createSubnet = async (name, vpc, cloud, cidr) => {
     });
     return response.data;
 };
-exports.createSubnet = createSubnet;
-const fetchProjectData = async () => {
+export const fetchProjectData = async () => {
     const projectId = sessionStorage.getItem('selectedProjectId'); // Fetch project ID from session storage
     // const response:IProjectArtchitecture = await AxiosInstence.get('/canvas/project', {
     //   data: {
@@ -45,9 +40,9 @@ const fetchProjectData = async () => {
                 projectId: '1',
                 _id: '7',
                 name: 'vpc1',
-                type: canvas_1.ServiceType.VPC,
+                type: ServiceType.VPC,
                 parentId: null,
-                cloudProvider: canvas_1.CloudProvider.AZURE,
+                cloudProvider: CloudProvider.AZURE,
                 connnectedTo: [],
                 extraData: null
             },
@@ -55,9 +50,9 @@ const fetchProjectData = async () => {
                 projectId: '1',
                 _id: '8',
                 name: 'vpc2',
-                type: canvas_1.ServiceType.VPC,
+                type: ServiceType.VPC,
                 parentId: null,
-                cloudProvider: canvas_1.CloudProvider.AZURE,
+                cloudProvider: CloudProvider.AZURE,
                 connnectedTo: [],
                 extraData: null
             },
@@ -65,9 +60,9 @@ const fetchProjectData = async () => {
                 projectId: '1',
                 _id: '20',
                 name: 'subnet1',
-                type: canvas_1.ServiceType.Subnet,
+                type: ServiceType.Subnet,
                 parentId: '8',
-                cloudProvider: canvas_1.CloudProvider.AZURE,
+                cloudProvider: CloudProvider.AZURE,
                 connnectedTo: [],
                 extraData: null
             },
@@ -75,9 +70,9 @@ const fetchProjectData = async () => {
                 projectId: '1',
                 _id: '22',
                 name: 'VM1',
-                type: canvas_1.ServiceType.VM,
+                type: ServiceType.VM,
                 parentId: '20',
-                cloudProvider: canvas_1.CloudProvider.AZURE,
+                cloudProvider: CloudProvider.AZURE,
                 connnectedTo: ['14'],
                 extraData: null,
                 price: 200
@@ -86,9 +81,9 @@ const fetchProjectData = async () => {
                 projectId: '1',
                 _id: '9',
                 name: 'subnet1',
-                type: canvas_1.ServiceType.Subnet,
+                type: ServiceType.Subnet,
                 parentId: '7',
-                cloudProvider: canvas_1.CloudProvider.AZURE,
+                cloudProvider: CloudProvider.AZURE,
                 connnectedTo: [],
                 extraData: null,
                 price: 50
@@ -97,9 +92,9 @@ const fetchProjectData = async () => {
                 projectId: '1',
                 _id: '10',
                 name: 'VM1',
-                type: canvas_1.ServiceType.VM,
+                type: ServiceType.VM,
                 parentId: '9',
-                cloudProvider: canvas_1.CloudProvider.AZURE,
+                cloudProvider: CloudProvider.AZURE,
                 connnectedTo: ['18'],
                 extraData: null,
                 price: 200
@@ -108,9 +103,9 @@ const fetchProjectData = async () => {
                 projectId: '1',
                 _id: '11',
                 name: 'VM2',
-                type: canvas_1.ServiceType.VM,
+                type: ServiceType.VM,
                 parentId: '9',
-                cloudProvider: canvas_1.CloudProvider.AZURE,
+                cloudProvider: CloudProvider.AZURE,
                 connnectedTo: [],
                 extraData: null,
                 price: 210
@@ -119,9 +114,9 @@ const fetchProjectData = async () => {
                 projectId: '1',
                 _id: '12',
                 name: 'VPC1',
-                type: canvas_1.ServiceType.VPC,
+                type: ServiceType.VPC,
                 parentId: '2',
-                cloudProvider: canvas_1.CloudProvider.GCP,
+                cloudProvider: CloudProvider.GCP,
                 connnectedTo: [],
                 extraData: null,
                 price: 160
@@ -130,9 +125,9 @@ const fetchProjectData = async () => {
                 projectId: '1',
                 _id: '13',
                 name: 'SUBNET1',
-                type: canvas_1.ServiceType.Subnet,
+                type: ServiceType.Subnet,
                 parentId: '12',
-                cloudProvider: canvas_1.CloudProvider.GCP,
+                cloudProvider: CloudProvider.GCP,
                 connnectedTo: [],
                 extraData: null,
                 price: 60
@@ -141,9 +136,9 @@ const fetchProjectData = async () => {
                 projectId: '1',
                 _id: '14',
                 name: 'database1',
-                type: canvas_1.ServiceType.Databases,
+                type: ServiceType.Databases,
                 parentId: '13',
-                cloudProvider: canvas_1.CloudProvider.GCP,
+                cloudProvider: CloudProvider.GCP,
                 connnectedTo: [],
                 extraData: null,
                 price: 220
@@ -152,9 +147,9 @@ const fetchProjectData = async () => {
                 projectId: '1',
                 _id: '15',
                 name: 'bucket 1',
-                type: canvas_1.ServiceType.OBJECT_STORAGE,
+                type: ServiceType.OBJECT_STORAGE,
                 parentId: '2',
-                cloudProvider: canvas_1.CloudProvider.GCP,
+                cloudProvider: CloudProvider.GCP,
                 connnectedTo: [],
                 extraData: null,
                 price: 70
@@ -163,9 +158,9 @@ const fetchProjectData = async () => {
                 projectId: '1',
                 _id: '16',
                 name: 'bucket1',
-                type: canvas_1.ServiceType.OBJECT_STORAGE,
+                type: ServiceType.OBJECT_STORAGE,
                 parentId: '1',
-                cloudProvider: canvas_1.CloudProvider.AZURE,
+                cloudProvider: CloudProvider.AZURE,
                 connnectedTo: [],
                 extraData: null,
                 price: 80
@@ -174,9 +169,9 @@ const fetchProjectData = async () => {
                 projectId: '1',
                 _id: '17',
                 name: 'bucket1',
-                type: canvas_1.ServiceType.OBJECT_STORAGE,
+                type: ServiceType.OBJECT_STORAGE,
                 parentId: '3',
-                cloudProvider: canvas_1.CloudProvider.AWS,
+                cloudProvider: CloudProvider.AWS,
                 connnectedTo: [],
                 extraData: null,
                 price: 90
@@ -185,9 +180,9 @@ const fetchProjectData = async () => {
                 projectId: '1',
                 _id: '18',
                 name: 'bucket2',
-                type: canvas_1.ServiceType.OBJECT_STORAGE,
+                type: ServiceType.OBJECT_STORAGE,
                 parentId: '3',
-                cloudProvider: canvas_1.CloudProvider.AWS,
+                cloudProvider: CloudProvider.AWS,
                 connnectedTo: [],
                 extraData: null,
                 price: 100
@@ -196,5 +191,4 @@ const fetchProjectData = async () => {
     };
     return response.data;
 };
-exports.fetchProjectData = fetchProjectData;
 //# sourceMappingURL=canvasService.js.map

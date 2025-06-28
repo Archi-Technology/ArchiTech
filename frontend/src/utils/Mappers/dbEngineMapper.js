@@ -1,8 +1,4 @@
-"use strict";
 // utils/dbEngineMapper.ts
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllAvailableDBEngineNames = getAllAvailableDBEngineNames;
-exports.translateDBEngineToCloudOptions = translateDBEngineToCloudOptions;
 const dbEngineMap = [
     {
         name: 'PostgreSQL',
@@ -30,10 +26,10 @@ const dbEngineMap = [
         azure: ['Oracle'],
     },
 ];
-function getAllAvailableDBEngineNames() {
+export function getAllAvailableDBEngineNames() {
     return dbEngineMap.map((entry) => entry.name);
 }
-function translateDBEngineToCloudOptions(engineName, provider) {
+export function translateDBEngineToCloudOptions(engineName, provider) {
     const entry = dbEngineMap.find((e) => e.name === engineName);
     if (!entry)
         return [];

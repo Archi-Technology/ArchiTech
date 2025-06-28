@@ -1,9 +1,6 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.SuggestionSection = SuggestionSection;
-const jsx_runtime_1 = require("react/jsx-runtime");
-const fa_1 = require("react-icons/fa");
-function SuggestionSection({ suggestion }) {
-    return ((0, jsx_runtime_1.jsx)("div", { className: "suggestion-section", children: (0, jsx_runtime_1.jsxs)("div", { className: "suggestion-container", children: [(0, jsx_runtime_1.jsx)("div", { className: "bot-icon-container", children: (0, jsx_runtime_1.jsx)(fa_1.FaRobot, { className: "bot-icon" }) }), (0, jsx_runtime_1.jsxs)("div", { className: "suggestion-content", children: [(0, jsx_runtime_1.jsx)("div", { className: "suggestion-title", children: "Adam's Suggestion:" }), (0, jsx_runtime_1.jsx)("div", { className: "suggestion-text", children: suggestion || "No recommendation available at the moment." })] })] }) }));
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { FaRobot } from "react-icons/fa";
+export function SuggestionSection({ suggestion }) {
+    return (_jsx("div", { className: "suggestion-section", children: _jsxs("div", { className: "suggestion-container", children: [_jsx("div", { className: "bot-icon-container", children: _jsx(FaRobot, { className: "bot-icon" }) }), _jsxs("div", { className: "suggestion-content", children: [_jsx("div", { className: "suggestion-title", children: "Adam's Suggestion:" }), _jsx("div", { className: "suggestion-text", children: suggestion || "No recommendation available at the moment." })] })] }) }));
 }
 //# sourceMappingURL=suggestion-section.js.map

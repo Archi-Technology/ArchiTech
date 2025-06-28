@@ -1,7 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.translateInstanceTypeCategory = translateInstanceTypeCategory;
-exports.getAllAvailableInstanceCategories = getAllAvailableInstanceCategories;
 const instanceMap = {
     'General Purpose': {
         aws: [
@@ -59,13 +55,13 @@ const instanceMap = {
         azure: ['128 vCore', '96 vCore'],
     },
 };
-function translateInstanceTypeCategory(category, cloud) {
+export function translateInstanceTypeCategory(category, cloud) {
     const entry = instanceMap[category];
     if (!entry)
         return [];
     return entry[cloud] ?? [];
 }
-function getAllAvailableInstanceCategories() {
+export function getAllAvailableInstanceCategories() {
     return Object.keys(instanceMap).sort((a, b) => a.localeCompare(b));
 }
 //# sourceMappingURL=typeMapper.js.map

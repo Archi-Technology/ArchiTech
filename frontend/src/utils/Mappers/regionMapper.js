@@ -1,7 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.translateLocationToRegionCodes = translateLocationToRegionCodes;
-exports.getAllAvailableLocations = getAllAvailableLocations;
 const regionMap = {
     'United States of America': {
         aws: [
@@ -65,11 +61,11 @@ const regionMap = {
         azure: ['uaenorth', 'uaecentral'],
     },
 };
-function translateLocationToRegionCodes(location, cloud) {
+export function translateLocationToRegionCodes(location, cloud) {
     const entry = Object.entries(regionMap).find(([key]) => key.toLowerCase() === location.toLowerCase());
     return entry?.[1]?.[cloud] ?? [];
 }
-function getAllAvailableLocations() {
+export function getAllAvailableLocations() {
     return Object.keys(regionMap).sort((a, b) => a.localeCompare(b));
 }
 //# sourceMappingURL=regionMapper.js.map

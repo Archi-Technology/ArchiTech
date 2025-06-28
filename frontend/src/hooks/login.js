@@ -2,7 +2,6 @@
 // import React, { useState } from "react";
 // import { useUser } from "../contexts/userContext";
 // import { AxiosInstence } from "../services/axios/AxiosInstance";
-Object.defineProperty(exports, "__esModule", { value: true });
 // export interface ILoginResponse {
 //   token: string;
 //   refreshToken: string;  

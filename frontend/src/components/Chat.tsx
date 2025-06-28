@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import './Chat.css';
-import { AxiosInstence } from '../services/axios/AxiosInstance';
+import apiService from '../services/axios/AxiosInstance';
 import { IGenericResponse } from '../interfaces/user';
 
 interface Message {
@@ -22,7 +22,7 @@ export default function Chat() {
     setQuestion('');
 
     try {
-      const res = await AxiosInstence.post<IGenericResponse>('/chat', {
+      const res = await apiService.apiClient.post<IGenericResponse>('/chat', {
         question,
       });
 

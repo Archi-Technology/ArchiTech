@@ -1,9 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.translateInstanceTypeCategory = translateInstanceTypeCategory;
-exports.getAllAvailableInstanceCategories = getAllAvailableInstanceCategories;
-exports.getAllAvailableDBInstanceTypes = getAllAvailableDBInstanceTypes;
-exports.translateDBInstanceTypeToCloudOptions = translateDBInstanceTypeToCloudOptions;
 const instanceMap = {
     'General Purpose': {
         aws: [
@@ -43,13 +37,13 @@ const instanceMap = {
         azure: ['128 vCore', '96 vCore'],
     },
 };
-function translateInstanceTypeCategory(category, cloud) {
+export function translateInstanceTypeCategory(category, cloud) {
     const entry = instanceMap[category];
     if (!entry)
         return [];
     return entry[cloud] ?? [];
 }
-function getAllAvailableInstanceCategories() {
+export function getAllAvailableInstanceCategories() {
     return Object.keys(instanceMap).sort((a, b) => a.localeCompare(b));
 }
 const dbInstanceTypeMap = [
@@ -74,10 +68,10 @@ const dbInstanceTypeMap = [
         azure: ['Hyperscale', 'ComputeOptimized_F'],
     },
 ];
-function getAllAvailableDBInstanceTypes() {
+export function getAllAvailableDBInstanceTypes() {
     return dbInstanceTypeMap.map((entry) => entry.name);
 }
-function translateDBInstanceTypeToCloudOptions(typeName, provider) {
+export function translateDBInstanceTypeToCloudOptions(typeName, provider) {
     const entry = dbInstanceTypeMap.find((e) => e.name === typeName);
     if (!entry)
         return [];
