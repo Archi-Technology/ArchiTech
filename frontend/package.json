@@ -4,7 +4,8 @@
   "description": "React TypeScript app with login/register pages and SWR",
   "main": "index.js",
   "scripts": {
-    "start": "webpack serve --mode development --watch",
+    "start-dev": "vite --mode development",
+    "start-prod": "vite --mode production",
     "build-host": "tsc -b && vite build && cp -r ./dist/* ../../backend/front-static",
     "build-local": "tsc -b && vite build && xcopy /E /I /Y .\\dist\\* ..\\..\\backend\\front-static\\"
   },
