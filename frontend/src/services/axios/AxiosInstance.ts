@@ -1,7 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import useSWR from "swr";
 import { refreshTokenName, removeAuthTokens, updateTokens } from "../../utils/functions/localstorage";
-console.log(import.meta.env?.VITE_BACKEND_URL)
 const backend_url = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 class ApiService {
     private static instance: ApiService;
