@@ -5,7 +5,6 @@ import https from 'https';
 import fs from 'fs';
 
 const PORT = config.PORT;
-const https_port = process.env.HTTPS_PORT;
 
 appPromise.then((app:Application) => {
   if(process.env.NODE_ENV !== 'production') {
@@ -17,7 +16,7 @@ appPromise.then((app:Application) => {
       key: fs.readFileSync('../../client-key.pem'),
       cert: fs.readFileSync('../../client-cert.pem')
     }
-    https.createServer(prop, app).listen(https_port);
+    https.createServer(prop, app).listen(PORT);
 
   }
 })
