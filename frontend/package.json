@@ -6,8 +6,8 @@
   "scripts": {
     "start-dev": "vite --mode development",
     "start-prod": "vite --mode production",
-    "build-host": "tsc -b && vite build && cp -r ./dist/* ../../backend/front-static",
-    "build-local": "tsc -b && vite build && xcopy /E /I /Y .\\dist\\* ..\\backend\\front-static\\"
+    "build-host": "tsc -b --clean && tsc -b && vite build --mode production && cp -r ./dist/* ../../backend/front-static",
+    "build-local": "tsc -b --clean && tsc -b && vite build --mode development && xcopy /E /I /Y .\\dist\\* ..\\backend\\front-static\\"
   },
   "author": "",
   "license": "MIT",

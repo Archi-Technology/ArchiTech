@@ -3,11 +3,12 @@
     "target": "ESNext",
     "module": "ESNext",
     "jsx": "react-jsx",
-    "sourceMap": true,
+    "sourceMap": false,
     "moduleResolution": "Bundler",
     "strict": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
+    "outDir": "dist",
     "lib": ["DOM", "ESNext"]
   },
   "include": ["src"]
