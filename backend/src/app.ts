@@ -63,6 +63,13 @@ const appPromise: Promise<Application> = new Promise(async (resolve, reject) => 
   app.use("/api/azure", azureRouter);
   app.use('/api/dashboard', dashboardRouter);
 
+  app.use(express.static("front-static"));
+  const frontPath = path.join(__dirname, "..", "front-static");
+  
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(frontPath, "index.html"));
+  });
+
   try {
     await mongoose.connect(config.MONGO_URI as string);
     console.log("MongoDB connected");
@@ -80,6 +87,16 @@ const appPromise: Promise<Application> = new Promise(async (resolve, reject) => 
         description:
           "This is ArchiTech API.",
       },
+      servers: [
+        {
+          url: 'https://10.10.248.96',
+          description: "Development server",
+        },
+        {
+          url: `http://localhost:${config.PORT}`,
+          description: "Production server",
+        }
+      ],
     },
     apis: ["./src/routes/*.ts"],
   };

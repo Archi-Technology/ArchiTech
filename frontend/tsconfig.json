@@ -1,14 +1,15 @@
 {
-    "compilerOptions": {
-      "target": "ES5",
-      "module": "ESNext",
-      "jsx": "react-jsx",
-      "sourceMap": true,
-      "moduleResolution": "node",
-      "strict": true,
-      "esModuleInterop": true,
-      "resolveJsonModule": true,
-    },
-    "include": ["src"]
-  }
-  
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "jsx": "react-jsx",
+    "sourceMap": false,
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "outDir": "dist",
+    "lib": ["DOM", "ESNext"]
+  },
+  "include": ["src"]
+}

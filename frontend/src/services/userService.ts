@@ -1,9 +1,8 @@
-import axios from 'axios';
-import useSWR from 'swr'; // Replace with your Axios instance setup
+import apiService from "./axios/AxiosInstance";
+import useSWR from 'swr'; 
 import { showToast } from '../consts/toast';
 import { IGenericResponse, IUser } from '../interfaces/user';
 import { getAuthTokenByName, refreshTokenName, removeAuthTokens, updateTokens } from '../utils/functions/localstorage';
-import { AxiosInstence } from './axios/AxiosInstance';
 import { IUserContext } from '../components/cloud-assistant';
 
 export interface ILoginResponse {
@@ -20,7 +19,7 @@ export interface IRegisterResponse {
 export const userDataKey = 'user-data'
 
 const fetchUserDataById = async (id: string) => {
-  const res = await AxiosInstence.get<IUser>(`/user/details/${id}`);
+    const res = await apiService.apiClient.get<IUser>(`/user/details/${id}`);
   return res.data;
 }
 
@@ -31,7 +30,7 @@ export const useGetUserDataById = (userid: string | null) =>
   );
 
 const fetchUserData = async () => {
-  const res = await AxiosInstence.get<IUser>('/user/data');
+    const res = await apiService.apiClient.get<IUser>('/user/data');
   return res.data;
 }
 
@@ -44,7 +43,7 @@ export const useGetUserData = (userid: string | null) =>
 
 export const loginUser = async (email: string, password: string) => {
 
-  const data = (await axios.post<ILoginResponse>('http://localhost:5000/api/auth/login', {
+  const data = (await apiService.apiClient.post<ILoginResponse>('/auth/login', {
     email,
     password
   })).data;
@@ -54,7 +53,7 @@ export const loginUser = async (email: string, password: string) => {
 
 export const registerUser = async (email: string, username: string, password: string) => {
 
-  (await axios.post<IRegisterResponse>('http://localhost:5000/api/auth/register', {
+  (await apiService.apiClient.post<IRegisterResponse>('/auth/register', {
     email,
     username,
     password
@@ -66,7 +65,7 @@ export const registerUser = async (email: string, username: string, password: st
 export const logout = async () => {
   try {
     const refreshToken = getAuthTokenByName(refreshTokenName);
-    (await axios.post<IRegisterResponse>('http://localhost:5000/api/auth/logout', {}, {
+    (await apiService.apiClient.post<IRegisterResponse>('/auth/logout', {}, {
       headers: {
         Authorization: `Bearer ${refreshToken}`
       }
@@ -93,7 +92,7 @@ export const getLogin = async (username: string, password: string) => {
 
 export const editProfile = async (userId: string, editedProfile: FormData) => {
   try {
-    (await AxiosInstence.put<IGenericResponse>(`user/update`, editedProfile)).data
+        (await apiService.apiClient.put<IGenericResponse>(`user/update`, editedProfile)).data
     showToast('successfully update profile', "success")
   } catch (error) {
     showToast('failed to edit post', "error")
@@ -102,7 +101,7 @@ export const editProfile = async (userId: string, editedProfile: FormData) => {
 
 export const saveUserContext = async ( userContext: Partial<IUserContext>) => {
   try {
-    (await AxiosInstence.post<IGenericResponse>(`user/context/create`, userContext))
+        (await apiService.apiClient.post<IGenericResponse>(`user/context/create`, userContext))
   } catch (error) {
     showToast('failed to save user context', "error")
   }
@@ -110,7 +109,7 @@ export const saveUserContext = async ( userContext: Partial<IUserContext>) => {
 
 export const checkUserContext = async ( ) => {
   try {
-    return (await AxiosInstence.get<IGenericResponse>(`user/context/check`)).data
+        return (await apiService.apiClient.get<IGenericResponse>(`user/context/check`)).data
   } catch (error) {
     showToast('failed to check user context', "error")
   }
@@ -119,7 +118,7 @@ export const checkUserContext = async ( ) => {
 
 export const googleSignin = async (credential?: string) => {
 
-  const tokens = (await axios.post<ILoginResponse>('http://localhost:5000/api/auth/login/google', {
+  const tokens = (await apiService.apiClient.post<ILoginResponse>('/auth/login/google', {
     credential,
   })).data;
 

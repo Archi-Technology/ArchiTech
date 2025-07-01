@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useUser } from '../../contexts/userContext';
 import appLogo from '../../assets/logoIcon.png';
 import './index.scss'; // Import the CSS styles for the navbar
-import { AxiosInstence } from '../../services/axios/AxiosInstance';
+import apiService from '../../services/axios/AxiosInstance';
 
 const Navbar: React.FC = () => {
   const { setUserData, user } = useUser();
@@ -37,7 +37,7 @@ const Navbar: React.FC = () => {
           className="navButton"
           onClick={async () => {
             try {
-              const response = await AxiosInstence.post('/auth/logout');
+              const response = await apiService.apiClient.post('/auth/logout');
               if (response.status === 200) {
                 // setUserData(null); // Clear user data
                 window.location.href = '/login'; // Redirect to login

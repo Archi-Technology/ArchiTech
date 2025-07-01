@@ -1,9 +1,9 @@
 'use client';
 
 import type React from 'react';
-
+import axios from 'axios';
 import { useState, useEffect, useRef } from 'react';
-import { AxiosInstence } from '../services/axios/AxiosInstance';
+import apiService from '../services/axios/AxiosInstance';
 import type { IGenericResponse } from '../interfaces/user';
 import './Chat.css';
 
@@ -54,7 +54,7 @@ export default function Chat() {
     setIsTyping(true);
 
     try {
-      const res = await AxiosInstence.post<IGenericResponse>('/chat', {
+      const res = await apiService.apiClient.post<IGenericResponse>('/chat', {
         question,
       });
 
