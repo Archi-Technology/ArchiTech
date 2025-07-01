@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -15,15 +16,36 @@ import {
   Legend,
   Tooltip,
 } from "recharts";
+import { getProviderDistribution } from "../services/dashboardService";
 
-const data = [
-  { name: "AWS", value: 44, color: "#0070F3" },
-  { name: "Azure", value: 33, color: "#7928CA" },
-  { name: "GCP", value: 23, color: "#00C7B7" },
-];
+const providerColors: Record<string, string> = {
+  AWS: "#0070F3",
+  AZURE: "#7928CA",
+  GCP: "#00C7B7",
+};
+interface ResourceDistributionByProvider {
+  [provider: string]: number;
+}
 
-export function CostDistributionChart() {
+
+
+export function CostDistributionChart({ projectId }: { projectId: string }) {
   const theme = useTheme();
+  const [data, setData] = useState<{ name: string; value: number; color: string }[]>([]);
+
+  // Get projectId from sessionStorage
+
+  useEffect(() => {
+    if (!projectId) return;
+    getProviderDistribution(projectId).then((distribution: ResourceDistributionByProvider) => {
+      const chartData = Object.entries(distribution).map(([name, value]) => ({
+        name,
+        value,
+        color: providerColors[name] || "#ccc",
+      }));
+      setData(chartData);
+    });
+  }, [projectId]);
 
   return (
     <Card
@@ -43,12 +65,12 @@ export function CostDistributionChart() {
       <CardHeader
         title={
           <Typography variant="h6" fontWeight={600} color="primary">
-            Cloud Provider Cost Distribution
+            Cloud Provider Resource Distribution
           </Typography>
         }
         subheader={
           <Typography variant="body2" color="text.secondary">
-            Breakdown of costs by cloud provider
+            Breakdown of resources by cloud provider
           </Typography>
         }
       />

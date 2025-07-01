@@ -1,44 +1,84 @@
-'use client';
-import './index.scss';
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useCallback, useEffect, useState } from "react";
+import { getAllAvailableDBEngineNames } from '../../utils/Mappers/dbEngineMapper';
+import { getAllAvailableDBInstanceTypes } from '../../utils/Mappers/dbInstanceTypeMapper';
+import { getAllAvailableLoadBalancerTypes } from '../../utils/Mappers/loadBalancerMapper';
+import { getAllAvailableObjectStorageClasses } from '../../utils/Mappers/objectStorageMapper';
+import { getAllAvailableOSNames } from '../../utils/Mappers/osMapper';
+import { getAllAvailableLocations } from '../../utils/Mappers/regionMapper';
+import { getAllAvailableInstanceCategories } from '../../utils/Mappers/typeMapper';
+import ResourceModal from '../resource-modal'; // Import the ResourceModal component
+import MultipleSelectChip from './multi-select'; // Import the MultipleSelectChip component
+import {IBaseService} from '../../interfaces/canvas'; // Import the interface for base service
+import { getAllAvailableVMInstanceCategories } from '../../utils/Mappers/vmInstanceTypeMapper';
+
+import type { JSX } from 'react';
+
+
 import {
   askOptimalChoices,
   parseGeminiRecommendation,
 } from '../../utils/recommendation';
-import { getAllAvailableLocations } from '../../utils/Mappers/regionMapper';
-import { getAllAvailableInstanceCategories } from '../../utils/Mappers/typeMapper';
-import { getAllAvailableOSNames } from '../../utils/Mappers/osMapper';
-import { getAllAvailableObjectStorageClasses } from '../../utils/Mappers/objectStorageMapper';
-import { getAllAvailableLoadBalancerTypes } from '../../utils/Mappers/loadBalancerMapper';
-import { getAllAvailableDBInstanceTypes } from '../../utils/Mappers/dbInstanceTypeMapper';
-import { getAllAvailableDBEngineNames } from '../../utils/Mappers/dbEngineMapper';
-import { getAllAvailableVMInstanceCategories } from '../../utils/Mappers/vmInstanceTypeMapper';
 import { Button } from '../ui/button/button';
-import ResourceModal from '../resource-modal';
-import type { JSX } from 'react';
+import "./index.scss";// Adjust the import path as needed
+import { CloudProvider } from '../../interfaces/canvas';
+import { IResource } from '../../services/resourceService';
+
+'use client';
+
+export enum ServiceType  {
+  VPC = "Vpc",
+  SUBNET = 'Subnet',
+  LB = 'LoadBalancer',
+  VM = 'VirtualMachine',
+  DATABASE = 'Database',
+  OBJECT_STORAGE = 'ObjectStorage'
+}
+
+ 
+function mapServiceNameToServiceType(serviceName: string): ServiceType  {
+  switch (serviceName) {
+    case 'Virtual Machine':
+      return ServiceType.VM;
+    case 'Object Storage':
+      return ServiceType.OBJECT_STORAGE;
+    case 'Load Balancer':
+      return ServiceType.LB;
+    case 'Database':
+      return ServiceType.DATABASE;
+    case 'Vpc':
+      return ServiceType.VPC;
+    case 'Subnet':
+      return ServiceType.SUBNET;
+    default:
+      return ServiceType.SUBNET; // Return null if the service name doesn't match any enum value
+  }
+}
+
 
 interface ServicePopupProps {
   service: { name: string; icon: JSX.Element };
-  onConfirm: (
-    resourceInfo: {
-      instanceType?: string;
-      vmInstanceType?: string;
-      region?: string;
-      os?: string;
-      pricing?: any;
-      cloud?: string;
-      storageClass?: any;
-      lbType?: any;
-      dbInstanceType?: string;
-      engine?: any;
-    },
-    type: string,
-    selectedCloud: string,
-  ) => void;
+  // onConfirm: (
+    //   resourceInfo: {
+      //     instanceType?: string;
+      //     vmInstanceType?: string;
+      //     region?: string;
+      //     os?: string;
+      //     pricing?: any;
+      //     cloud?: string;
+      //     storageClass?: any;
+      //     lbType?: any;
+      //     dbInstanceType?: string;
+      //     engine?: any;
+      //   },
+      //   type: string,
+  //   selectedCloud: string,
+  // ) => Promise<void>;
+  onConfirm: (selectedService: any) => Promise<void>;
   onCancel: () => void;
-  availableVPCs: { id: string; name: string }[];
-  availableSubnets: { id: string; name: string }[];
+  availableVPCs: IBaseService[];
+  availableSubnets: IBaseService[];
+  availableSource?: IBaseService[];
   pricingOptions: any[];
   instanceTypes?: { id: string; name: string }[];
   regions?: { id: string; name: string }[];
@@ -52,6 +92,9 @@ interface ServicePopupProps {
 export default function ServicePopup({
   service,
   onConfirm,
+  availableVPCs,
+  availableSubnets,
+  availableSource,
   onCancel,
 }: ServicePopupProps) {
   const [selectedVPC, setSelectedVPC] = useState<string>('');
@@ -59,16 +102,18 @@ export default function ServicePopup({
   const [selectedPricing, setSelectedPricing] = useState<string>('');
   const [selectedInstanceType, setSelectedInstanceType] = useState<string>('');
   const [selectedVmInstanceType, setSelectedVmInstanceType] =
-    useState<string>('');
+  useState<string>('');
   const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [selectedOS, setSelectedOS] = useState<string>('');
+  const [selectedName, setSelectedName] = useState<string>('');
   const [selectedStorageClass, setSelectedStorageClass] = useState<string>('');
   const [selectedLBType, setSelectedLBType] = useState<string>('');
   const [selectedDBInstanceType, setSelectedDBInstanceType] =
-    useState<string>('');
+  useState<string>('');
   const [selectedDBEngine, setSelectedDBEngine] = useState<string>('');
   const [selectedRedundancy, setSelectedRedundancy] = useState<string>('');
   const [recommendation, setRecommendation] = useState<string>('');
+  const [selectedCloudProvider, setSelectedCloudProvider] = useState<CloudProvider | ''>('');
   const [currentPage, setCurrentPage] = useState<'form' | 'price-comparison'>(
     'form',
   );
@@ -76,12 +121,39 @@ export default function ServicePopup({
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [showValidation, setShowValidation] = useState(false);
   const [shakingFields, setShakingFields] = useState<string[]>([]);
-
+  
+  const [selectedConnections, setSelectedConnections] = useState<string[]>([]);
+  const projectId = sessionStorage.getItem('selectedProjectId');
+  console.log('service popup Project ID:', projectId);
+  
   useEffect(() => {
     setRecommendation(
       `Based on your app context, click here to get optimal cost and performance for "${service.name}".`,
     );
   }, [service]);
+
+//   const handleConfirm = async () => {
+//     if (selectedCloud && addressRange) {
+//         const resourceMap: Record<string, (name: string, cloud: string, cidr: string) => Promise<any>> = {
+//             VPC: createVPC,
+//             Subnet: (name, cloud, cidr) => createSubnet(name, "default-vpc", cloud, cidr),
+//         };
+
+//         const resourceType = services.find((s) => s.name === service.name)?.name; // Match service name with the list
+
+//         if (resourceType && resourceMap[resourceType]) {
+//             try {
+//                 const response = await resourceMap[resourceType]("default-resource", selectedCloud, addressRange); // Call the appropriate function
+//                 console.log(`${resourceType} created:`, response); // Log the response for debugging
+//                 onConfirm(response.id, "default-subnet"); // Pass the resource ID to onConfirm
+//             } catch (error) {
+//                 console.error(`Error creating ${resourceType}:`, error); // Handle errors
+//             }
+//         } else {
+//             console.error(`Unsupported resource type: ${service.name}`);
+//         }
+//     }
+// };
 
   const handleNext = () => {
     setShowValidation(true);
@@ -106,7 +178,7 @@ export default function ServicePopup({
       if (!selectedRegion) {
         errors.region = 'Please select a region';
         fieldsToShake.push('region');
-      }
+      } 
       if (!selectedStorageClass) {
         errors.storageClass = 'Please select a storage class';
         fieldsToShake.push('storageClass');
@@ -133,8 +205,36 @@ export default function ServicePopup({
         errors.dbEngine = 'Please select a database engine';
         fieldsToShake.push('dbEngine');
       }
+    } else if (service.name === 'Vpc' || service.name === 'Subnet') {
+      if (!selectedRegion) {
+        errors.region = 'Please select a region';
+        fieldsToShake.push('region');
+      }
     }
 
+    if(service.name !== 'Object Storage' && service.name !== 'Vpc' && service.name !== 'Subnet') {
+     
+      if (!selectedSubnet) {  
+        errors.subnet = 'Please select a subnet';
+        fieldsToShake.push('subnet');
+      }
+    }
+    if(service.name === 'Subnet') {
+       if (!selectedVPC) { 
+        errors.vpc = 'Please select a VPC';
+        fieldsToShake.push('vpc');
+      } 
+    }
+    if (service.name === 'Vpc') {
+      if (!selectedCloudProvider) {
+        errors.cloudProvider = 'Please select a cloud provider';
+        fieldsToShake.push('cloudProvider');
+      }
+    }
+    if (!selectedName) {
+      errors.name = 'Please enter a name';
+      fieldsToShake.push('name');
+    }
     setFormErrors(errors);
 
     // Trigger shaking animation
@@ -167,60 +267,80 @@ export default function ServicePopup({
       };
 
       setFormData(data);
-      setCurrentPage('price-comparison');
+      if(service.name === 'Vpc' || service.name === 'Subnet') {
+        const findCloudProvider = availableVPCs.find(vpc => vpc._id === selectedVPC)?.cloudProvider || CloudProvider.AZURE;
+        handleConfirm(selectedCloudProvider || findCloudProvider, 500); // Default pricing for VPC and Subnet
+      } else {
+
+        setCurrentPage('price-comparison');
+      }
     }
   };
 
-  const handleConfirm = (selectedCloud: string, pricing: any) => {
+  const handleConfirm = async(selectedCloud: CloudProvider, pricing: any) => {
+    const data = prepereDataForSave();
+    console.log('handleConfirm selected connections', data.connectedTo);
+    data.cloudProvider = selectedCloud;
+     // Assuming cloud provider is passed as a parameter
     if (service.name === 'Virtual Machine') {
-      onConfirm(
-        {
-          vmInstanceType: selectedVmInstanceType,
-          region: selectedRegion,
-          os: selectedOS,
-          pricing: pricing,
-          cloud: selectedCloud,
-        },
-        'virtual-machine',
-        selectedCloud,
-      );
-    } else if (service.name === 'Object Storage') {
-      onConfirm(
-        {
-          region: selectedRegion,
-          storageClass: selectedStorageClass,
-          pricing: pricing,
-          cloud: selectedCloud,
-        },
-        'object-storage',
-        selectedCloud,
-      );
+      data.extraData.instanceType = selectedInstanceType,
+      data.extraData.region = selectedRegion,
+      data.extraData.os = selectedOS,
+      data.extraData.pricing = pricing
+      } else if (service.name === 'Object Storage') {
+      data.extraData.region = selectedRegion,
+      data.extraData.storageClass = selectedStorageClass,
+      data.extraData.pricing = pricing
+      
     } else if (service.name === 'Load Balancer') {
-      onConfirm(
-        {
-          region: selectedRegion,
-          lbType: selectedLBType,
-          pricing: pricing,
-          cloud: selectedCloud,
-        },
-        'load-balancer',
-        selectedCloud,
-      );
-    } else if (service.name === 'Database') {
-      onConfirm(
-        {
-          region: selectedRegion,
-          dbInstanceType: selectedDBInstanceType,
-          engine: selectedDBEngine,
-          pricing: pricing,
-          cloud: selectedCloud,
-        },
-        'database',
-        selectedCloud,
-      );
-    }
-    onCancel(); // Close the current ServicePopup
+        data.extraData.region = selectedRegion,
+        data.extraData.lbType = selectedLBType,
+        data.extraData.pricing = pricing
+      } else if (service.name === 'Database') {
+        data.extraData.region = selectedRegion,
+        data.extraData.dbInstanceType = selectedDBInstanceType,
+        data.extraData.engine = selectedDBEngine,
+        data.extraData.pricing = pricing
+      } else if (service.name === 'Vpc') {
+        data.parentId = undefined;
+        data.extraData.region = selectedRegion
+      } else if (service.name === 'Subnet') {
+        data.parentId = selectedVPC; // Assuming VPC is the parent for Subnet
+        data.extraData.region = selectedRegion
+      }
+
+      console.log('connected to', selectedConnections);
+    await onConfirm(data);
   };
+
+
+  const prepereDataForSave = useCallback(() => { 
+      const type = mapServiceNameToServiceType(service.name)
+      const data: IResource = {
+        type: type,
+        cloudProvider: CloudProvider.AZURE, // Assuming Azure as default, can be parameterized
+        parentId: type != ServiceType.SUBNET && type != ServiceType.VPC ?  selectedSubnet : undefined,
+        name: selectedName,
+        connectedTo: selectedConnections, // Assuming no connections for now, can be updated later
+        extraData: {},
+        projectId: projectId ? projectId : 'default-project-id', // Use sessionStorage or a default value
+      };
+  
+      if (service.name === 'Virtual Machine') {
+        data.extraData.instanceType = selectedInstanceType;
+        data.extraData.os = selectedOS;
+      } else if (service.name === 'Object Storage') {
+        data.extraData.storageClass = selectedStorageClass;
+      } else if (service.name === 'Load Balancer') {
+        data.extraData.lbType = selectedLBType;
+      } else if (service.name === 'Database') {
+        data.extraData.dbInstanceType = selectedDBInstanceType;
+        data.extraData.dbEngine = selectedDBEngine;
+      }
+  
+      console.log('data.connected to', data.connectedTo  );
+      return data;
+   },[selectedSubnet, service, projectId, selectedInstanceType, selectedOS, selectedStorageClass, selectedLBType, selectedDBInstanceType, selectedDBEngine, selectedName, selectedConnections]);
 
   const isFormValid = () => {
     if (service.name === 'Virtual Machine') {
@@ -246,7 +366,9 @@ export default function ServicePopup({
             exit={{ opacity: 0, x: -300 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="popup-recommendation">
+            {
+              service.name !== 'Vpc' && service.name !== 'Subnet' && (
+                <div className="popup-recommendation">
               <div className="chatbot-icon">🤖</div>
               <button
                 className="popup-button ai"
@@ -290,12 +412,121 @@ export default function ServicePopup({
                 <p>{recommendation}</p>
               </button>
             </div>
+              )
+            }
             <div className="popup-service">
               <div className="popup-service-icon">{service.icon}</div>
               <div className="popup-service-name">{service.name}</div>
             </div>
+            {
+              <>
+              <div className="popup-selection">
+                        <label>Name:</label>
+                        <input
+                          type="text"
+                          value={selectedName}
+                          onChange={(e) => setSelectedName(e.target.value)}
+                          className={`${showValidation && formErrors.name ? 'error' : ''} ${
+                            shakingFields.includes('name') ? 'shake' : ''
+                          }`}
+                          placeholder="Enter a name"
+                        />
+                        {showValidation && formErrors.name && (
+                          <div className="error-message">{formErrors.name}</div>
+                        )}
+                      </div>
+              </>
+            }
+            {
+              service.name === 'Vpc' && (
+                <>
+      <div className="popup-selection">
+        <label>Cloud Provider:</label>
+        <select
+          value={selectedCloudProvider}
+          onChange={(e) => setSelectedCloudProvider(e.target.value as CloudProvider)}
+          className={`${showValidation && formErrors.cloudProvider ? 'error' : ''} ${
+            shakingFields.includes('cloudProvider') ? 'shake' : ''
+          }`}
+        >
+          <option value="">-- Select Cloud Provider --</option>
+          {Object.values(CloudProvider).map((provider) => (
+            <option key={provider} value={provider}>
+              {provider}
+            </option>
+          ))}
+        </select>
+        {showValidation && formErrors.cloudProvider && (
+          <div className="error-message">{formErrors.cloudProvider}</div>
+        )}
+      </div>
+    </>
+              )
+            }
+            {
+              service.name === 'Subnet' && (
+                
+                       
+                      <div className="popup-selection">
+                        <label>Vpc:</label>
+                        <select
+                          value={selectedVPC}
+                          onChange={(e) => setSelectedVPC(e.target.value)}
+                          className={`${showValidation && formErrors.vpc ? 'error' : ''} ${
+                            shakingFields.includes('vpc') ? 'shake' : ''
+                          }`}
+                        >
+                          <option value="">-- Select Vpc --</option>
+                          {availableVPCs.map((vpc) => (
+                            <option key={vpc._id} value={vpc._id}>
+                              {vpc.name}
+                            </option>
+                          ))}
+                        </select>
+                        {showValidation && formErrors.vpc && (
+                          <div className="error-message">{formErrors.vpc}</div>
+                        )}
+                      </div>
+              )
+            }
+                {
+                  service.name !== 'Object Storage' && service.name !== 'Vpc' && service.name !== 'Subnet' && (
+                    
+                      <div className="popup-selection">
+                        <label>Subnet:</label>
+                        <select
+                          value={selectedSubnet}
+                          onChange={(e) => setSelectedSubnet(e.target.value)}
+                          className={`${showValidation && formErrors.subnet ? 'error' : ''} ${
+                            shakingFields.includes('subnet') ? 'shake' : ''
+                          }`}
+                        >
+                          <option value="">-- Select Subnet --</option>
+                          {availableSubnets.map((subnet) => (
+                            <option key={subnet._id} value={subnet._id}>
+                              {subnet.name}
+                            </option>
+                          ))}
+                        </select>
+                        {showValidation && formErrors.subnet && (
+                          <div className="error-message">{formErrors.subnet}</div>
+                        )}
+                      </div>
+                    
+                  )
+                }
 
+                {
+                  service.name !== 'Vpc' && service.name !== 'Subnet' && (
+                    <MultipleSelectChip
+  availableSource={availableSource}
+  selectedConnections={selectedConnections}
+  setSelectedConnections={setSelectedConnections}
+/>
+                  )
+                }
             {service.name === 'Virtual Machine' && (
+              
               <>
                 <div className="popup-selection">
                   <label>Instance Type:</label>
@@ -520,15 +751,38 @@ export default function ServicePopup({
                 </div>
               </>
             )}
+            {
+  (service.name === 'Vpc' || service.name === 'Subnet') && (
+    <>
+      <div className="popup-selection">
+        <label>Region:</label>
+        <select
+          value={selectedRegion}
+          onChange={(e) => setSelectedRegion(e.target.value)}
+          className={`${showValidation && formErrors.region ? 'error' : ''} ${
+            shakingFields.includes('region') ? 'shake' : ''
+          }`}
+        >
+          <option value="">-- Select Region --</option>
+          {getAllAvailableLocations().map((loc) => (
+            <option key={loc} value={loc}>
+              {loc}
+            </option>
+          ))}
+        </select>
+        {showValidation && formErrors.region && (
+          <div className="error-message">{formErrors.region}</div>
+        )}
+      </div>
+    </>
+  )
+}
 
             <div className="popup-actions">
-              <button onClick={handleNext} className="button primary">
-                Next
-              </button>
-
-              <button className="button secondary" onClick={onCancel}>
+              <Button onClick={handleNext}>{service.name == 'Vpc' || service.name == 'Subnet' ? 'Submit' : 'next'}</Button>
+              <Button variant='destructive' onClick={onCancel}>
                 Cancel
-              </button>
+              </Button>
             </div>
           </motion.div>
         ) : (

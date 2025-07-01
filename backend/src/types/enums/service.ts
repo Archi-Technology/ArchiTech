@@ -1,12 +1,14 @@
+
+
 export enum ServiceType  {
     VPC = "Vpc",
     SUBNET = 'Subnet',
     LB = 'LoadBalancer',
     VM = 'VirtualMachine',
-    DATABASES = 'databases',
+    DATABASE = 'Database',
     OBJECT_STORAGE = 'ObjectStorage'
-}
-
+  }
+  
 export enum CloudProvider {    
     GCP = 'GCP',
     AZURE = 'AZURE',
@@ -20,6 +22,6 @@ interface IBaseService {
     type: ServiceType;
     parentId: string;
     cloudProvider: CloudProvider;
-    connnectedTo: string[];
+    connectedTo: string[];
     extraData: JSON;
 }

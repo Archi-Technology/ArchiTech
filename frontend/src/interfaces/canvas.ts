@@ -1,11 +1,4 @@
-export enum ServiceType  {
-    VPC = "VPC",
-    Subnet = 'Subnet',
-    LB = 'LoadBalancer',
-    VM = 'VirtualMachine',
-    Databases = 'databases',
-    OBJECT_STORAGE = 'ObjectStorage'
-}
+import { ServiceType } from "../components/service-popup";
 
 export enum CloudProvider {    
     GCP = 'GCP',
@@ -24,7 +17,7 @@ export interface IBaseService {
     type: ServiceType;
     parentId: string | null;
     cloudProvider: CloudProvider;
-    connnectedTo: string[];
+    connectedTo: string[];
     extraData: JSON | null;
     price?: number | null;
 }

@@ -6,9 +6,9 @@ export interface IResource extends Document {
   name: string;
   type: ServiceType;
   parentId: Types.ObjectId | null;
-  connnectedTo: string[];
+  connectedTo: string[];
   cloudProvider: CloudProvider;
-  extraData: JSON;
+  extraData: any;
 }
 
 
@@ -19,7 +19,7 @@ const RosourceSchema = new Schema<IResource>(
         name: { type: String, required: true },
         parentId: { type:  Schema.Types.ObjectId, ref: 'Project', null: true },
         cloudProvider: { type: String, required: true },
-        connnectedTo: { type: [String], required: true },
+        connectedTo: { type: [String], required: true },
         extraData: { type: Schema.Types.Mixed, required: true },
       }
     

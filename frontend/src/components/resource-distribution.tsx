@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -7,17 +8,33 @@ import {
   useTheme,
   LinearProgress,
 } from "@mui/material";
-import { Database, Server, Zap, Shield } from "lucide-react";
+import { Database, Server, Zap } from "lucide-react";
+import { getTypeDistribution } from "../services/dashboardService";
 
-const resources = [
-  { name: "Storage", value: 45, icon: Database, color: "#0070F3" },
-  { name: "Compute", value: 30, icon: Server, color: "#7928CA" },
-  { name: "Network", value: 15, icon: Zap, color: "#00C7B7" },
-  { name: "Security", value: 10, icon: Shield, color: "#009688" },
-];
-
-export function ResourceDistribution() {
+export function ResourceDistribution({ projectId }: { projectId: string }) {
   const theme = useTheme();
+  const [distribution, setDistribution] = useState({
+    Storage: 0,
+    Compute: 0,
+    Network: 0,
+  });
+
+  useEffect(() => {
+    if (!projectId) return;
+    getTypeDistribution(projectId).then((data) => {
+      setDistribution({
+        Storage: data.storage ?? 0,
+        Compute: data.compute ?? 0,
+        Network: data.network ?? 0,
+      });
+    });
+  }, [projectId]);
+
+  const resources = [
+    { name: "Storage", value: distribution.Storage, icon: Database, color: "#0070F3" },
+    { name: "Compute", value: distribution.Compute, icon: Server, color: "#7928CA" },
+    { name: "Network", value: distribution.Network, icon: Zap, color: "#00C7B7" },
+  ];
 
   return (
     <Card

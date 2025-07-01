@@ -29,6 +29,23 @@ class ProjectController {
       res.status(400).json({ message: error.message });
     }
   }
+  async getProjectSubnets(req: Request, res: Response) {
+    try {
+      const data = await this.service.getSubnetsBYProject(req.params.id);
+      res.json(data);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
+  async getProjectVpcs(req: Request, res: Response) {
+    try {
+      const data = await this.service.getVpcsByProject(req.params.id);
+      res.json(data);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
 
   async create(req: Request, res: Response) {
     try {

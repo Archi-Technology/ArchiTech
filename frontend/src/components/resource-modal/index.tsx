@@ -11,6 +11,7 @@ import { ResourceTabs } from './tabs/resource-tabs';
 import { SuggestionSection } from './suggestion-section';
 import { ModalActions } from './modal-actions';
 import './index.scss';
+import { CloudProvider } from '../../interfaces/canvas';
 
 export default function ResourceModal({
   isOpen,
@@ -22,7 +23,7 @@ export default function ResourceModal({
 }: {
   isOpen: boolean
   onClose: () => void
-  onConfirm: (selectedCloud: string, pricing: any) => void
+  onConfirm: (selectedCloud: CloudProvider, pricing: any) => void
   selectedResourceName: string
   onResourceChange?: (name: string) => void
   resourceParams?: Record<string, any>
@@ -219,9 +220,9 @@ export default function ResourceModal({
               onConfirm={() => {
                 if (selectedResource !== null) {
                   const selectedResourceDetails = resources.find((resource) => resource.id === selectedResource);
-                  const selectedCloud = selectedResourceDetails?.provider || "unknown";
-
-                  onConfirm(selectedCloud, '10$'); // Pass the selected cloud provider
+                  const selectedCloud = (selectedResourceDetails?.provider || CloudProvider.AWS).toLocaleUpperCase() as CloudProvider;
+                  const price = selectedResourceName == 'Object Storage' ? selectedResourceDetails?.pricePerGbPerMonth || 0.1 : selectedResourceDetails?.pricePerHour || 0.1; 
+                  onConfirm(selectedCloud, price); // Pass the selected cloud provider
                   document.dispatchEvent(new Event("closeParentModal")); // Trigger parent modal close
                 }
               }}

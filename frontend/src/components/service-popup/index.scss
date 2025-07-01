@@ -76,8 +76,9 @@
 }
 
 .popup-selection {
-  margin: 1rem 0;
+  margin: 0.5rem 0;
   text-align: left;
+  position: relative;
 }
 
 .popup-selection label {
@@ -87,7 +88,7 @@
   color: #374151;
 }
 
-.popup-selection select {
+.popup-selection select, input[type="text"] {
   width: 100%;
   padding: 0.5rem;
   border: 1px solid #e2e8f0;
@@ -95,11 +96,36 @@
   font-size: 0.875rem;
   margin-bottom: 1rem; /* Added margin for spacing */
   text-align: center; /* Center text in select dropdowns */
+  appearance: none;
+}
+
+.popup-selection select[multiple] {
+  height: auto;
+  min-height: 100px; /* Adjust height for better usability */
+  overflow-y: auto;
 }
 
 .popup-selection select:focus {
   outline: none;
   border-color: #3b82f6;
+}
+
+.popup-selection input[type="text"]:focus {
+  outline: none;
+  box-shadow: none;
+  border-color: #3b82f6;
+}
+
+
+.custom-multiselect-arrow {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.25rem;
+  color: #374151; // Match your select arrow color
+  pointer-events: none; // So the whole field is clickable
+  user-select: none;
 }
 
 .popup-recommendation {
