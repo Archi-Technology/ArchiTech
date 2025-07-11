@@ -1,6 +1,6 @@
 import { ServiceType } from '../components/service-popup';
 import { CloudProvider } from '../interfaces/canvas';
-import {AxiosInstence} from './axios/AxiosInstance';
+import apiService from './axios/AxiosInstance';
 
 // Fetch project ID from session storage
 export interface IResource {
@@ -15,7 +15,7 @@ export interface IResource {
 
 export const createResource = async (data: IResource) => {
     try {
-        const response = await AxiosInstence.post('/resource/create', {
+        const response = await apiService.apiClient.post('/resource/create', {
             ...data
           });
           return response.data;
@@ -28,7 +28,7 @@ export const createResource = async (data: IResource) => {
 
 export const generateTerraform = async (resourceId: string) => {
     try {
-        const response = await AxiosInstence.post('/terraform', {
+        const response = await apiService.apiClient.post('/terraform', {
             resourceId: resourceId
           });
           console.log('generated terraform', response)
