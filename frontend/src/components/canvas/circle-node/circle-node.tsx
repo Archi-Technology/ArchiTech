@@ -13,7 +13,6 @@ const CircleNode = ({ data }: NodeProps) => {
           {imageSrc && <img src={imageSrc} alt="node" className="circle-image" />}
         </div>
         <div className="circle-label">{label}</div>
-        {price && <div className="circle-price" style={{ color: 'green' }}>${price}</div>}
         <Handle type="source" position={Position.Bottom} />
       </div>
     );
