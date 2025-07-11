@@ -10,7 +10,7 @@ export const getAllProjects = async () => {
 };
 
 export const getProjectResources = async (projectId: string) => { // Fetch project ID from session storage
-    const response:IProjectArtchitecture = await AxiosInstence.get(`/projects/artchitecture/${projectId}`,);
+    const response:IProjectArtchitecture = await apiService.apiClient.get(`/projects/artchitecture/${projectId}`,);
   return response.data;
 };
 
