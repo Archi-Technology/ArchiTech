@@ -32,7 +32,7 @@ export const createSubnet = async (name: string, vpc: string, cloud: string, cid
 
 export const fetchProjectData = async () => {
   const projectId = sessionStorage.getItem('selectedProjectId'); // Fetch project ID from session storage
-  const response:IProjectArtchitecture = await AxiosInstence.get(`/projects/artchitecture/${projectId}`,);
+  const response:IProjectArtchitecture = await apiService.apiClient.get(`/projects/artchitecture/${projectId}`,);
   // let response: IProjectArtchitecture;
   // response = {
   //   data: [
