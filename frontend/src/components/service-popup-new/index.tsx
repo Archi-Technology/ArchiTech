@@ -798,7 +798,7 @@ export default function ServicePopupNew({
               <Button className='cancel' variant='outline' onClick={onCancel}>
                 Cancel
               </Button>
-              <Button className='next' onClick={handleNext}>{service.name == 'Vpc' || service.name == 'Subnet' ? 'Submit' : 'next'}</Button>
+              <Button className='next' onClick={handleNext}>{service.name == 'Vpc' || service.name == 'Subnet' ? 'Submit' : 'Next'}</Button>
             </div>
           </motion.div>
         ) : (
